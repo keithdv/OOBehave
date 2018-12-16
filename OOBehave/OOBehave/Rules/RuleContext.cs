@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace OOBehave.Rules
-{
+//namespace OOBehave.Rules
+//{
 
-    public interface IRuleContext
-    {
-        IReadOnlyDictionary<IRegisteredProperty, object> InputPropertyValues { get; }
-    }
+//    public interface IRuleContext
+//    {
+//        IReadOnlyDictionary<IRegisteredProperty, object> InputPropertyValues { get; }
+//    }
 
-    public class RuleContext : IRuleContext
-    {
+//    public class RuleContext : IRuleContext
+//    {
 
-        public IReadOnlyDictionary<IRegisteredProperty, object> InputPropertyValues { get; set; }
+//        public IReadOnlyDictionary<IRegisteredProperty, object> InputPropertyValues { get; set; }
 
-    }
-}
+//    }
+//}

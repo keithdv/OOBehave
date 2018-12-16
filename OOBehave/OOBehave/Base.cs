@@ -1,5 +1,6 @@
 ﻿using OOBehave.Core;
 using System;
+using System.ComponentModel;
 
 namespace OOBehave
 {
@@ -20,6 +21,7 @@ namespace OOBehave
 
         protected readonly IRegisteredPropertyDataManager<T> FieldDataManager;
 
+
         public Base(IBaseServices<T> services)
         {
             FieldDataManager = services.RegisteredPropertyDataManager;
@@ -39,23 +41,16 @@ namespace OOBehave
             return RegisteredPropertyManager.RegisterProperty<T, P>(name);
         }
 
-
-
-        protected P ReadProperty<P>(IRegisteredProperty<P> registeredProperty)
+        protected P ReadProperty<P>(IRegisteredProperty<P> property)
         {
-            return FieldDataManager.Read(registeredProperty);
+            return FieldDataManager.Read(property);
         }
 
-        protected void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        protected void LoadProperty<P>(IRegisteredProperty<P> property, P value)
         {
-            FieldDataManager.Load(registeredProperty, value);
+            FieldDataManager.Load(property, value);
         }
-
-
-        
 
     }
-
-
 
 }

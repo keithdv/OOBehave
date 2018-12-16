@@ -14,8 +14,9 @@ namespace OOBehave.Core
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
         IBaseServices<T> CreateBaseServices<T>();
         IValidateBaseServices<T> CreateValidateBaseServices<T>();
-        IRegisteredRuleList CreateRegisteredRuleList(IEnumerable<IRule> rules);
-        IRuleList CreateRuleList();
+        IRegisteredRuleList<T> CreateRegisteredRuleList<T>(IEnumerable<IRule<T>> rules);
+        IRuleList<T> CreateRuleList<T>();
+        IRuleExecute<T> CreateRuleExecute<T>(T target, IReadOnlyCollection<IRule<T>> rules);
     }
     public class Factory : IFactory
     {
@@ -93,16 +94,21 @@ namespace OOBehave.Core
             return new EditableBaseServices<T>(new RegisteredPropertyValidateDataManager<T>(RegisteredPropertyManager), RuleManager);
         }
 
-        public IRegisteredRuleList CreateRegisteredRuleList(IEnumerable<IRule> rules)
+        public IRegisteredRuleList<T> CreateRegisteredRuleList<T>(IEnumerable<IRule<T>> rules)
         {
-            var list = new RegisteredRuleList();
+            var list = new RegisteredRuleList<T>();
             foreach (var r in rules) { list.Add(r); }
             return list;
         }
 
-        public IRuleList CreateRuleList()
+        public IRuleList<T> CreateRuleList<T>()
         {
-            return new RuleList();
+            return new RuleList<T>();
+        }
+
+        public IRuleExecute<T> CreateRuleExecute<T>(T target, IReadOnlyCollection<IRule<T>> rules)
+        {
+            return new RuleExecute<T>(target, rules);
         }
     }
 }

@@ -9,36 +9,33 @@ namespace OOBehave.Rules
 
     public interface IRule
     {
-        Task<IRuleResult> Execute(IRuleContext context);
+        uint UniqueIndex { get; }
 
-        IReadOnlyList<IRegisteredProperty> InputProperties { get; }
     }
 
-    public abstract class Rule : IRule
+    public interface IRule<T> : IRule
     {
-        public Rule(IRegisteredProperty inputProperty)
+        Task<RuleResult> Execute(T target);
+    }
+
+    public abstract class Rule<T> : IRule<T>
+    {
+
+        private static uint indexer = 0;
+
+        protected Rule()
         {
-            InputProperties = new List<IRegisteredProperty>() { inputProperty }.AsReadOnly();
+            UniqueIndex = indexer;
+            indexer++;
         }
 
-        public Rule(ValueTuple<IRegisteredProperty, IRegisteredProperty> inputProperties)
-        {
-            this.InputProperties = new List<IRegisteredProperty>() { inputProperties.Item1, inputProperties.Item2 }.AsReadOnly();
-        }
 
-        public Rule(ValueTuple<IRegisteredProperty, IRegisteredProperty, IRegisteredProperty> inputProperties)
-        {
-            this.InputProperties = new List<IRegisteredProperty>() { inputProperties.Item1, inputProperties.Item2, inputProperties.Item3 }.AsReadOnly();
-        }
+        public uint UniqueIndex { get; }
 
-        public Rule(IEnumerable<IRegisteredProperty> inputProperties)
-        {
-            this.InputProperties = inputProperties.ToList().AsReadOnly();
-        }
+        // TODO - Pass Cancellation Token and Cancel if we reach this 
+        // rule again and it is currently running
 
-        public IReadOnlyList<IRegisteredProperty> InputProperties { get; }
-
-        public abstract Task<IRuleResult> Execute(IRuleContext context);
+        public abstract Task<RuleResult> Execute(T target);
 
     }
 }

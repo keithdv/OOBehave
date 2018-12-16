@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using OOBehave.Rules;
 
-namespace OOBehave.UnitTest.Validate
+namespace OOBehave.UnitTest.ValidateAsyncRules
 {
-    public class Validate : ValidateBase<Validate>
+    public class ValidateAsyncRules : ValidateBase<ValidateAsyncRules>
     {
 
-        public Validate(IValidateBaseServices<Validate> services) : base(services) { }
+        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services) { }
 
         public static IRegisteredProperty<string> FirstNameProperty = RegisterProperty<string>(nameof(FirstName));
 
@@ -55,10 +55,10 @@ namespace OOBehave.UnitTest.Validate
 
 
 
-        protected override void RegisterRules(IRuleList<Validate> rules)
+        protected override void RegisterRules(IRuleList<ValidateAsyncRules> rules)
         {
-            rules.AddRule(new NameCascadeRule());
-            rules.AddRule(new TitleCascadeRule());
+            rules.AddRule(new NameCascadeAsyncRule());
+            rules.AddRule(new TitleCascadeAsyncRule());
         }
 
     }

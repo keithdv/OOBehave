@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -6,12 +7,17 @@ using System.Text;
 namespace OOBehave.Rules
 {
 
-    public interface IRegisteredRuleList : IReadOnlyCollection<IRule>
+    public interface IRegisteredRuleList : IList
     {
 
     }
 
-    public class RegisteredRuleList : ConcurrentBag<IRule>, IRegisteredRuleList
+    public interface IRegisteredRuleList<T> : IList<IRule<T>>, IRegisteredRuleList
+    {
+
+    }
+
+    public class RegisteredRuleList<T> : List<IRule<T>>, IRegisteredRuleList<T>
     {
 
 
