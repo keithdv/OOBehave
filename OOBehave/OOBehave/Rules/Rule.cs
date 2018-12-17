@@ -15,7 +15,7 @@ namespace OOBehave.Rules
 
     public interface IRule<T> : IRule
     {
-        Task<RuleResult> Execute(T target);
+        Task<IRuleResult> Execute(T target);
     }
 
     public abstract class Rule<T> : IRule<T>
@@ -35,7 +35,7 @@ namespace OOBehave.Rules
         // TODO - Pass Cancellation Token and Cancel if we reach this 
         // rule again and it is currently running
 
-        public abstract Task<RuleResult> Execute(T target);
+        public abstract Task<IRuleResult> Execute(T target);
 
     }
 }

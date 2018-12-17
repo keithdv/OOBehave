@@ -17,18 +17,19 @@ namespace OOBehave.Rules
         void CheckRulesForProperty<P>(IRegisteredProperty<P> property);
 
         Task WaitForRules { get; }
+
+        bool IsValid { get; }
     }
 
     public class RuleExecute<T> : IRuleExecute<T>
     {
 
         protected T Target { get; }
-        protected IDictionary<uint, IRuleResult> Results { get; }
+        protected IDictionary<uint, IRuleResult> Results { get; } = new ConcurrentDictionary<uint, IRuleResult>();
 
         public RuleExecute(T target, IReadOnlyCollection<IRule<T>> rules)
         {
             this.Rules = rules;
-            this.Results = new ConcurrentDictionary<uint, IRuleResult>();
             this.Target = target;
         }
 
@@ -40,43 +41,99 @@ namespace OOBehave.Rules
 
         public void CheckRulesForProperty<P>(IRegisteredProperty<P> property)
         {
-            System.Diagnostics.Debug.WriteLine($"Enqueue {property.Name}");
-            propertyQueue.Enqueue(property);
+            if (!propertyQueue.Contains(property))
+            {
+                System.Diagnostics.Debug.WriteLine($"Enqueue {property.Name}");
+                propertyQueue.Enqueue(property);
+            }
+
             CheckRulesQueue();
         }
 
+        public bool IsValid
+        {
+            get { return !Results.Values.Where(r => r.IsError).Any(); }
+        }
+
         public Task WaitForRules { get; private set; } = Task.CompletedTask;
-        public TaskCompletionSource<object> waitForRulesSource;
+        private TaskCompletionSource<object> waitForRulesSource;
+
+        private bool isRunningRules = false;
 
         public void CheckRulesQueue()
         {
-            if (propertyQueue.TryDequeue(out var property))
+            // DISCUSS : Runes the rules sequentially - even Async Rules
+            // Make async rules changing properties a non-issue
+
+            void ResetWaitForRules()
             {
                 if (WaitForRules.IsCompleted)
                 {
                     waitForRulesSource = new TaskCompletionSource<object>();
                     WaitForRules = waitForRulesSource.Task;
                 }
-
-                System.Diagnostics.Debug.WriteLine($"Dequeue {property.Name}");
-
-                var runningRuleTask = RunCascadeRulesRecursive(property)
-                    .ContinueWith(x =>
-                    {
-                        System.Diagnostics.Debug.WriteLine($"ContinueWith {property.Name}");
-
-                        // Only matters if there is an async fork withing the rules
-                        CheckRulesQueue();
-                    });
-
-                System.Diagnostics.Debug.WriteLine($"Rules done for {property.Name}");
-
             }
-            else
+
+            void CompleteWaitForRules()
             {
-                if (!WaitForRules.IsCompleted)
+                if (propertyQueue.Any())
+                {
+                    CheckRulesQueue();
+                }
+                else if (!WaitForRules.IsCompleted)
                 {
                     waitForRulesSource.SetResult(new object());
+                }
+            }
+
+            if (!isRunningRules)
+            {
+                while (propertyQueue.TryDequeue(out var property))
+                {
+                    isRunningRules = true;
+
+                    System.Diagnostics.Debug.WriteLine($"Dequeue {property.Name}");
+
+                    var cascadeRuleTask = RunCascadeRulesRecursive(property);
+
+                    if (!cascadeRuleTask.IsCompleted)
+                    {
+                        ResetWaitForRules();
+
+                        cascadeRuleTask.ContinueWith(x =>
+                        {
+                            isRunningRules = false;
+                            CheckRulesQueue();
+                        });
+
+                        return; // Let the ContinueWith call CheckRulesQueue again
+                    }
+                    else
+                    {
+                        isRunningRules = false;
+                    }
+                }
+
+                isRunningRules = true;
+
+                var targetRuleTask = RunTargetRulesSequential();
+
+                if (!targetRuleTask.IsCompleted)
+                {
+                    ResetWaitForRules();
+
+                    targetRuleTask.ContinueWith(x =>
+                    {
+                        isRunningRules = false;
+                        CompleteWaitForRules();
+                    });
+
+                    return;
+                }
+                else
+                {
+                    isRunningRules = false;
+                    CompleteWaitForRules();
                 }
             }
         }
@@ -86,10 +143,31 @@ namespace OOBehave.Rules
             foreach (var r in Rules.OfType<ICascadeRule<T>>().Where(r => r.TriggerProperties.Contains(property)).ToList())
             {
                 // TODO - Wrap with a Try/Catch
-                var result = await r.Execute(Target);
+                Results[r.UniqueIndex] = await r.Execute(Target);
                 // Todo - Deal with result
             }
-
         }
+
+        private async Task RunTargetRulesSequential()
+        {
+            foreach (var r in Rules.OfType<ITargetRule<T>>().ToList())
+            {
+                // TODO - Wrap with a Try/Catch
+                Results[r.UniqueIndex] = await r.Execute(Target);
+                // Todo - Deal with result
+            }
+        }
+    }
+
+
+    [Serializable]
+    public class TargetRulePropertyChangeException : Exception
+    {
+        public TargetRulePropertyChangeException() { }
+        public TargetRulePropertyChangeException(string message) : base(message) { }
+        public TargetRulePropertyChangeException(string message, Exception inner) : base(message, inner) { }
+        protected TargetRulePropertyChangeException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

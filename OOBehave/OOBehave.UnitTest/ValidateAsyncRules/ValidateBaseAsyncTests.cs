@@ -10,7 +10,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 {
 
     [TestClass]
-    public class ValidateAsyncRulesBaseTests
+    public class ValidateBaseAsyncRulesTests
     {
 
 
@@ -47,13 +47,14 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
         public void ValidateAsyncRules_RulesCreated()
         {
             Assert.IsTrue(Core.Factory.StaticFactory.RuleManager.RegisteredRules.ContainsKey(typeof(ValidateAsyncRules)));
-            Assert.AreEqual(2, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)].Count);
-            Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).First(), typeof(NameCascadeAsyncRule));
-            Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Last(), typeof(TitleCascadeAsyncRule));
+            Assert.AreEqual(3, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)].Count);
+            Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).First(), typeof(ShortNameCascadeAsyncRule));
+            Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Take(2).Last(), typeof(FullNameCascadeAsyncRule));
+            Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Take(3).Last(), typeof(FirstNameTargetAsyncRule));
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_NameCascadeRule()
+        public async Task ValidateAsyncRules_CascadeRule_ShortName()
         {
 
             validate.FirstName = "John";
@@ -68,7 +69,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_TitleCascadeRule()
+        public async Task ValidateAsyncRules_CascadeRule_FullName()
         {
 
             validate.Title = "Mr.";

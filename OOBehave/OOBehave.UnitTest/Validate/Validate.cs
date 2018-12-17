@@ -52,13 +52,11 @@ namespace OOBehave.UnitTest.Validate
             set { SetProperty(FullNameProperty, value); }
         }
 
-
-
-
         protected override void RegisterRules(IRuleList<Validate> rules)
         {
-            rules.AddRule(new NameCascadeRule());
-            rules.AddRule(new TitleCascadeRule());
+            rules.AddRule(new ShortNameCascadeRule());
+            rules.AddRule(new FullNameCascadeRule());
+            rules.AddRule(new FirstNameTargetRule());
         }
 
     }

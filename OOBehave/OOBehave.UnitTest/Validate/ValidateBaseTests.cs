@@ -46,9 +46,10 @@ namespace OOBehave.UnitTest.Validate
         public void Validate_RulesCreated()
         {
             Assert.IsTrue(Core.Factory.StaticFactory.RuleManager.RegisteredRules.ContainsKey(typeof(Validate)));
-            Assert.AreEqual(2, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)].Count);
-            Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).First(), typeof(NameCascadeRule));
-            Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Last(), typeof(TitleCascadeRule));
+            Assert.AreEqual(3, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)].Count);
+            Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).First(), typeof(ShortNameCascadeRule));
+            Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Take(2).Last(), typeof(FullNameCascadeRule));
+            Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Take(3).Last(), typeof(FirstNameTargetRule));
         }
 
         [TestMethod]
@@ -63,7 +64,7 @@ namespace OOBehave.UnitTest.Validate
         }
 
         [TestMethod]
-        public void Validate_TitleCascadeRule()
+        public void Validate_CascadeRule_FullName()
         {
 
             validate.Title = "Mr.";
@@ -73,6 +74,62 @@ namespace OOBehave.UnitTest.Validate
             Assert.AreEqual("John Smith", validate.ShortName);
             Assert.AreEqual("Mr. John Smith", validate.FullName);
 
+        }
+
+        [TestMethod]
+        public void Validate_CascadeRule_IsValid_True()
+        {
+            validate.Title = "Mr.";
+            validate.FirstName = "John";
+            validate.LastName = "Smith";
+
+            Assert.IsTrue(validate.IsValid);
+        }
+
+        [TestMethod]
+        public void Validate_CascadeRule_IsValid_False()
+        {
+            validate.LastName = "Smith";
+            validate.FirstName = "Error";
+
+            Assert.IsFalse(validate.IsValid);
+        }
+
+        [TestMethod]
+        public void Validate_CascadeRule_IsValid_False_Fixed()
+        {
+            validate.LastName = "Smith";
+            validate.FirstName = "Error";
+
+            Assert.IsFalse(validate.IsValid);
+
+            validate.FirstName = "John";
+
+            Assert.IsTrue(validate.IsValid);
+        }
+
+        [TestMethod]
+        public void Validate_TargetRule_IsValid_False()
+        {
+
+            validate.FirstName = "Error";
+            validate.LastName = "Smith";
+            validate.Title = "Mr.";
+
+            Assert.IsFalse(validate.IsValid);
+        }
+
+        [TestMethod]
+        public void Validate_TargetRule_IsValid_False_Fixed()
+        {
+            validate.LastName = "Smith";
+            validate.FirstName = "Error";
+
+            Assert.IsFalse(validate.IsValid);
+
+            validate.FirstName = "John";
+
+            Assert.IsTrue(validate.IsValid);
         }
     }
 }

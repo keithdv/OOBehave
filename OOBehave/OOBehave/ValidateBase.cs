@@ -44,7 +44,7 @@ namespace OOBehave
             // Default - No Rules
         }
 
-        public bool IsValid => throw new NotImplementedException();
+        public bool IsValid => RuleExecute.IsValid;
 
         public bool IsSelfValid => throw new NotImplementedException();
 

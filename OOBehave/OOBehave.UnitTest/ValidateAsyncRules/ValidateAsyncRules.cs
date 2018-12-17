@@ -57,8 +57,9 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 
         protected override void RegisterRules(IRuleList<ValidateAsyncRules> rules)
         {
-            rules.AddRule(new NameCascadeAsyncRule());
-            rules.AddRule(new TitleCascadeAsyncRule());
+            rules.AddRule(new ShortNameCascadeAsyncRule());
+            rules.AddRule(new FullNameCascadeAsyncRule());
+            rules.AddRule(new FirstNameTargetAsyncRule());
         }
 
     }
