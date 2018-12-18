@@ -23,10 +23,6 @@ namespace OOBehave
         {
         }
 
-        protected void SetRegisteredProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
-        {
-            FieldDataManager.Load(registeredProperty, value);
-        }
 
     }
 

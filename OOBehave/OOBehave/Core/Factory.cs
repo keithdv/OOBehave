@@ -10,7 +10,6 @@ namespace OOBehave.Core
     {
         IRegisteredPropertyManager RegisteredPropertyManager { get; }
         IRegisteredRuleManager RuleManager { get; }
-        IRegisteredPropertyDictionary CreateRegisteredPropertyDictionary();
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
         IBaseServices<T> CreateBaseServices<T>();
         IValidateBaseServices<T> CreateValidateBaseServices<T>();
@@ -72,11 +71,6 @@ namespace OOBehave.Core
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
         {
             return new RegisteredProperty<T>(name);
-        }
-
-        public IRegisteredPropertyDictionary CreateRegisteredPropertyDictionary()
-        {
-            return new RegisteredPropertyDictionary();
         }
 
         public IBaseServices<T> CreateBaseServices<T>()

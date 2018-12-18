@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Concurrent;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace OOBehave.Core
-{
+//namespace OOBehave.Core
+//{
 
-    public delegate IRegisteredPropertyDictionary CreateRegisteredPropertyDictionary();
+//    public delegate IRegisteredPropertyDictionary CreateRegisteredPropertyDictionary();
 
-    public class RegisteredPropertyDictionary : ConcurrentDictionary<string, IRegisteredProperty>, IRegisteredPropertyDictionary
-    {
+//    public class RegisteredPropertyDictionary : ConcurrentDictionary<string, IRegisteredProperty>, IRegisteredPropertyDictionary
+//    {
 
 
 
-    }
-}
+//    }
+//}

@@ -11,7 +11,7 @@ namespace OOBehave.Rules
     {
         bool IsError { get; }
 
-        IDictionary<IRegisteredProperty, string> PropertyErrorMessages { get; }
+        IDictionary<string, string> PropertyErrorMessages { get; }
 
         IList<string> TargetErrorMessages { get; }
 
@@ -20,7 +20,7 @@ namespace OOBehave.Rules
     public class RuleResult : IRuleResult
     {
 
-        public IDictionary<IRegisteredProperty, string> PropertyErrorMessages { get; } = new Dictionary<IRegisteredProperty, string>();
+        public IDictionary<string, string> PropertyErrorMessages { get; } = new Dictionary<string, string>();
 
         public IList<string> TargetErrorMessages { get; } = new List<string>();
 
@@ -31,10 +31,10 @@ namespace OOBehave.Rules
             return (IRuleResult)new RuleResult();
         }
 
-        public static IRuleResult PropertyError(IRegisteredProperty property, string message)
+        public static IRuleResult PropertyError(string propertyName, string message)
         {
             var result = new RuleResult();
-            result.PropertyErrorMessages.Add(property, message);
+            result.PropertyErrorMessages.Add(propertyName, message);
             return (IRuleResult)result;
         }
 

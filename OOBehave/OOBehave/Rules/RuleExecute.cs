@@ -15,7 +15,7 @@ namespace OOBehave.Rules
 
         IReadOnlyList<IRuleResult> Results { get; }
 
-        void CheckRulesForProperty<P>(IRegisteredProperty<P> property);
+        void CheckRulesForProperty(string propertyName);
 
         Task WaitForRules { get; }
 
@@ -38,14 +38,14 @@ namespace OOBehave.Rules
 
         IReadOnlyList<IRuleResult> IRuleExecute<T>.Results => Results.Values.ToList().AsReadOnly();
 
-        private ConcurrentQueue<IRegisteredProperty> propertyQueue = new ConcurrentQueue<IRegisteredProperty>();
+        private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
 
-        public void CheckRulesForProperty<P>(IRegisteredProperty<P> property)
+        public void CheckRulesForProperty(string propertyName)
         {
-            if (!propertyQueue.Contains(property))
+            if (!propertyQueue.Contains(propertyName))
             {
-                System.Diagnostics.Debug.WriteLine($"Enqueue {property.Name}");
-                propertyQueue.Enqueue(property);
+                System.Diagnostics.Debug.WriteLine($"Enqueue {propertyName}");
+                propertyQueue.Enqueue(propertyName);
             }
 
             CheckRulesQueue();
@@ -107,12 +107,12 @@ namespace OOBehave.Rules
                 Start();
                 var token = cancellationTokenSource.Token; // Local stack copy important
 
-                while (propertyQueue.TryDequeue(out var property))
+                while (propertyQueue.TryDequeue(out var propertyName))
                 {
 
-                    System.Diagnostics.Debug.WriteLine($"Dequeue {property.Name}");
+                    System.Diagnostics.Debug.WriteLine($"Dequeue {propertyName}");
 
-                    var cascadeRuleTask = RunCascadeRulesRecursive(property, token);
+                    var cascadeRuleTask = RunCascadeRulesRecursive(propertyName, token);
 
                     if (!cascadeRuleTask.IsCompleted)
                     {
@@ -156,9 +156,9 @@ namespace OOBehave.Rules
 
 
 
-        private async Task RunCascadeRulesRecursive(IRegisteredProperty property, CancellationToken token)
+        private async Task RunCascadeRulesRecursive(string propertyName, CancellationToken token)
         {
-            foreach (var r in Rules.OfType<ICascadeRule<T>>().Where(r => r.TriggerProperties.Contains(property)).ToList())
+            foreach (var r in Rules.OfType<ICascadeRule<T>>().Where(r => r.TriggerProperties.Contains(propertyName)).ToList())
             {
                 // TODO - Wrap with a Try/Catch
                 var result = await r.Execute(Target, token);

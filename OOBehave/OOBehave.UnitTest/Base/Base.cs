@@ -9,12 +9,11 @@ namespace OOBehave.UnitTest.Base
 
         public Base(IBaseServices<Base> services) : base(services) { }
 
-        public static IRegisteredProperty<string> NameProperty = RegisterProperty<string>(nameof(Name));
 
         public string Name
         {
-            get { return ReadProperty(NameProperty); }
-            set { LoadProperty(NameProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { LoadProperty(value); }
         }
 
 

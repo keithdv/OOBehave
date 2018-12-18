@@ -10,46 +10,35 @@ namespace OOBehave.UnitTest.Validate
 
         public Validate(IValidateBaseServices<Validate> services) : base(services) { }
 
-        public static IRegisteredProperty<string> FirstNameProperty = RegisterProperty<string>(nameof(FirstName));
-
         public string FirstName
         {
-            get { return ReadProperty(FirstNameProperty); }
-            set { SetProperty(FirstNameProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { SetProperty(value); }
         }
-
-
-        public static IRegisteredProperty<string> LastNameProperty = RegisterProperty<string>(nameof(LastName));
 
         public string LastName
         {
-            get { return ReadProperty(LastNameProperty); }
-            set { SetProperty(LastNameProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { SetProperty(value); }
         }
 
-
-        public static IRegisteredProperty<string> ShortNameProperty = RegisterProperty<string>(nameof(ShortNameProperty));
 
         public string ShortName
         {
-            get { return ReadProperty(ShortNameProperty); }
-            set { SetProperty(ShortNameProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { SetProperty(value); }
         }
-
-        public static IRegisteredProperty<string> TitleProperty = RegisterProperty<string>(nameof(TitleProperty));
 
         public string Title
         {
-            get { return ReadProperty(TitleProperty); }
-            set { SetProperty(TitleProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { SetProperty(value); }
         }
-
-        public static IRegisteredProperty<string> FullNameProperty = RegisterProperty<string>(nameof(FullNameProperty));
 
         public string FullName
         {
-            get { return ReadProperty(FullNameProperty); }
-            set { SetProperty(FullNameProperty, value); }
+            get { return ReadProperty<string>(); }
+            set { SetProperty(value); }
         }
 
         protected override void RegisterRules(IRuleList<Validate> rules)

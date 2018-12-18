@@ -10,36 +10,26 @@ namespace OOBehave.Rules
     public interface ICascadeRule<T> : IRule<T>
     {
 
-        IReadOnlyList<IRegisteredProperty> TriggerProperties { get; }
+        IReadOnlyList<string> TriggerProperties { get; }
 
     }
 
     public abstract class CascadeAsyncRule<T> : Rule<T>, ICascadeRule<T>
     {
 
-        public CascadeAsyncRule(IRegisteredProperty triggerProperty) : base()
+        public CascadeAsyncRule() : base()
         {
-            TriggerProperties = new List<IRegisteredProperty>() { triggerProperty }.AsReadOnly();
+            TriggerProperties = new List<string>();
         }
 
-        public CascadeAsyncRule(IEnumerable<IRegisteredProperty> triggerProperties) : base()
-        {
-            this.TriggerProperties = triggerProperties.ToList().AsReadOnly();
-        }
-
-        public IReadOnlyList<IRegisteredProperty> TriggerProperties { get; }
-
+        IReadOnlyList<string> ICascadeRule<T>.TriggerProperties => TriggerProperties.AsReadOnly();
+        protected List<string> TriggerProperties { get; }
 
     }
 
     public abstract class CascadeRule<T> : CascadeAsyncRule<T>
     {
-        public CascadeRule(IRegisteredProperty triggerProperty) : base(triggerProperty)
-        {
-
-        }
-
-        public CascadeRule(IEnumerable<IRegisteredProperty> triggerProperties) : base(triggerProperties)
+        public CascadeRule() : base()
         {
 
         }

@@ -50,23 +50,23 @@ namespace OOBehave
 
         public bool IsChild => throw new NotImplementedException();
 
-        protected void SetProperty<P>(IRegisteredProperty<P> property, P value)
+        protected void SetProperty<P>(P value,[System.Runtime.CompilerServices.CallerMemberName]  string propertyName = "")
         {
-            LoadProperty(property, value);
-            PropertyHasChanged(property);
+            LoadProperty(value, propertyName);
+            PropertyHasChanged(propertyName);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void PropertyHasChanged<P>(IRegisteredProperty<P> property)
+        protected void PropertyHasChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.Name));
-            CheckRules(property);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            CheckRules(propertyName);
         }
 
-        protected virtual void CheckRules<P>(IRegisteredProperty<P> property)
+        protected virtual void CheckRules(string propertyName)
         {
-            RuleExecute.CheckRulesForProperty(property);
+            RuleExecute.CheckRulesForProperty(propertyName);
         }
 
         public virtual Task WaitForRules()

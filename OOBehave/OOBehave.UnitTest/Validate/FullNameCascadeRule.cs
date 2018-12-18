@@ -9,8 +9,11 @@ namespace OOBehave.UnitTest.Validate
     public class FullNameCascadeRule : CascadeRule<Validate>
     {
 
-        public FullNameCascadeRule() : base(new List<IRegisteredProperty> { Validate.TitleProperty, Validate.ShortNameProperty })
-        { }
+        public FullNameCascadeRule() : base()
+        {
+            TriggerProperties.Add(nameof(Validate.Title));
+            TriggerProperties.Add(nameof(Validate.ShortName));
+        }
 
         public override IRuleResult Execute(Validate target)
         {

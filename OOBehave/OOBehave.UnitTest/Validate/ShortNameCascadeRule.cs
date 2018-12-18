@@ -9,9 +9,10 @@ namespace OOBehave.UnitTest.Validate
     public class ShortNameCascadeRule : CascadeRule<Validate>
     {
 
-        public ShortNameCascadeRule() : base(new List<IRegisteredProperty> { Validate.FirstNameProperty, Validate.LastNameProperty })
+        public ShortNameCascadeRule() : base()
         {
-
+            TriggerProperties.Add(nameof(Validate.FirstName));
+            TriggerProperties.Add(nameof(Validate.LastName));
         }
 
         public override IRuleResult Execute(Validate target)
@@ -21,7 +22,7 @@ namespace OOBehave.UnitTest.Validate
 
             if(target.FirstName.StartsWith("Error"))
             {
-                return RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName);
+                return RuleResult.PropertyError(nameof(Validate.FirstName), target.FirstName);
             }
 
             target.ShortName = $"{target.FirstName} {target.LastName}";

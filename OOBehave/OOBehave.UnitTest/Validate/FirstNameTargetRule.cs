@@ -16,7 +16,7 @@ namespace OOBehave.UnitTest.Validate
 
             if (target.FirstName.StartsWith("Error"))
             {
-                return RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName);
+                return RuleResult.PropertyError(nameof(Validate.FirstName), target.FirstName);
             }
 
 

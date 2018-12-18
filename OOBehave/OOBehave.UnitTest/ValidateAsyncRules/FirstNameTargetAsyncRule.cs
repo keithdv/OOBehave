@@ -19,7 +19,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 
             if (target.FirstName?.StartsWith("Error") ?? false)
             {
-                return RuleResult.PropertyError(ValidateAsyncRules.FirstNameProperty, target.FirstName);
+                return RuleResult.PropertyError(nameof(ValidateAsyncRules.FirstName), target.FirstName);
             }
 
             return RuleResult.Empty();

@@ -10,9 +10,10 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
     public class ShortNameCascadeAsyncRule : CascadeAsyncRule<ValidateAsyncRules>
     {
 
-        public ShortNameCascadeAsyncRule() : base(new List<IRegisteredProperty> { ValidateAsyncRules.FirstNameProperty, ValidateAsyncRules.LastNameProperty })
+        public ShortNameCascadeAsyncRule() : base()
         {
-
+            TriggerProperties.Add(nameof(ValidateAsyncRules.FirstName));
+            TriggerProperties.Add(nameof(ValidateAsyncRules.LastName));
         }
 
         public override async Task<IRuleResult> Execute(ValidateAsyncRules target, CancellationToken token)
@@ -24,7 +25,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 
             if (target.FirstName.StartsWith("Error"))
             {
-                return RuleResult.PropertyError(ValidateAsyncRules.FirstNameProperty, target.FirstName);
+                return RuleResult.PropertyError(nameof(ValidateAsyncRules.FirstName), target.FirstName);
             }
 
             target.ShortName = $"{target.FirstName} {target.LastName}";

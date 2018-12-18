@@ -36,19 +36,14 @@ namespace OOBehave
             }
         }
 
-        protected static IRegisteredProperty<P> RegisterProperty<P>(string name)
+        protected P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            return RegisteredPropertyManager.RegisterProperty<T, P>(name);
+            return FieldDataManager.Read<P>(propertyName);
         }
 
-        protected P ReadProperty<P>(IRegisteredProperty<P> property)
+        protected void LoadProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            return FieldDataManager.Read(property);
-        }
-
-        protected void LoadProperty<P>(IRegisteredProperty<P> property, P value)
-        {
-            FieldDataManager.Load(property, value);
+            FieldDataManager.Load(propertyName, value);
         }
 
     }

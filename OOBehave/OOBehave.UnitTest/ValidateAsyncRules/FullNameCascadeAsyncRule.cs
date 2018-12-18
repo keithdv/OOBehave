@@ -10,8 +10,12 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
     public class FullNameCascadeAsyncRule : CascadeAsyncRule<ValidateAsyncRules>
     {
 
-        public FullNameCascadeAsyncRule() : base(new List<IRegisteredProperty> { ValidateAsyncRules.TitleProperty, ValidateAsyncRules.ShortNameProperty })
-        { }
+        public FullNameCascadeAsyncRule() : base()
+        {
+
+            TriggerProperties.Add(nameof(ValidateAsyncRules.Title));
+            TriggerProperties.Add(nameof(ValidateAsyncRules.ShortName));
+        }
 
         public override async Task<IRuleResult> Execute(ValidateAsyncRules target, CancellationToken token)
         {
