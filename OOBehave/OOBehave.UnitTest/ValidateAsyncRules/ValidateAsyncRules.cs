@@ -5,10 +5,15 @@ using OOBehave.Rules;
 
 namespace OOBehave.UnitTest.ValidateAsyncRules
 {
-    public class ValidateAsyncRules : ValidateBase<ValidateAsyncRules>
+    public class ValidateAsyncRules : ValidateBase<ValidateAsyncRules>, IValidate
     {
 
-        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services) { }
+        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services)
+        {
+            RuleExecute.AddRule(new ShortNameCascadeAsyncRule());
+            RuleExecute.AddRule(new FullNameCascadeAsyncRule());
+            RuleExecute.AddRule(new FirstNameTargetAsyncRule());
+        }
 
         public string FirstName
         {
@@ -39,16 +44,6 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
         {
             get { return ReadProperty<string>(); }
             set { SetProperty(value); }
-        }
-
-
-
-
-        protected override void RegisterRules(IRuleList<ValidateAsyncRules> rules)
-        {
-            rules.AddRule(new ShortNameCascadeAsyncRule());
-            rules.AddRule(new FullNameCascadeAsyncRule());
-            rules.AddRule(new FirstNameTargetAsyncRule());
         }
 
     }

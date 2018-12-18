@@ -18,6 +18,6 @@ namespace OOBehave
     public class EditableBaseServices<T> : ValidateBaseServices<T>, IEditableBaseServices<T>
     {
 
-        public EditableBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IRegisteredRuleManager ruleManager) : base(registeredPropertyManager, ruleManager) { }
+        public EditableBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory) { }
     }
 }

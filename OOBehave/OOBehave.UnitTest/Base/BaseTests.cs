@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Autofac;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace OOBehave.UnitTest.Base
         [TestInitialize]
         public void TestInitialize()
         {
-            single = new Base(Core.Factory.StaticFactory.CreateBaseServices<Base>());
+            single = AutofacContainer.GetLifetimeScope().Resolve<Base>();
         }
         [TestMethod]
         public void Base_Construct()

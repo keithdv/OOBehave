@@ -10,8 +10,10 @@ namespace OOBehave.Core
     public class RegisteredPropertyManager : IRegisteredPropertyManager
     {
 
-        public RegisteredPropertyManager()
+        private IFactory Factory { get; }
+        public RegisteredPropertyManager(IFactory factory)
         {
+            this.Factory = factory;
         }
 
         IDictionary<Type, IDictionary<string, IRegisteredProperty>> RegisteredProperties { get; } = new ConcurrentDictionary<Type, IDictionary<string, IRegisteredProperty>>();
@@ -32,7 +34,7 @@ namespace OOBehave.Core
 
             if (!keyValuePairs.TryGetValue(name, out var prop))
             {
-                prop = Core.Factory.StaticFactory.CreateRegisteredProperty<P>(name);
+                prop = Factory.CreateRegisteredProperty<P>(name);
                 keyValuePairs.Add(name, prop);
             }
 
