@@ -20,6 +20,9 @@ namespace OOBehave.Rules
         Task WaitForRules { get; }
 
         bool IsValid { get; }
+
+        void AddRule(IRule<T> rule);
+
     }
 
     public class RuleExecute<T> : IRuleExecute<T>
@@ -28,17 +31,23 @@ namespace OOBehave.Rules
         protected T Target { get; }
         protected IDictionary<uint, IRuleResult> Results { get; } = new ConcurrentDictionary<uint, IRuleResult>();
 
-        public RuleExecute(T target, IReadOnlyCollection<IRule<T>> rules)
+        public RuleExecute(T target)
         {
-            this.Rules = rules;
             this.Target = target;
         }
 
-        public IReadOnlyCollection<IRule<T>> Rules { get; }
+        IReadOnlyCollection<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
+
+        private List<IRule<T>> Rules { get; } = new List<IRule<T>>();
 
         IReadOnlyList<IRuleResult> IRuleExecute<T>.Results => Results.Values.ToList().AsReadOnly();
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
+
+        public void AddRule(IRule<T> rule)
+        {
+            Rules.Add(rule);
+        }
 
         public void CheckRulesForProperty(string propertyName)
         {

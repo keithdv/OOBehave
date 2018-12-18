@@ -27,15 +27,6 @@ namespace OOBehave
             FieldDataManager = services.RegisteredPropertyDataManager;
         }
 
-        // Static so this can't be mixed with DependencyInjection
-        public static IRegisteredPropertyManager RegisteredPropertyManager
-        {
-            get
-            {
-                return Core.Factory.StaticFactory.RegisteredPropertyManager;
-            }
-        }
-
         protected P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
             return FieldDataManager.Read<P>(propertyName);

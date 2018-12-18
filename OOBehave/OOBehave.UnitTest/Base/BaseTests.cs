@@ -13,7 +13,7 @@ namespace OOBehave.UnitTest.Base
         [TestInitialize]
         public void TestInitialize()
         {
-            single = new Base(Core.Factory.StaticFactory.CreateBaseServices<Base>());
+            single = AutofacContainer.Resolve<Base>();
         }
         [TestMethod]
         public void Base_Construct()

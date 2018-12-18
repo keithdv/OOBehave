@@ -14,19 +14,19 @@ namespace OOBehave
     public interface IValidateBaseServices<T> : IBaseServices<T>
     {
         IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
-        IRegisteredRuleManager RuleManager { get; }
 
-        IRuleExecute<T> CreateRuleExecute(T target, IReadOnlyCollection<IRule<T>> rules);
+        IRuleExecute<T> CreateRuleExecute(T target);
 
     }
 
     public class ValidateBaseServices<T> : BaseServices<T>, IValidateBaseServices<T>
     {
 
-        public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IRegisteredRuleManager ruleManager) : base(registeredPropertyManager)
+        private IFactory Factory { get; }
+        public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager)
         {
             this.RegisteredPropertyValidateDataManager = registeredPropertyManager;
-            this.RuleManager = ruleManager;
+            this.Factory = factory;
         }
 
         public IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
@@ -36,11 +36,9 @@ namespace OOBehave
             get { return RegisteredPropertyValidateDataManager; }
         }
 
-        public IRegisteredRuleManager RuleManager { get; }
-
-        public IRuleExecute<T> CreateRuleExecute(T target, IReadOnlyCollection<IRule<T>> rules)
+        public IRuleExecute<T> CreateRuleExecute(T target)
         {
-            return Core.Factory.StaticFactory.CreateRuleExecute(target, rules);
+            return Factory.CreateRuleExecute(target);
         }
 
     }

@@ -8,7 +8,12 @@ namespace OOBehave.UnitTest.Validate
     public class Validate : ValidateBase<Validate>
     {
 
-        public Validate(IValidateBaseServices<Validate> services) : base(services) { }
+        public Validate(IValidateBaseServices<Validate> services) : base(services)
+        {
+            RuleExecute.AddRule(new ShortNameCascadeRule());
+            RuleExecute.AddRule(new FullNameCascadeRule());
+            RuleExecute.AddRule(new FirstNameTargetRule());
+        }
 
         public string FirstName
         {
@@ -39,13 +44,6 @@ namespace OOBehave.UnitTest.Validate
         {
             get { return ReadProperty<string>(); }
             set { SetProperty(value); }
-        }
-
-        protected override void RegisterRules(IRuleList<Validate> rules)
-        {
-            rules.AddRule(new ShortNameCascadeRule());
-            rules.AddRule(new FullNameCascadeRule());
-            rules.AddRule(new FirstNameTargetRule());
         }
 
     }

@@ -22,31 +22,19 @@ namespace OOBehave
         where T: ValidateBase<T>
     {
         protected IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
-        protected IRegisteredRuleManager RegisteredRuleManager { get; }
         protected IRuleExecute<T> RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices<T> services) : base(services)
         {
             this.RegisteredPropertyValidateDataManager = services.RegisteredPropertyValidateDataManager;
-            this.RegisteredRuleManager = services.RuleManager;
 
-            this.RegisteredRuleManager.RegisterRules<T>(RegisterRules);
             // TODO - Why do I need to cast to T??
-            this.RuleExecute = services.CreateRuleExecute((T) this, RegisteredRuleManager.GetRegisteredRules<T>());
+            this.RuleExecute = services.CreateRuleExecute((T) this);
         }
 
-        /// <summary>
-        /// Only gets called once per type
-        /// </summary>
-        /// <param name="rules"></param>
-        protected virtual void RegisterRules(IRuleList<T> rules)
-        {
-            // Default - No Rules
-        }
+        public bool IsValid => RuleExecute.IsValid; // And Child.IsValidate from RegisteredPropertyDataManager
 
-        public bool IsValid => RuleExecute.IsValid;
-
-        public bool IsSelfValid => throw new NotImplementedException();
+        public bool IsSelfValid => RuleExecute.IsValid;
 
         public bool IsChild => throw new NotImplementedException();
 
