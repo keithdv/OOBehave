@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Text;
 using OOBehave.Rules;
 
-namespace OOBehave.UnitTest.Validate
+namespace OOBehave.UnitTest.ValidateDependencyRule
 {
-    public class Validate : ValidateBase<Validate>, IValidate
+
+    public class ValidateDependencyRules : ValidateBase<ValidateDependencyRules>, IValidate
     {
 
-        public Validate(IValidateBaseServices<Validate> services) : base(services)
+        public ValidateDependencyRules(IValidateBaseServices<ValidateDependencyRules> services,
+                ShortNameCascadeRule<ValidateDependencyRules> shortNameRule,
+                FullNameCascadeRule<ValidateDependencyRules> fullNameRule,
+                FirstNameTargetDependencyRule<ValidateDependencyRules> firstNameRule) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameCascadeRule());
-            RuleExecute.AddRule(new FullNameCascadeRule());
-            RuleExecute.AddRule(new FirstNameTargetRule());
+            RuleExecute.AddRule(shortNameRule);
+            RuleExecute.AddRule(fullNameRule);
+            RuleExecute.AddRule(firstNameRule);
         }
 
         public string FirstName

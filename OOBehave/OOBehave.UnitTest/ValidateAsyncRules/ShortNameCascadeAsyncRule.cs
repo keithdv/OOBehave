@@ -21,7 +21,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 
             await Task.Delay(10, token);
 
-            System.Diagnostics.Debug.WriteLine($"ShortNameCascadeAsyncRule {target.FirstName} {target.LastName}");
+            // System.Diagnostics.Debug.WriteLine($"ShortNameCascadeAsyncRule {target.FirstName} {target.LastName}");
 
             if (target.FirstName.StartsWith("Error"))
             {

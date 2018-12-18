@@ -17,4 +17,8 @@
     <ProjectReference Include="..\OOBehave\OOBehave.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Rules\" />
+  </ItemGroup>
+
 </Project>

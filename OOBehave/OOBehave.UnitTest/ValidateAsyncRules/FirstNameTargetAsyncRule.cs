@@ -15,7 +15,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
 
             await Task.Delay(10, token);
 
-            System.Diagnostics.Debug.WriteLine($"FullNameTargetRule {target.FullName}");
+            // System.Diagnostics.Debug.WriteLine($"FullNameTargetRule {target.FullName}");
 
             if (target.FirstName?.StartsWith("Error") ?? false)
             {

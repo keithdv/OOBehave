@@ -12,7 +12,7 @@ namespace OOBehave.UnitTest.Validate
         public override IRuleResult Execute(Validate target)
         {
 
-            System.Diagnostics.Debug.WriteLine($"FullNameTargetRule {target.FullName}");
+            // System.Diagnostics.Debug.WriteLine($"FullNameTargetRule {target.FullName}");
 
             if (target.FirstName.StartsWith("Error"))
             {

@@ -18,7 +18,7 @@ namespace OOBehave.UnitTest.Validate
         public override IRuleResult Execute(Validate target)
         {
 
-            System.Diagnostics.Debug.WriteLine($"Run Rule {target.FirstName} {target.LastName}");
+            // System.Diagnostics.Debug.WriteLine($"Run Rule {target.FirstName} {target.LastName}");
 
             if(target.FirstName.StartsWith("Error"))
             {

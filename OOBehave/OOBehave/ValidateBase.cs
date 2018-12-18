@@ -22,6 +22,7 @@ namespace OOBehave
         where T: ValidateBase<T>
     {
         protected IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
+
         protected IRuleExecute<T> RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices<T> services) : base(services)

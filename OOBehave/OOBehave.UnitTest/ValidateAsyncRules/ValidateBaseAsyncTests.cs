@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Autofac;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.Resolve<ValidateAsyncRules>();
+            validate = AutofacContainer.GetLifetimeScope().Resolve<ValidateAsyncRules>();
         }
 
         [TestMethod]
@@ -60,7 +61,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
             validate.FirstName = "John";
             validate.LastName = "Smith";
 
-            System.Diagnostics.Debug.WriteLine("WaitForRules");
+            // System.Diagnostics.Debug.WriteLine("WaitForRules");
 
             await validate.WaitForRules();
 
@@ -76,7 +77,7 @@ namespace OOBehave.UnitTest.ValidateAsyncRules
             validate.FirstName = "John";
             validate.LastName = "Smith";
 
-            System.Diagnostics.Debug.WriteLine("WaitForRules");
+            // System.Diagnostics.Debug.WriteLine("WaitForRules");
 
             await validate.WaitForRules();
 

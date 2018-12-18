@@ -12,12 +12,9 @@ namespace OOBehave.UnitTest
 
 
         private static IContainer Container;
-        private static AsyncLocal<ILifetimeScope> Scopes = new AsyncLocal<ILifetimeScope>();
 
         public static ILifetimeScope GetLifetimeScope()
         {
-            if (Scopes.Value == null)
-            {
 
                 if (Container == null)
                 {
@@ -38,20 +35,19 @@ namespace OOBehave.UnitTest
                     builder.RegisterType<ValidateAsyncRules.ValidateAsyncRules>();
 
 
+                    builder.RegisterGeneric(typeof(ValidateDependencyRule.ShortNameCascadeRule<>));
+                    builder.RegisterGeneric(typeof(ValidateDependencyRule.FullNameCascadeRule<>));
+                    builder.RegisterGeneric(typeof(ValidateDependencyRule.FirstNameTargetDependencyRule<>));
+                    builder.RegisterType<ValidateDependencyRule.DisposableDependency>().As<ValidateDependencyRule.IDisposableDependency>();
+                    builder.RegisterType<ValidateDependencyRule.DisposableDependencyList>().InstancePerLifetimeScope();
+                    builder.RegisterType<ValidateDependencyRule.ValidateDependencyRules>();
+
+                    
                     Container = builder.Build();
                 }
 
-                Scopes.Value = Container.BeginLifetimeScope();
+                return Container.BeginLifetimeScope();
 
-            }
-
-            return Scopes.Value;
-
-        }
-
-        public static T Resolve<T>()
-        {
-            return GetLifetimeScope().Resolve<T>();
         }
 
     }

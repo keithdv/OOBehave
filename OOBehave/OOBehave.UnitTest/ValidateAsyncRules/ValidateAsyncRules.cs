@@ -5,7 +5,7 @@ using OOBehave.Rules;
 
 namespace OOBehave.UnitTest.ValidateAsyncRules
 {
-    public class ValidateAsyncRules : ValidateBase<ValidateAsyncRules>
+    public class ValidateAsyncRules : ValidateBase<ValidateAsyncRules>, IValidate
     {
 
         public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services)

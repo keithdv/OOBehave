@@ -22,6 +22,7 @@ namespace OOBehave.Core
 
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
         {
+            System.Diagnostics.Debug.WriteLine($"Register Property {name}");
             return new RegisteredProperty<T>(name);
         }
 
