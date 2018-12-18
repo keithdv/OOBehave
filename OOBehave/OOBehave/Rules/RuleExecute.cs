@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave.Rules
@@ -57,104 +58,135 @@ namespace OOBehave.Rules
 
         public Task WaitForRules { get; private set; } = Task.CompletedTask;
         private TaskCompletionSource<object> waitForRulesSource;
+        private CancellationTokenSource cancellationTokenSource;
 
         private bool isRunningRules = false;
 
-        public void CheckRulesQueue()
+        public void CheckRulesQueue(bool isRecursiveCall = false)
         {
             // DISCUSS : Runes the rules sequentially - even Async Rules
             // Make async rules changing properties a non-issue
 
-            void ResetWaitForRules()
+            void Start()
             {
-                if (WaitForRules.IsCompleted)
+                if (!isRecursiveCall)
                 {
+
+#if DEBUG
+                    if (!WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
+#endif
+                    isRunningRules = true;
+                    cancellationTokenSource = new CancellationTokenSource();
                     waitForRulesSource = new TaskCompletionSource<object>();
                     WaitForRules = waitForRulesSource.Task;
                 }
             }
 
-            void CompleteWaitForRules()
+            void Stop()
             {
+                // We need to handle if properties changed by the user while rules were running
+                // Yes, this causes the infinite loop if they change a property in a TargetRule. Which they should not do.
+
                 if (propertyQueue.Any())
                 {
-                    CheckRulesQueue();
+                    CheckRulesQueue(true);
                 }
-                else if (!WaitForRules.IsCompleted)
+                else
                 {
+#if DEBUG
+                    if (WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
+#endif
+
+                    isRunningRules = false;
                     waitForRulesSource.SetResult(new object());
                 }
             }
 
-            if (!isRunningRules)
+            if (!isRunningRules || isRecursiveCall)
             {
+                Start();
+                var token = cancellationTokenSource.Token; // Local stack copy important
+
                 while (propertyQueue.TryDequeue(out var property))
                 {
-                    isRunningRules = true;
 
                     System.Diagnostics.Debug.WriteLine($"Dequeue {property.Name}");
 
-                    var cascadeRuleTask = RunCascadeRulesRecursive(property);
+                    var cascadeRuleTask = RunCascadeRulesRecursive(property, token);
 
                     if (!cascadeRuleTask.IsCompleted)
                     {
-                        ResetWaitForRules();
-
+                        // Really important
+                        // If there there is not an asyncronous fork all of the async methods will run synchronously
+                        // Which is great! Because we are likely within a property change
+                        // However, if there was an asyncronous fork we need to handle it's completion
+                        // In WPF there's an executable so this will continue "hands off"
+                        // In request response the WaitForRules needs to be awaited!
                         cascadeRuleTask.ContinueWith(x =>
                         {
-                            isRunningRules = false;
-                            CheckRulesQueue();
+                            CheckRulesQueue(true);
                         });
 
                         return; // Let the ContinueWith call CheckRulesQueue again
                     }
-                    else
-                    {
-                        isRunningRules = false;
-                    }
                 }
 
-                isRunningRules = true;
+                var targetRuleTask = RunTargetRulesSequential(token);
 
-                var targetRuleTask = RunTargetRulesSequential();
-
+                // Really important
+                // If there there is not an asyncronous fork all of the async methods will run synchronously
+                // Which is great! Because we are likely within a property change
+                // However, if there was an asyncronous fork we need to handle it's completion
+                // In WPF there's an executable so this will continue "hands off"
+                // In request response the WaitForRules needs to be awaited!
                 if (!targetRuleTask.IsCompleted)
                 {
-                    ResetWaitForRules();
-
                     targetRuleTask.ContinueWith(x =>
                     {
-                        isRunningRules = false;
-                        CompleteWaitForRules();
+                        Stop();
                     });
 
-                    return;
                 }
                 else
                 {
-                    isRunningRules = false;
-                    CompleteWaitForRules();
+                    Stop();
                 }
             }
         }
 
-        private async Task RunCascadeRulesRecursive(IRegisteredProperty property)
+
+
+        private async Task RunCascadeRulesRecursive(IRegisteredProperty property, CancellationToken token)
         {
             foreach (var r in Rules.OfType<ICascadeRule<T>>().Where(r => r.TriggerProperties.Contains(property)).ToList())
             {
                 // TODO - Wrap with a Try/Catch
-                Results[r.UniqueIndex] = await r.Execute(Target);
-                // Todo - Deal with result
+                var result = await r.Execute(Target, token);
+
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Results[r.UniqueIndex] = result;
+
             }
         }
 
-        private async Task RunTargetRulesSequential()
+        private async Task RunTargetRulesSequential(CancellationToken token)
         {
             foreach (var r in Rules.OfType<ITargetRule<T>>().ToList())
             {
                 // TODO - Wrap with a Try/Catch
-                Results[r.UniqueIndex] = await r.Execute(Target);
-                // Todo - Deal with result
+                var result = await r.Execute(Target, token);
+
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Results[r.UniqueIndex] = result;
+
             }
         }
     }
@@ -171,3 +203,4 @@ namespace OOBehave.Rules
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
+

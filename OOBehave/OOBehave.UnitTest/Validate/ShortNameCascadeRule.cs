@@ -14,19 +14,19 @@ namespace OOBehave.UnitTest.Validate
 
         }
 
-        public override Task<IRuleResult> Execute(Validate target)
+        public override IRuleResult Execute(Validate target)
         {
 
             System.Diagnostics.Debug.WriteLine($"Run Rule {target.FirstName} {target.LastName}");
 
             if(target.FirstName.StartsWith("Error"))
             {
-                return Task.FromResult(RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName));
+                return RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName);
             }
 
             target.ShortName = $"{target.FirstName} {target.LastName}";
 
-            return Task.FromResult(RuleResult.Empty());
+            return RuleResult.Empty();
         }
 
     }

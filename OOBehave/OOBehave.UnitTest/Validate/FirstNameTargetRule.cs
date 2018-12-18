@@ -9,18 +9,18 @@ namespace OOBehave.UnitTest.Validate
     public class FirstNameTargetRule : TargetRule<Validate> 
     {
 
-        public override Task<IRuleResult> Execute(Validate target)
+        public override IRuleResult Execute(Validate target)
         {
 
             System.Diagnostics.Debug.WriteLine($"FullNameTargetRule {target.FullName}");
 
             if (target.FirstName.StartsWith("Error"))
             {
-                return Task.FromResult(RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName));
+                return RuleResult.PropertyError(Validate.FirstNameProperty, target.FirstName);
             }
 
 
-            return Task.FromResult(RuleResult.Empty());
+            return RuleResult.Empty();
         }
 
     }

@@ -12,11 +12,11 @@ namespace OOBehave.UnitTest.Validate
         public FullNameCascadeRule() : base(new List<IRegisteredProperty> { Validate.TitleProperty, Validate.ShortNameProperty })
         { }
 
-        public override Task<IRuleResult> Execute(Validate target)
+        public override IRuleResult Execute(Validate target)
         {
             target.FullName = $"{target.Title} {target.ShortName}";
 
-            return Task.FromResult(RuleResult.Empty());
+            return RuleResult.Empty();
 
         }
 
