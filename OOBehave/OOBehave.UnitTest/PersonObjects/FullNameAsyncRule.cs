@@ -5,19 +5,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.ValidateAsyncRules
+namespace OOBehave.UnitTest.PersonObjects
 {
-    public class FullNameCascadeAsyncRule : CascadeAsyncRule<ValidateAsyncRules>
+    public class FullNameAsyncRule<T> : CascadeAsyncRule<T>
+        where T : IPersonBase
     {
 
-        public FullNameCascadeAsyncRule() : base()
+        public FullNameAsyncRule() : base()
         {
 
-            TriggerProperties.Add(nameof(ValidateAsyncRules.Title));
-            TriggerProperties.Add(nameof(ValidateAsyncRules.ShortName));
+            TriggerProperties.Add(nameof(IPersonBase.FirstName));
+            TriggerProperties.Add(nameof(IPersonBase.ShortName));
         }
 
-        public override async Task<IRuleResult> Execute(ValidateAsyncRules target, CancellationToken token)
+        public override async Task<IRuleResult> Execute(T target, CancellationToken token)
         {
             await Task.Delay(10, token);
 

@@ -1,25 +1,49 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Rules;
+using OOBehave.UnitTest.Objects;
+using OOBehave.UnitTest.PersonObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.UnitTest.Validate
+namespace OOBehave.UnitTest.ValidateBase
 {
+    public class ValidateDependencyRules : PersonBase<ValidateDependencyRules>, IValidate
+    {
+
+        public ValidateDependencyRules(IValidateBaseServices<ValidateDependencyRules> services,
+                ShortNameDependencyRule<ValidateDependencyRules> shortNameRule,
+                FullNameDependencyRule<ValidateDependencyRules> fullNameRule,
+                PersonDependencyRule<ValidateDependencyRules> firstNameRule) : base(services)
+        {
+            RuleExecute.AddRule(shortNameRule);
+            RuleExecute.AddRule(fullNameRule);
+            RuleExecute.AddRule(firstNameRule);
+        }
+
+    }
 
     [TestClass]
-    public class ValidateBaseTests
+    public class ValidateDependencyRulesTests
     {
 
 
-        Validate validate;
+        ValidateDependencyRules validate;
+        ILifetimeScope scope;
 
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.GetLifetimeScope().Resolve<Validate>();
+            scope = AutofacContainer.GetLifetimeScope();
+            validate = scope.Resolve<ValidateDependencyRules>();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            scope.Dispose();
         }
 
         [TestMethod]
@@ -27,7 +51,6 @@ namespace OOBehave.UnitTest.Validate
         {
 
         }
-
 
         [TestMethod]
         public void Validate_Set()
@@ -54,7 +77,7 @@ namespace OOBehave.UnitTest.Validate
         //}
 
         [TestMethod]
-        public void Validate_NameCascadeRule()
+        public void Validate_CascadeRule()
         {
 
             validate.FirstName = "John";
@@ -65,7 +88,7 @@ namespace OOBehave.UnitTest.Validate
         }
 
         [TestMethod]
-        public void Validate_CascadeRule_FullName()
+        public void Validate_CascadeRule_Recursive()
         {
 
             validate.Title = "Mr.";
@@ -90,47 +113,82 @@ namespace OOBehave.UnitTest.Validate
         [TestMethod]
         public void Validate_CascadeRule_IsValid_False()
         {
-            validate.LastName = "Smith";
+            validate.Title = "Mr.";
             validate.FirstName = "Error";
+            validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
+            Assert.AreEqual("Error", validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Single());
         }
 
         [TestMethod]
         public void Validate_CascadeRule_IsValid_False_Fixed()
         {
-            validate.LastName = "Smith";
+            validate.Title = "Mr.";
             validate.FirstName = "Error";
+            validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
 
             validate.FirstName = "John";
 
             Assert.IsTrue(validate.IsValid);
+            Assert.AreEqual(0, validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Count());
+
         }
 
         [TestMethod]
         public void Validate_TargetRule_IsValid_False()
         {
 
-            validate.FirstName = "Error";
-            validate.LastName = "Smith";
             validate.Title = "Mr.";
+            validate.FirstName = "John";
+            validate.LastName = "Smith";
+            Assert.IsTrue(validate.IsValid);
+
+            validate.ShortName = "";
 
             Assert.IsFalse(validate.IsValid);
+            Assert.AreEqual(1, validate.BrokenRulePropertyMessages(nameof(validate.ShortName)).Count());
+
+        }
+
+
+        [TestMethod]
+        public void ValidateDependencyRules_DisposableDependency_Count()
+        {
+            var dependencies = scope.Resolve<DisposableDependencyList>();
+
+            Assert.AreEqual(3, dependencies.Count);
+            Assert.AreEqual(3, dependencies.Select(x => x.UniqueId).Distinct().Count());
+            Assert.IsFalse(dependencies.Where(x => x.IsDisposed).Any());
         }
 
         [TestMethod]
-        public void Validate_TargetRule_IsValid_False_Fixed()
+        public void ValidateDependencyRules_DisposableDependency_Unique()
         {
-            validate.LastName = "Smith";
-            validate.FirstName = "Error";
+            var dependencies = scope.Resolve<DisposableDependencyList>();
 
-            Assert.IsFalse(validate.IsValid);
-
-            validate.FirstName = "John";
-
-            Assert.IsTrue(validate.IsValid);
+            Assert.AreEqual(3, dependencies.Select(x => x.UniqueId).Distinct().Count());
         }
+
+        [TestMethod]
+        public void ValidateDependencyRules_DisposableDependency_NotDisposed()
+        {
+            var dependencies = scope.Resolve<DisposableDependencyList>();
+
+            Assert.IsFalse(dependencies.Where(x => x.IsDisposed).Any());
+        }
+
+        [TestMethod]
+        public void ValidateDependencyRules_DisposableDependency_Dispose()
+        {
+            var dependencies = scope.Resolve<DisposableDependencyList>();
+
+            scope.Dispose();
+
+            Assert.IsFalse(dependencies.Where(x => !x.IsDisposed).Any());
+        }
+
     }
 }

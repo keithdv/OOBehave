@@ -3,20 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using OOBehave.Rules;
 
-namespace OOBehave.UnitTest.ValidateDependencyRule
+namespace OOBehave.UnitTest.PersonObjects
+
 {
 
-    public class ValidateDependencyRules : ValidateBase<ValidateDependencyRules>, IValidate
+    public abstract class PersonBase<T> : ValidateBase<T>, IValidate, IPersonBase
+        where T : PersonBase<T>
     {
 
-        public ValidateDependencyRules(IValidateBaseServices<ValidateDependencyRules> services,
-                ShortNameCascadeRule<ValidateDependencyRules> shortNameRule,
-                FullNameCascadeRule<ValidateDependencyRules> fullNameRule,
-                FirstNameTargetDependencyRule<ValidateDependencyRules> firstNameRule) : base(services)
+        public PersonBase(IValidateBaseServices<T> services) : base(services)
         {
-            RuleExecute.AddRule(shortNameRule);
-            RuleExecute.AddRule(fullNameRule);
-            RuleExecute.AddRule(firstNameRule);
         }
 
         public string FirstName
@@ -30,7 +26,6 @@ namespace OOBehave.UnitTest.ValidateDependencyRule
             get { return ReadProperty<string>(); }
             set { SetProperty(value); }
         }
-
 
         public string ShortName
         {

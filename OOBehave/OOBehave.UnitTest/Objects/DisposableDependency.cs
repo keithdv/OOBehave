@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OOBehave.UnitTest.ValidateDependencyRule
+namespace OOBehave.UnitTest.Objects
 {
 
     public class DisposableDependencyList : List<DisposableDependency> { }

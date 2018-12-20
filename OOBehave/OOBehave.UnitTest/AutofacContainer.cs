@@ -16,37 +16,39 @@ namespace OOBehave.UnitTest
         public static ILifetimeScope GetLifetimeScope()
         {
 
-                if (Container == null)
-                {
-                    var builder = new ContainerBuilder();
+            if (Container == null)
+            {
+                var builder = new ContainerBuilder();
 
-                    builder.RegisterType<DefaultFactory>().As<IFactory>().SingleInstance();
-                    builder.RegisterType<RegisteredPropertyManager>().As<IRegisteredPropertyManager>().SingleInstance();
-                    builder.RegisterGeneric(typeof(RegisteredPropertyDataManager<>)).As(typeof(IRegisteredPropertyDataManager<>));
-                    builder.RegisterGeneric(typeof(RegisteredPropertyValidateDataManager<>)).As(typeof(IRegisteredPropertyValidateDataManager<>));
+                builder.RegisterType<DefaultFactory>().As<IFactory>().SingleInstance();
+                builder.RegisterType<RegisteredPropertyManager>().As<IRegisteredPropertyManager>().SingleInstance();
+                builder.RegisterGeneric(typeof(RegisteredPropertyDataManager<>)).As(typeof(IRegisteredPropertyDataManager<>));
+                builder.RegisterGeneric(typeof(RegisteredPropertyValidateDataManager<>)).As(typeof(IRegisteredPropertyValidateDataManager<>));
 
-                    builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
-                    builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
-                    builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
-
-
-                    builder.RegisterType<Base.Base>();
-                    builder.RegisterType<Validate.Validate>();
-                    builder.RegisterType<ValidateAsyncRules.ValidateAsyncRules>();
+                builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
+                builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
+                builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
 
 
-                    builder.RegisterGeneric(typeof(ValidateDependencyRule.ShortNameCascadeRule<>));
-                    builder.RegisterGeneric(typeof(ValidateDependencyRule.FullNameCascadeRule<>));
-                    builder.RegisterGeneric(typeof(ValidateDependencyRule.FirstNameTargetDependencyRule<>));
-                    builder.RegisterType<ValidateDependencyRule.DisposableDependency>().As<ValidateDependencyRule.IDisposableDependency>();
-                    builder.RegisterType<ValidateDependencyRule.DisposableDependencyList>().InstancePerLifetimeScope();
-                    builder.RegisterType<ValidateDependencyRule.ValidateDependencyRules>();
+                builder.RegisterType<Base.Base>();
+                builder.RegisterType<ValidateBase.Validate>();
+                builder.RegisterType<ValidateBase.ValidateAsyncRules>();
+                builder.RegisterType<ValidateBase.ValidateDependencyRules>();
 
-                    
-                    Container = builder.Build();
-                }
 
-                return Container.BeginLifetimeScope();
+                builder.RegisterGeneric(typeof(PersonObjects.ShortNameDependencyRule<>));
+                builder.RegisterGeneric(typeof(PersonObjects.FullNameDependencyRule<>));
+                builder.RegisterGeneric(typeof(PersonObjects.PersonDependencyRule<>));
+
+
+                builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
+                builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
+
+
+                Container = builder.Build();
+            }
+
+            return Container.BeginLifetimeScope();
 
         }
 

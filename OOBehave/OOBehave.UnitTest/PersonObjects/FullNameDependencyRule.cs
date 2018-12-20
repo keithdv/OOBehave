@@ -1,19 +1,18 @@
 ﻿using OOBehave.Rules;
+using OOBehave.UnitTest.Objects;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.ValidateDependencyRule
+
+namespace OOBehave.UnitTest.PersonObjects
 {
-    public class FullNameCascadeRule<T> : CascadeRule<T>
-        where T : IValidate
+    public class FullNameDependencyRule<T> : CascadeRule<T>
+        where T : IPersonBase
     {
 
-        public FullNameCascadeRule(IDisposableDependency dd) : base()
+        public FullNameDependencyRule(IDisposableDependency dd) : base()
         {
-            TriggerProperties.Add(nameof(ValidateDependencyRules.Title));
-            TriggerProperties.Add(nameof(ValidateDependencyRules.ShortName));
+            TriggerProperties.Add(nameof(IPersonBase.Title));
+            TriggerProperties.Add(nameof(IPersonBase.ShortName));
 
             this.DisposableDependency = dd;
         }
