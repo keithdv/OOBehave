@@ -10,6 +10,26 @@ namespace OOBehave.Core
     {
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
         IRuleExecute<T> CreateRuleExecute<T>(T target);
+
+        T Create<T>() where T : IOOBehaveObject;
+
+        T Create<T, C>(C criteria) where T : IOOBehaveObject;
+
+    }
+
+    public interface IServiceScope
+    {
+        T Resolve<T>();
+
+        object Resolve(Type t);
+
+        bool TryResolve<T>(out T result);
+
+        bool TryResolve(Type T, out object result);
+
+        bool IsRegistered<T>();
+
+        bool IsRegistered(Type type);
     }
 
     /// <summary>
@@ -18,7 +38,12 @@ namespace OOBehave.Core
     /// </summary>
     public class DefaultFactory : IFactory
     {
+        private IServiceScope scope { get; }
 
+        public DefaultFactory(IServiceScope scope)
+        {
+            this.scope = scope;
+        }
 
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
         {
@@ -26,10 +51,19 @@ namespace OOBehave.Core
             return new RegisteredProperty<T>(name);
         }
 
-
         public IRuleExecute<T> CreateRuleExecute<T>(T target)
         {
             return new RuleExecute<T>(target);
+        }
+
+        public T Create<T>() where T : IOOBehaveObject
+        {
+            return scope.Resolve<T>();
+        }
+
+        public T Create<T, C>(C criteria) where T : IOOBehaveObject
+        {
+            return scope.Resolve<T>();
         }
     }
 

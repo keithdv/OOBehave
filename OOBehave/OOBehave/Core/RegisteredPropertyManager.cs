@@ -6,6 +6,8 @@ using System.Text;
 
 namespace OOBehave.Core
 {
+    // TODO
+    // What happens if I make this <T> and registered SingleInstance??
 
     public class RegisteredPropertyManager : IRegisteredPropertyManager
     {

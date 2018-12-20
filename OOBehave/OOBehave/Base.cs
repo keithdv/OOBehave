@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace OOBehave
 {
 
-    public interface IBase
+    public interface IBase : IOOBehaveObject
     {
 
     }

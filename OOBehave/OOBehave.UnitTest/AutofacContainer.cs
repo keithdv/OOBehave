@@ -45,6 +45,11 @@ namespace OOBehave.UnitTest
                 builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
 
 
+                builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
+                builder.RegisterType<ValidateBase.Person>().As<ValidateBase.IPerson>();
+
+                builder.RegisterType<ObjectPortal>();
+
                 Container = builder.Build();
             }
 
