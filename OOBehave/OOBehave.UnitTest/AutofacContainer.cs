@@ -1,5 +1,8 @@
 ﻿using Autofac;
 using OOBehave.Core;
+using OOBehave.Portal;
+using OOBehave.Portal.Core;
+using OOBehave.UnitTest.ObjectPortal;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,12 +32,10 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
                 builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
 
-
                 builder.RegisterType<Base.Base>();
                 builder.RegisterType<ValidateBase.Validate>();
                 builder.RegisterType<ValidateBase.ValidateAsyncRules>();
                 builder.RegisterType<ValidateBase.ValidateDependencyRules>();
-
 
                 builder.RegisterGeneric(typeof(PersonObjects.ShortNameDependencyRule<>));
                 builder.RegisterGeneric(typeof(PersonObjects.FullNameDependencyRule<>));
@@ -44,11 +45,18 @@ namespace OOBehave.UnitTest
                 builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
                 builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
 
-
                 builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
                 builder.RegisterType<ValidateBase.Person>().As<ValidateBase.IPerson>();
 
-                builder.RegisterType<ObjectPortal>();
+                builder.RegisterType<RegisteredOperationManager>().As<IRegisteredOperationManager>().SingleInstance();
+                builder.RegisterGeneric(typeof(RequestResponseObjectPortal<>)).As(typeof(IObjectPortal<>));
+
+                builder.RegisterType<DomainObject>().As<IDomainObject>();
+
+                builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>
+                {
+                    return PersonObjects.PersonDto.Data();
+                }).SingleInstance();
 
                 Container = builder.Build();
             }

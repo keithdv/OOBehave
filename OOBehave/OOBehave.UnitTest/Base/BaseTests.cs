@@ -19,21 +19,27 @@ namespace OOBehave.UnitTest.Base
         [TestMethod]
         public void Base_Construct()
         {
-            var name = single.Name;
+            var name = single.FirstName;
         }
 
         [TestMethod]
         public void Base_Set()
         {
-            single.Name = Guid.NewGuid().ToString();
+            single.Id = Guid.NewGuid();
+            single.FirstName = Guid.NewGuid().ToString();
+            single.LastName = Guid.NewGuid().ToString();
         }
 
         [TestMethod]
         public void Base_SetGet()
         {
-            var name = Guid.NewGuid().ToString();
-            single.Name = name;
-            Assert.AreEqual(name, single.Name);
+            var id = single.Id = Guid.NewGuid();
+            var firstName = single.FirstName = Guid.NewGuid().ToString();
+            var lastName = single.LastName = Guid.NewGuid().ToString();
+
+            Assert.AreEqual(id, single.Id);
+            Assert.AreEqual(firstName, single.FirstName);
+            Assert.AreEqual(lastName, single.LastName);
         }
     }
 }

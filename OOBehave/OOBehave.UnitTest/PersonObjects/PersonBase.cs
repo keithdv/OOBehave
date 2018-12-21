@@ -6,7 +6,6 @@ using OOBehave.Rules;
 namespace OOBehave.UnitTest.PersonObjects
 
 {
-
     public abstract class PersonBase<T> : ValidateBase<T>, IValidate, IPersonBase
         where T : PersonBase<T>
     {
@@ -14,6 +13,8 @@ namespace OOBehave.UnitTest.PersonObjects
         public PersonBase(IValidateBaseServices<T> services) : base(services)
         {
         }
+
+        public Guid PersonId { get { return ReadProperty<Guid>(); } }
 
         public string FirstName
         {
@@ -45,5 +46,13 @@ namespace OOBehave.UnitTest.PersonObjects
             set { SetProperty(value); }
         }
 
+
+        protected void FillFromDto(PersonDto dto)
+        {
+            LoadProperty(dto.PersonId, nameof(PersonId));
+            LoadProperty(dto.FirstName, nameof(FirstName));
+            LoadProperty(dto.LastName, nameof(LastName));
+            LoadProperty(dto.Title, nameof(Title));
+        }
     }
 }

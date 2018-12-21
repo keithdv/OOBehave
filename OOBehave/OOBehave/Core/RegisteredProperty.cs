@@ -7,12 +7,11 @@ namespace OOBehave.Core
 
     public class RegisteredProperty<T> : IRegisteredProperty, IRegisteredProperty<T>
     {
-        private static uint index = 0;
-        private static uint NextIndex() { index++; return index; } // This may be overly simple and in the wrong spot
-        public RegisteredProperty(string name)
+
+        public RegisteredProperty(string name, uint index)
         {
             this.Name = name;
-            this.Index = NextIndex();
+            this.Index = index;
         }
 
         public string Name { get; private set; }

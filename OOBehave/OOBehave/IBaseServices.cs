@@ -1,4 +1,5 @@
 ﻿using OOBehave.Core;
+using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,16 +14,20 @@ namespace OOBehave
     public interface IBaseServices<T>
     {
         IRegisteredPropertyDataManager<T> RegisteredPropertyDataManager { get; }
+        IRegisteredOperationManager RegisteredOperationManager { get; }
     }
 
     public class BaseServices<T> : IBaseServices<T>
     {
 
-        public BaseServices(IRegisteredPropertyDataManager<T> registeredPropertyDataManager)
+        public BaseServices(IRegisteredPropertyDataManager<T> registeredPropertyDataManager, IRegisteredOperationManager registeredOperationManager)
         {
             this.RegisteredPropertyDataManager = registeredPropertyDataManager;
+            this.RegisteredOperationManager = registeredOperationManager;
         }
 
         public IRegisteredPropertyDataManager<T> RegisteredPropertyDataManager { get; }
+
+        public IRegisteredOperationManager RegisteredOperationManager { get; }
     }
 }

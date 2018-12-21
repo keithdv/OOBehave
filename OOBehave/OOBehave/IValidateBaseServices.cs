@@ -1,4 +1,5 @@
 ﻿using OOBehave.Core;
+using OOBehave.Portal;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,9 @@ namespace OOBehave
     {
 
         private IFactory Factory { get; }
-        public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager)
+        public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager,
+            IRegisteredOperationManager registeredOperationManager,
+            IFactory factory) : base(registeredPropertyManager, registeredOperationManager)
         {
             this.RegisteredPropertyValidateDataManager = registeredPropertyManager;
             this.Factory = factory;

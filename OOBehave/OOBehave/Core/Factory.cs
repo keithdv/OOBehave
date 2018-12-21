@@ -6,31 +6,6 @@ using System.Threading;
 
 namespace OOBehave.Core
 {
-    public interface IFactory
-    {
-        IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
-        IRuleExecute<T> CreateRuleExecute<T>(T target);
-
-        T Create<T>() where T : IOOBehaveObject;
-
-        T Create<T, C>(C criteria) where T : IOOBehaveObject;
-
-    }
-
-    public interface IServiceScope
-    {
-        T Resolve<T>();
-
-        object Resolve(Type t);
-
-        bool TryResolve<T>(out T result);
-
-        bool TryResolve(Type T, out object result);
-
-        bool IsRegistered<T>();
-
-        bool IsRegistered(Type type);
-    }
 
     /// <summary>
     /// You can't register generic delegates in C#
@@ -38,6 +13,9 @@ namespace OOBehave.Core
     /// </summary>
     public class DefaultFactory : IFactory
     {
+        private static uint index = 0;
+        private static uint NextIndex() { index++; return index; } // This may be overly simple and in the wrong spot
+
         private IServiceScope scope { get; }
 
         public DefaultFactory(IServiceScope scope)
@@ -48,7 +26,7 @@ namespace OOBehave.Core
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
         {
             System.Diagnostics.Debug.WriteLine($"Register Property {name}");
-            return new RegisteredProperty<T>(name);
+            return new RegisteredProperty<T>(name, NextIndex());
         }
 
         public IRuleExecute<T> CreateRuleExecute<T>(T target)
@@ -56,15 +34,6 @@ namespace OOBehave.Core
             return new RuleExecute<T>(target);
         }
 
-        public T Create<T>() where T : IOOBehaveObject
-        {
-            return scope.Resolve<T>();
-        }
-
-        public T Create<T, C>(C criteria) where T : IOOBehaveObject
-        {
-            return scope.Resolve<T>();
-        }
     }
 
     [Serializable]

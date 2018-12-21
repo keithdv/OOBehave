@@ -1,9 +1,11 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Core;
+using OOBehave.Portal;
 using OOBehave.UnitTest.PersonObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OOBehave.UnitTest.ValidateBase
@@ -14,6 +16,7 @@ namespace OOBehave.UnitTest.ValidateBase
         IPerson Mate { get; }
         IPerson Child { get; }
     }
+
     public class Person : PersonBase<Person>, IPerson
     {
         public Person(IValidateBaseServices<Person> services) : base(services)
@@ -33,6 +36,34 @@ namespace OOBehave.UnitTest.ValidateBase
         {
             get { return ReadProperty<IPerson>(); }
             set { SetProperty(value); }
+        }
+
+        [Create]
+        public void Create(IObjectPortal<IPerson> portal, IReadOnlyList<PersonDto> personTable)
+        {
+            var dto = personTable.Single(p => p.FirstName == "Grandpa");
+            base.FillFromDto(dto);
+
+            var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+
+            if (child != null)
+            {
+                LoadProperty(portal.CreateChild(child), nameof(Child));
+            }
+        }
+
+
+        [CreateChild]
+        public void Create(PersonDto dto, IObjectPortal<IPerson> portal, IReadOnlyList<PersonDto> personTable)
+        {
+            base.FillFromDto(dto);
+
+            var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+
+            if (child != null)
+            {
+                LoadProperty(portal.CreateChild(child), nameof(Child));
+            }
         }
 
     }
@@ -57,9 +88,7 @@ namespace OOBehave.UnitTest.ValidateBase
         [TestMethod]
         public void ValidateParentChildTests_Create_Parent()
         {
-            var parent = scope.Resolve<IFactory>().Create<IPerson>();
-
-
+            var parent = scope.Resolve<IObjectPortal<IPerson>>().Create();
         }
     }
 }
