@@ -36,11 +36,19 @@ namespace OOBehave.Core
 
             if (!keyValuePairs.TryGetValue(name, out var prop))
             {
+                // Check that the correct type of object is being sent in
+                var property = objectType.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
+                    .Where(f => f.Name == name).FirstOrDefault();
+
+                if (property == null) { throw new PropertyNotFoundException($"Property {name} not found on {objectType.FullName}"); }
+                if (property.PropertyType != typeof(P)) { throw new PropertyNotFoundException($"Property {name} isn't of type {typeof(P).FullName}. Explicitly define type of LoadProperty method to LoadProperty<{property.PropertyType.Name}> for this senario."); }
+
                 prop = Factory.CreateRegisteredProperty<P>(name);
                 keyValuePairs.Add(name, prop);
             }
 
-            return (IRegisteredProperty<P>) prop;
+            var ret = prop as IRegisteredProperty<P> ?? throw new PropertyTypeMismatchException($"Cannot cast {prop.GetType().FullName} to {typeof(IRegisteredProperty<P>).FullName}.");
+            return ret;
         }
 
         public IReadOnlyList<IRegisteredProperty> GetRegisteredPropertiesForType(Type objectType)

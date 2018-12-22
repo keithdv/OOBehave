@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OOBehave.UnitTest.PersonObjects
@@ -15,8 +16,8 @@ namespace OOBehave.UnitTest.PersonObjects
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public Guid FatherId { get; set; }
-        public Guid MotherId { get; set; }
+        public Guid? FatherId { get; set; }
+        public Guid? MotherId { get; set; }
         public Guid? MateId { get; set; }
 
         public static IReadOnlyList<PersonDto> Data()
@@ -26,21 +27,29 @@ namespace OOBehave.UnitTest.PersonObjects
             PersonDto father;
             PersonDto mother;
 
-            result.Add(father = new PersonDto() { FirstName = "Grandpa", LastName = "Smith", Title = "Mr." });
-            result.Add(mother = new PersonDto() { FirstName = "Grandma", LastName = "Smith", Title = "Mrs." });
+            result.Add(father = new PersonDto() { FirstName = "A", LastName = "Smith", Title = "Mr." });
+            result.Add(mother = new PersonDto() { FirstName = "B", LastName = "Smith", Title = "Mrs." });
 
             father.MateId = mother.PersonId;
             mother.MateId = father.PersonId;
 
             List<PersonDto> children = new List<PersonDto>();
 
-            children.Add(new PersonDto() { FirstName = "Oldest Child", LastName = "Smith", Title = "Mr." });
-            //children.Add(new PersonDto() { FirstName = "Middle Child", LastName = "Smith", Title = "Mr." });
-            //children.Add(new PersonDto() { FirstName = "Youngest Child", LastName = "Smith", Title = "Mr." });
+            children.Add(new PersonDto() { FirstName = "AB1", LastName = "Smith", Title = "Mr." });
+            children.Add(new PersonDto() { FirstName = "AB2", LastName = "Smith", Title = "Mr." });
+            children.Add(new PersonDto() { FirstName = "AB3", LastName = "Smith", Title = "Mr." });
 
             children.ForEach(c => { c.FatherId = father.PersonId; c.MotherId = mother.PersonId; });
 
             result.AddRange(children);
+
+            father = children.First();
+            mother = new PersonDto() { FirstName = "C", LastName = "Johnson", Title = "Mrs." };
+            children.Clear();
+
+            children.Add(new PersonDto() { FirstName = "AB1C1", LastName = "Smith", Title = "Mr." });
+            children.Add(new PersonDto() { FirstName = "AB1C2", LastName = "Smith", Title = "Mr." });
+            children.Add(new PersonDto() { FirstName = "AB1C3", LastName = "Smith", Title = "Mr." });
 
             return result.AsReadOnly();
 

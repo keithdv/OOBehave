@@ -41,5 +41,21 @@ namespace OOBehave.UnitTest.Base
             Assert.AreEqual(firstName, single.FirstName);
             Assert.AreEqual(lastName, single.LastName);
         }
+
+        [TestMethod]
+        public void Base_Set_Inherited_Type_Setter()
+        {
+            var B = new B();
+            single.TestPropertyType = B;
+        }
+
+        [TestMethod]
+        public void Base_Set_Inherited_Type_LoadProperty()
+        {
+            var B = new B();
+            single.LoadPropertyTest(B);
+        }
+
+
     }
 }

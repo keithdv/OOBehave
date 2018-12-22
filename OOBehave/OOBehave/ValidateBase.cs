@@ -25,19 +25,19 @@ namespace OOBehave
     public abstract class ValidateBase<T> : Base<T>, IValidateBase<T>, INotifyPropertyChanged
         where T : ValidateBase<T>
     {
-        protected IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
+        protected IRegisteredPropertyValidateDataManager<T> ValidateFieldDataManager { get; }
 
         protected IRuleExecute<T> RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices<T> services) : base(services)
         {
-            this.RegisteredPropertyValidateDataManager = services.RegisteredPropertyValidateDataManager;
+            this.ValidateFieldDataManager = services.RegisteredPropertyValidateDataManager;
 
             // TODO - Why do I need to cast to T??
             this.RuleExecute = services.CreateRuleExecute((T)this);
         }
 
-        public bool IsValid => RuleExecute.IsValid; // And Child.IsValidate from RegisteredPropertyDataManager
+        public bool IsValid => RuleExecute.IsValid && ValidateFieldDataManager.IsValid;
 
         public bool IsSelfValid => RuleExecute.IsValid;
 

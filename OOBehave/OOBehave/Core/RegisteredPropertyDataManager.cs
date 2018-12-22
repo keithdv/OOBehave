@@ -56,12 +56,12 @@ namespace OOBehave.Core
             return registeredPropertyManager.RegisterProperty<T, P>(name);
         }
 
-        public void Load<P>(string name, P newValue)
+        public virtual void Load<P>(string name, P newValue)
         {
             Load(GetRegisteredProperty<P>(name), newValue);
         }
 
-        public void Load<P>(IRegisteredProperty registeredProperty, P newValue)
+        public virtual void Load<P>(IRegisteredProperty registeredProperty, P newValue)
         {
             if (!fieldData.ContainsKey(registeredProperty.Index))
             {
@@ -79,7 +79,7 @@ namespace OOBehave.Core
             return Read<P>(GetRegisteredProperty<P>(name));
         }
 
-        public P Read<P>(IRegisteredProperty<P> registeredProperty)
+        public virtual P Read<P>(IRegisteredProperty<P> registeredProperty)
         {
             if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
             {

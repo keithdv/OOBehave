@@ -46,12 +46,15 @@ namespace OOBehave.UnitTest
                 builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
 
                 builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
-                builder.RegisterType<ValidateBase.Person>().As<ValidateBase.IPerson>();
+                builder.RegisterType<ValidateBase.ParentChild>().As<ValidateBase.IParentChild>();
 
                 builder.RegisterType<RegisteredOperationManager>().As<IRegisteredOperationManager>().SingleInstance();
-                builder.RegisterGeneric(typeof(RequestResponseObjectPortal<>)).As(typeof(IObjectPortal<>));
 
-                builder.RegisterType<DomainObject>().As<IDomainObject>();
+                builder.RegisterGeneric(typeof(LocalReceivePortal<>)).As(typeof(IReceivePortal<>)).InstancePerLifetimeScope();
+                builder.RegisterGeneric(typeof(LocalSendReceivePortal<>)).As(typeof(ISendReceivePortal<>)).InstancePerLifetimeScope();
+
+                builder.RegisterType<ReadOnlyObject>().As<IReadOnlyObject>();
+                builder.RegisterType<EditObject>().As<IEditObject>();
 
                 builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>
                 {

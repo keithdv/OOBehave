@@ -7,63 +7,49 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBase
 {
 
-    public interface IPerson : IPersonBase
+    public interface IParentChild : IPersonBase
     {
-        IPerson Mate { get; }
-        IPerson Child { get; }
+        IPersonBase Child { get; }
     }
 
-    public class Person : PersonBase<Person>, IPerson
+    public class ParentChild : PersonBase<ParentChild>, IParentChild
     {
-        public Person(IValidateBaseServices<Person> services) : base(services)
+        public ParentChild(IValidateBaseServices<ParentChild> services) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameAsyncRule<Person>());
-            RuleExecute.AddRule(new FullNameAsyncRule<Person>());
-            RuleExecute.AddRule(new PersonAsyncRule<Person>());
+            RuleExecute.AddRule(new ShortNameRule<ParentChild>());
+            RuleExecute.AddRule(new FullNameRule<ParentChild>());
+            RuleExecute.AddRule(new PersonRule<ParentChild>());
         }
 
-        public IPerson Mate
+        public IPersonBase Child
         {
-            get { return ReadProperty<IPerson>(); }
+            get { return ReadProperty<IPersonBase>(); }
             set { SetProperty(value); }
         }
 
-        public IPerson Child
+        [Fetch]
+        public async Task Fetch(PersonDto person, IReceivePortal<IParentChild> portal, IReadOnlyList<PersonDto> personTable)
         {
-            get { return ReadProperty<IPerson>(); }
-            set { SetProperty(value); }
-        }
-
-        [Create]
-        public void Create(IObjectPortal<IPerson> portal, IReadOnlyList<PersonDto> personTable)
-        {
-            var dto = personTable.Single(p => p.FirstName == "Grandpa");
-            base.FillFromDto(dto);
+            base.FillFromDto(person);
 
             var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
 
             if (child != null)
             {
-                LoadProperty(portal.CreateChild(child), nameof(Child));
+                LoadProperty<IPersonBase>(await portal.FetchChild(child), nameof(Child));
             }
         }
 
 
-        [CreateChild]
-        public void Create(PersonDto dto, IObjectPortal<IPerson> portal, IReadOnlyList<PersonDto> personTable)
+        [FetchChild]
+        public void Fetch(PersonDto dto)
         {
             base.FillFromDto(dto);
-
-            var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
-
-            if (child != null)
-            {
-                LoadProperty(portal.CreateChild(child), nameof(Child));
-            }
         }
 
     }
@@ -72,23 +58,54 @@ namespace OOBehave.UnitTest.ValidateBase
     public class ValidateParentChildTests
     {
         private ILifetimeScope scope;
-
+        private Task<IParentChild> parentTask;
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
+            var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
+            parentTask = scope.Resolve<IReceivePortal<IParentChild>>().Fetch(parentDto);
         }
 
-        [TestMethod]
-        public void ValidateAsyncRules_Const()
+        [TestCleanup]
+        public void TestInitalize()
         {
             scope.Dispose();
         }
 
         [TestMethod]
-        public void ValidateParentChildTests_Create_Parent()
+        public void ValidateAsyncRules_Const()
         {
-            var parent = scope.Resolve<IObjectPortal<IPerson>>().Create();
+        }
+
+        [TestMethod]
+        public async Task ValidateParentChildTests_Fetch()
+        {
+            var parent = await parentTask;
+            Assert.IsTrue(parent.IsValid);
+        }
+
+        [TestMethod]
+        public async Task ValidateParentChildTests_ParentInvalid()
+        {
+            var parent = await parentTask;
+            parent.FirstName = "Error";
+            Assert.IsFalse(parent.IsValid);
+            Assert.IsFalse(parent.IsSelfValid);
+            Assert.IsTrue(parent.Child.IsValid);
+            Assert.IsTrue(parent.Child.IsSelfValid);
+        }
+
+        [TestMethod]
+        public async Task ValidateParentChildTests_ChildInvalid()
+        {
+            var parent = await parentTask;
+            parent.Child.FirstName = "Error";
+            Assert.IsFalse(parent.IsValid);
+            Assert.IsTrue(parent.IsSelfValid);
+            Assert.IsFalse(parent.Child.IsValid);
+            Assert.IsFalse(parent.Child.IsSelfValid);
         }
     }
 }
+

@@ -8,12 +8,12 @@ namespace OOBehave.Core
 {
     public interface IRegisteredPropertyValidateDataManager<T> : IRegisteredPropertyDataManager<T>
     {
-
+        bool IsValid { get; }
     }
 
-    internal interface IRegisteredPropertyValidateData : IRegisteredPropertyData, IValidateMetaProperties
+    internal interface IRegisteredPropertyValidateData : IRegisteredPropertyData
     {
-
+        bool IsValid { get; }
     }
 
     internal interface IRegisteredPropertyValidateData<T> : IRegisteredPropertyValidateData, IRegisteredPropertyData<T>
@@ -32,10 +32,6 @@ namespace OOBehave.Core
 
         public bool IsValid => child.IsValid;
 
-        public bool IsSelfValid => child.IsValid;
-
-        public bool IsChild => child.IsChild;
-
     }
 
     internal class RegisteredPropertyValidateData<T> : RegisteredPropertyData<T>, IRegisteredPropertyValidateData<T>
@@ -47,10 +43,6 @@ namespace OOBehave.Core
 
         public bool IsValid => true;
 
-        public bool IsSelfValid => true;
-
-        public bool IsChild => true;
-
     }
 
     public class RegisteredPropertyValidateDataManager<T> : RegisteredPropertyDataManager<T>, IRegisteredPropertyValidateDataManager<T>
@@ -58,6 +50,14 @@ namespace OOBehave.Core
 
         public RegisteredPropertyValidateDataManager(IRegisteredPropertyManager registeredPropertyManager) : base(registeredPropertyManager)
         {
+        }
+
+        public bool IsValid
+        {
+            get
+            {
+                return !fieldData.Values.Cast<IRegisteredPropertyValidateData>().Any(_ => !_.IsValid);
+            }
         }
 
         protected override IRegisteredPropertyData<P> CreateRegisteredPropertyData<P>(string name, P value)

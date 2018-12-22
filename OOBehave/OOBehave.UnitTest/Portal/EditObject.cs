@@ -5,10 +5,10 @@ using System;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class DomainObject : Base<DomainObject>, IDomainObject
+    public class EditObject : EditBase<EditObject>, IEditObject
     {
 
-        public DomainObject(IBaseServices<DomainObject> baseServices) : base(baseServices)
+        public EditObject(IEditableBaseServices<EditObject> baseServices) : base(baseServices)
         {
         }
 
@@ -65,6 +65,61 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         [CreateChild]
         private void CreateChild(Guid criteria, IDisposableDependency dependency)
+        {
+            Assert.IsNotNull(dependency);
+            GuidCriteria = criteria;
+        }
+
+        public bool FetchCalled { get; set; } = false;
+
+        [Fetch]
+        private void Fetch()
+        {
+            FetchCalled = true;
+        }
+
+        [Fetch]
+        private void Fetch(int criteria)
+        {
+            IntCriteria = criteria;
+        }
+
+        [Fetch]
+        private void Fetch(Guid criteria)
+        {
+            GuidCriteria = criteria;
+        }
+
+
+        [Fetch]
+        private void Fetch(Guid criteria, IDisposableDependency dependency)
+        {
+            Assert.IsNotNull(dependency);
+            GuidCriteria = criteria;
+        }
+
+        public bool FetchChildCalled { get; set; } = false;
+
+        [FetchChild]
+        private void FetchChild()
+        {
+            FetchChildCalled = true;
+        }
+
+        [FetchChild]
+        private void FetchChild(int criteria)
+        {
+            IntCriteria = criteria;
+        }
+
+        [FetchChild]
+        private void FetchChild(Guid criteria)
+        {
+            GuidCriteria = criteria;
+        }
+
+        [FetchChild]
+        private void FetchChild(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;

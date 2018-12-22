@@ -4,6 +4,12 @@ using System.Text;
 
 namespace OOBehave.UnitTest.Base
 {
+    public interface IA { }
+
+    public interface IB : IA { }
+
+    public class B : IB { }
+
     public class Base : Base<Base>
     {
 
@@ -27,5 +33,23 @@ namespace OOBehave.UnitTest.Base
             set { LoadProperty(value); }
         }
 
+        public IA TestPropertyType
+        {
+            get { return ReadProperty<IA>(); }
+            set { LoadProperty(value); }
+        }
+
+        /// <summary>
+        /// For unit testing purposes only
+        /// Do not expose the LoadProperty method like this
+        /// </summary>
+        /// <param name="propertyValue"></param>
+        public void LoadPropertyTest(B propertyValue)
+        {
+            /// Example - If the types are different you need to explicitly define the type
+            /// of the Property
+            /// The <IA> in this case
+            LoadProperty<IA>(propertyValue, nameof(TestPropertyType));
+        }
     }
 }
