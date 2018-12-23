@@ -80,9 +80,9 @@ namespace OOBehave.UnitTest.Base.Authorization
         }
 
         [AuthorizationRules]
-        public static void RegisterAuthorizationRules(IRegisteredAuthorizationRuleManager registeredAuthorizationRuleManager)
+        public static void RegisterAuthorizationRules(IAuthorizationRuleManager authorizationRuleManager)
         {
-            registeredAuthorizationRuleManager.AddRule<AuthorizationGrantedAsyncRule>();
+            authorizationRuleManager.AddRule<AuthorizationGrantedAsyncRule>();
         }
 
         [Create]

@@ -14,6 +14,7 @@ namespace OOBehave.UnitTest.Base.Authorization
     {
         public int Criteria { get; set; }
         public bool ExecuteCreateCalled { get; set; }
+
         [Execute(AuthorizeOperation.Create)]
         public IAuthorizationRuleResult ExecuteCreate()
         {
@@ -62,20 +63,20 @@ namespace OOBehave.UnitTest.Base.Authorization
         }
     }
 
-    public interface IBaseAuthorizationObject : IBase { }
+    public interface IBaseAuthorizationGrantedObject : IBase { }
 
-    public class BaseAuthorizationObject : Base<BaseAuthorizationObject>, IBaseAuthorizationObject
+    public class BaseAuthorizationGrantedObject : Base<BaseAuthorizationGrantedObject>, IBaseAuthorizationGrantedObject
     {
 
-        public BaseAuthorizationObject(IBaseServices<BaseAuthorizationObject> services) : base(services)
+        public BaseAuthorizationGrantedObject(IBaseServices<BaseAuthorizationGrantedObject> services) : base(services)
         {
 
         }
 
         [AuthorizationRules]
-        public static void RegisterAuthorizationRules(IRegisteredAuthorizationRuleManager registeredAuthorizationRuleManager)
+        public static void RegisterAuthorizationRules(IAuthorizationRuleManager authorizationRuleManager)
         {
-            registeredAuthorizationRuleManager.AddRule<AuthorizationGrantedRule>();
+            authorizationRuleManager.AddRule<AuthorizationGrantedRule>();
         }
 
         [Create]
@@ -90,17 +91,17 @@ namespace OOBehave.UnitTest.Base.Authorization
     }
 
     [TestClass]
-    public class BaseAuthorizationTests
+    public class BaseAuthorizationGrantedTests
     {
 
         ILifetimeScope scope;
-        IReceivePortal<IBaseAuthorizationObject> portal;
+        IReceivePortal<IBaseAuthorizationGrantedObject> portal;
 
         [TestInitialize]
         public void TestInitialize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            portal = scope.Resolve<IReceivePortal<IBaseAuthorizationObject>>();
+            portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedObject>>();
         }
 
         [TestMethod]
