@@ -26,8 +26,7 @@ namespace OOBehave
 
         private IFactory Factory { get; }
         public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager,
-            IRegisteredOperationManager registeredOperationManager,
-            IFactory factory) : base(registeredPropertyManager, registeredOperationManager)
+            IFactory factory) : base(registeredPropertyManager)
         {
             this.RegisteredPropertyValidateDataManager = registeredPropertyManager;
             this.Factory = factory;

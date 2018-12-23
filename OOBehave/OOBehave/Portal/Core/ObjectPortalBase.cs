@@ -18,15 +18,13 @@ namespace OOBehave.Portal.Core
         protected IServiceScope Scope { get; }
         protected IRegisteredOperationManager RegisteredOperationManager { get; }
         protected IRegisteredAuthorizationRuleManager RegisteredAuthorizationRuleManager { get; }
-        public ObjectPortalBase(IServiceScope scope, IRegisteredOperationManager registeredOperations)
+        public ObjectPortalBase(IServiceScope scope)
         {
             Scope = scope;
-            // TODO Align this with RegisteredAuthorizationRuleManager
-            // Where ObjectPortal does all the work
-            RegisteredOperationManager = registeredOperations;
 
             // To find the static method this needs to be the concrete type
             var concreteType = scope.ConcreteType<T>() ?? throw new Exception($"Type {typeof(T).FullName} is not registered");
+            RegisteredOperationManager = scope.Resolve(typeof(IRegisteredOperationManager<>).MakeGenericType(concreteType)) as IRegisteredOperationManager;
             RegisteredAuthorizationRuleManager = scope.Resolve(typeof(IRegisteredAuthorizationRuleManager<>).MakeGenericType(concreteType)) as IRegisteredAuthorizationRuleManager;
         }
 

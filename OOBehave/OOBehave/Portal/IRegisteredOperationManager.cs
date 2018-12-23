@@ -4,12 +4,16 @@ using System.Reflection;
 
 namespace OOBehave.Portal
 {
+
     public interface IRegisteredOperationManager
     {
-        bool TypeRegistered<T>();
-        MethodInfo MethodForOperation(Type targetType, Operation operation, Type criteriaType);
-        IEnumerable<MethodInfo> MethodsForOperation(Type targetType, Operation operation);
-        void RegisterOperation<T>(Operation operation, string methodName);
-        void RegisterOperation<T>(Operation operation, MethodInfo method);
+        MethodInfo MethodForOperation(Operation operation, Type criteriaType);
+        IEnumerable<MethodInfo> MethodsForOperation(Operation operation);
+        void RegisterOperation(Operation operation, string methodName);
+        void RegisterOperation(Operation operation, MethodInfo method);
+
+    }
+    public interface IRegisteredOperationManager<T> : IRegisteredOperationManager
+    {
     }
 }

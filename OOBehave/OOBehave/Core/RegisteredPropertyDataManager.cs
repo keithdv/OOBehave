@@ -38,10 +38,10 @@ namespace OOBehave.Core
     public class RegisteredPropertyDataManager<T> : IRegisteredPropertyDataManager<T>
     {
 
-        protected readonly IRegisteredPropertyManager registeredPropertyManager;
+        protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
         protected IDictionary<uint, IRegisteredPropertyData> fieldData = new ConcurrentDictionary<uint, IRegisteredPropertyData>();
 
-        public RegisteredPropertyDataManager(IRegisteredPropertyManager registeredPropertyManager)
+        public RegisteredPropertyDataManager(IRegisteredPropertyManager<T> registeredPropertyManager)
         {
             this.registeredPropertyManager = registeredPropertyManager;
         }
@@ -53,7 +53,7 @@ namespace OOBehave.Core
 
         private IRegisteredProperty<P> GetRegisteredProperty<P>(string name)
         {
-            return registeredPropertyManager.RegisterProperty<T, P>(name);
+            return registeredPropertyManager.RegisterProperty<P>(name);
         }
 
         public virtual void Load<P>(string name, P newValue)

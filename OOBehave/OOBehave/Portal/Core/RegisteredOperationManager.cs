@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,24 +8,41 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Portal.Core
 {
-    public class RegisteredOperationManager : IRegisteredOperationManager
+    public class RegisteredOperationManager<T> : IRegisteredOperationManager<T>
     {
 
-        private Dictionary<Type, Dictionary<Operation, List<MethodInfo>>> AllRegisteredOperations = new Dictionary<Type, Dictionary<Operation, List<MethodInfo>>>();
 
+        private IDictionary<Operation, List<MethodInfo>> RegisteredOperations { get; } = new ConcurrentDictionary<Operation, List<MethodInfo>>();
 
-        public bool TypeRegistered<T>()
+        public RegisteredOperationManager()
         {
-            return AllRegisteredOperations.ContainsKey(typeof(T));
+#if DEBUG
+            if (typeof(T).IsInterface) { throw new Exception($"RegisteredOperationManager should be service type not interface. {typeof(T).FullName}"); }
+#endif
+            RegisterPortalOperations();
         }
 
-        public void RegisterOperation<T>(Operation operation, string methodName)
+
+        // TODO: This should be handled by ObjectPortal
+        protected virtual void RegisterPortalOperations()
+        {
+                var methods = typeof(T).GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                    .Where(m => m.GetCustomAttribute<OperationAttribute>() != null);
+
+                foreach (var m in methods)
+                {
+                    var attribute = m.GetCustomAttribute<OperationAttribute>();
+                    RegisterOperation(attribute.Operation, m);
+                }
+        }
+
+        public void RegisterOperation(Operation operation, string methodName)
         {
             var method = typeof(T).GetMethod(methodName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance) ?? throw new Exception("No method found");
-            RegisterOperation<T>(operation, method);
+            RegisterOperation(operation, method);
         }
 
-        public void RegisterOperation<T>(Operation operation, MethodInfo method)
+        public void RegisterOperation(Operation operation, MethodInfo method)
         {
 
             var returnType = method.ReturnType;
@@ -34,28 +52,18 @@ namespace OOBehave.Portal.Core
                 throw new OperationMethodException($"{method.Name} must be void or return Task");
             }
 
-            if (!AllRegisteredOperations.TryGetValue(typeof(T), out var methodDict))
+            if (!RegisteredOperations.TryGetValue(operation, out var methodList))
             {
-                AllRegisteredOperations.Add(typeof(T), methodDict = new Dictionary<Operation, List<MethodInfo>>());
-            }
-
-            if (!methodDict.TryGetValue(operation, out var methodList))
-            {
-                methodDict.Add(operation, methodList = new List<MethodInfo>());
+                RegisteredOperations.Add(operation, methodList = new List<MethodInfo>());
             }
 
             methodList.Add(method);
 
         }
 
-        public IEnumerable<MethodInfo> MethodsForOperation(Type targetType, Operation operation)
+        public IEnumerable<MethodInfo> MethodsForOperation(Operation operation)
         {
-            if (!AllRegisteredOperations.TryGetValue(targetType, out var methodDict))
-            {
-                return null;
-            }
-
-            if (!methodDict.TryGetValue(operation, out var methods))
+            if (!RegisteredOperations.TryGetValue(operation, out var methods))
             {
                 return null;
             }
@@ -64,9 +72,9 @@ namespace OOBehave.Portal.Core
         }
 
 
-        public MethodInfo MethodForOperation(Type targetType, Operation operation, Type criteriaType)
+        public MethodInfo MethodForOperation(Operation operation, Type criteriaType)
         {
-            var methods = MethodsForOperation(targetType, operation);
+            var methods = MethodsForOperation(operation);
 
             if (methods != null)
             {

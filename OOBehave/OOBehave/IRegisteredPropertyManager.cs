@@ -3,9 +3,14 @@ using System.Collections.Generic;
 
 namespace OOBehave
 {
-    public interface IRegisteredPropertyManager
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T">Generic to ensure that types can only access their properties</typeparam>
+    public interface IRegisteredPropertyManager<T>
     {
-        IRegisteredProperty<P> RegisterProperty<T, P>(string name);
-        IEnumerable<IRegisteredProperty> GetRegisteredPropertiesForType(Type objectType);
+        IRegisteredProperty<P> RegisterProperty<P>(string name);
+        IEnumerable<IRegisteredProperty> GetRegisteredProperties();
     }
 }

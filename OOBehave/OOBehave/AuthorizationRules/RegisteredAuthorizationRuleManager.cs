@@ -99,6 +99,8 @@ namespace OOBehave.AuthorizationRules
 
                 IsRegistered = true;
 
+                // This is why we keep this Generic
+                // So that we don't pass the ability to change for ALL types
                 method.Invoke(null, new object[] { this });
             }
         }

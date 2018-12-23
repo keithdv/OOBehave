@@ -14,9 +14,8 @@ namespace OOBehave.Portal.Core
         where T : IBase
     {
 
-        public LocalReceivePortal(IServiceScope scope,
-            IRegisteredOperationManager registeredOperations)
-            : base(scope, registeredOperations)
+        public LocalReceivePortal(IServiceScope scope)
+            : base(scope)
         {
         }
 
@@ -69,7 +68,7 @@ namespace OOBehave.Portal.Core
         {
             await CheckAccess(operation.ToAuthorizationOperation());
 
-            var methods = RegisteredOperationManager.MethodsForOperation(target.GetType(), operation) ?? new List<MethodInfo>();
+            var methods = RegisteredOperationManager.MethodsForOperation(operation) ?? new List<MethodInfo>();
 
             var invoked = false;
 
@@ -132,7 +131,7 @@ namespace OOBehave.Portal.Core
 
             // This needs to be target.GetType() instead of a generic method
             // because T will be an interface but tager.GetType() will be the concrete
-            var method = RegisteredOperationManager.MethodForOperation(target.GetType(), operation, criteria.GetType());
+            var method = RegisteredOperationManager.MethodForOperation(operation, criteria.GetType());
 
             if (method == null)
             {
@@ -175,9 +174,8 @@ namespace OOBehave.Portal.Core
         where T : IEditBase
     {
 
-        public LocalSendReceivePortal(IServiceScope scope,
-            IRegisteredOperationManager registeredOperations)
-            : base(scope, registeredOperations)
+        public LocalSendReceivePortal(IServiceScope scope)
+            : base(scope)
         {
         }
 

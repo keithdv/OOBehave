@@ -48,7 +48,7 @@ namespace OOBehave.Core
     public class RegisteredPropertyValidateDataManager<T> : RegisteredPropertyDataManager<T>, IRegisteredPropertyValidateDataManager<T>
     {
 
-        public RegisteredPropertyValidateDataManager(IRegisteredPropertyManager registeredPropertyManager) : base(registeredPropertyManager)
+        public RegisteredPropertyValidateDataManager(IRegisteredPropertyManager<T> registeredPropertyManager) : base(registeredPropertyManager)
         {
         }
 

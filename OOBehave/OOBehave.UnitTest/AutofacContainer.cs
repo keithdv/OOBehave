@@ -33,14 +33,14 @@ namespace OOBehave.UnitTest
                 // Meta Data about the properties and methods of Classes
                 // This will not change during runtime
                 // So SingleInstance
-                builder.RegisterType<RegisteredOperationManager>().As<IRegisteredOperationManager>().SingleInstance();
-                builder.RegisterType<RegisteredPropertyManager>().As<IRegisteredPropertyManager>().SingleInstance();
+                builder.RegisterGeneric(typeof(RegisteredOperationManager<>)).As(typeof(IRegisteredOperationManager<>)).SingleInstance();
+                builder.RegisterGeneric(typeof(RegisteredPropertyManager<>)).As(typeof(IRegisteredPropertyManager<>)).SingleInstance();
 
 
                 // Should not be singleinstance because AuthorizationRules have constructor dependencies
                 builder.RegisterGeneric(typeof(RegisteredAuthorizationRuleManager<>)).As(typeof(IRegisteredAuthorizationRuleManager<>)).InstancePerLifetimeScope();
 
-                // Stored values for each class instance
+                // Stored values for each Domain Object instance
                 // MUST BE per instance
                 builder.RegisterGeneric(typeof(RegisteredPropertyDataManager<>)).As(typeof(IRegisteredPropertyDataManager<>));
                 builder.RegisterGeneric(typeof(RegisteredPropertyValidateDataManager<>)).As(typeof(IRegisteredPropertyValidateDataManager<>));

@@ -21,7 +21,6 @@ namespace OOBehave
     {
 
         public EditableBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager,
-                                        IRegisteredOperationManager registeredOperationManager,
-                                        IFactory factory) : base(registeredPropertyManager, registeredOperationManager, factory) { }
+                                        IFactory factory) : base(registeredPropertyManager, factory) { }
     }
 }
