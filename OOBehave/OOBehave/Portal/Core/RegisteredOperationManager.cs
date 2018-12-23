@@ -31,7 +31,7 @@ namespace OOBehave.Portal.Core
 
             if (!(returnType == typeof(void) || returnType == typeof(Task)))
             {
-                throw new OperationMethodException($"{method.Name} must be async or void");
+                throw new OperationMethodException($"{method.Name} must be void or return Task");
             }
 
             if (!AllRegisteredOperations.TryGetValue(typeof(T), out var methodDict))
@@ -48,7 +48,7 @@ namespace OOBehave.Portal.Core
 
         }
 
-        public IReadOnlyList<MethodInfo> MethodsForOperation(Type targetType, Operation operation)
+        public IEnumerable<MethodInfo> MethodsForOperation(Type targetType, Operation operation)
         {
             if (!AllRegisteredOperations.TryGetValue(targetType, out var methodDict))
             {
@@ -66,18 +66,21 @@ namespace OOBehave.Portal.Core
 
         public MethodInfo MethodForOperation(Type targetType, Operation operation, Type criteriaType)
         {
-            var methods = MethodsForOperation(targetType, operation) ?? throw new ArgumentNullException("methods");
+            var methods = MethodsForOperation(targetType, operation);
 
-            foreach (var m in methods)
+            if (methods != null)
             {
-                var parameters = m.GetParameters();
-                var hasCriteriaParameter = parameters.Where(p => p.ParameterType == criteriaType).FirstOrDefault();
-
-                if (hasCriteriaParameter != null)
+                foreach (var m in methods)
                 {
-                    return m;
-                }
+                    var parameters = m.GetParameters();
+                    var hasCriteriaParameter = parameters.Where(p => p.ParameterType == criteriaType).FirstOrDefault();
 
+                    if (hasCriteriaParameter != null)
+                    {
+                        return m;
+                    }
+
+                }
             }
 
             return null;

@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
 using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,13 @@ namespace OOBehave
         where T : Base<T>
     {
 
-        protected readonly IRegisteredPropertyDataManager<T> FieldDataManager;
+        protected IRegisteredPropertyDataManager<T> FieldDataManager { get; }
 
 
         public Base(IBaseServices<T> services)
         {
             FieldDataManager = services.RegisteredPropertyDataManager;
-            RegisterOperations(services.RegisteredOperationManager);
+            RegisterPortalOperations(services.RegisteredOperationManager);
         }
 
         protected P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -42,7 +43,8 @@ namespace OOBehave
             FieldDataManager.Load(propertyName, value);
         }
 
-        protected void RegisterOperations(IRegisteredOperationManager registeredOperationManager)
+        // TODO: This should be handled by ObjectPortal
+        protected virtual void RegisterPortalOperations(IRegisteredOperationManager registeredOperationManager)
         {
             if (!registeredOperationManager.TypeRegistered<T>())
             {

@@ -10,7 +10,7 @@ namespace OOBehave.Rules
     public interface ICascadeRule<T> : IRule<T>
     {
 
-        IReadOnlyList<string> TriggerProperties { get; }
+        IEnumerable<string> TriggerProperties { get; }
 
     }
 
@@ -22,7 +22,7 @@ namespace OOBehave.Rules
             TriggerProperties = new List<string>();
         }
 
-        IReadOnlyList<string> ICascadeRule<T>.TriggerProperties => TriggerProperties.AsReadOnly();
+        IEnumerable<string> ICascadeRule<T>.TriggerProperties => TriggerProperties.AsEnumerable();
         protected List<string> TriggerProperties { get; }
 
     }

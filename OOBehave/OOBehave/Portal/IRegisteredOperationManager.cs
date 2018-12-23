@@ -8,7 +8,7 @@ namespace OOBehave.Portal
     {
         bool TypeRegistered<T>();
         MethodInfo MethodForOperation(Type targetType, Operation operation, Type criteriaType);
-        IReadOnlyList<MethodInfo> MethodsForOperation(Type targetType, Operation operation);
+        IEnumerable<MethodInfo> MethodsForOperation(Type targetType, Operation operation);
         void RegisterOperation<T>(Operation operation, string methodName);
         void RegisterOperation<T>(Operation operation, MethodInfo method);
     }

@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
 using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,8 @@ namespace OOBehave
     public class BaseServices<T> : IBaseServices<T>
     {
 
-        public BaseServices(IRegisteredPropertyDataManager<T> registeredPropertyDataManager, IRegisteredOperationManager registeredOperationManager)
+        public BaseServices(IRegisteredPropertyDataManager<T> registeredPropertyDataManager,
+            IRegisteredOperationManager registeredOperationManager)
         {
             this.RegisteredPropertyDataManager = registeredPropertyDataManager;
             this.RegisteredOperationManager = registeredOperationManager;

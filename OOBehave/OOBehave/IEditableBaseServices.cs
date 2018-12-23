@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
 using OOBehave.Portal;
 using OOBehave.Rules;
 using System;

@@ -1,7 +1,9 @@
 ﻿using Autofac;
+using Autofac.Core;
 using OOBehave.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OOBehave.UnitTest
@@ -12,6 +14,7 @@ namespace OOBehave.UnitTest
         public ServiceScope(ILifetimeScope scope)
         {
             this.scope = scope;
+           
         }
 
         public T Resolve<T>()
@@ -42,6 +45,17 @@ namespace OOBehave.UnitTest
         public bool IsRegistered<T>()
         {
             return scope.IsRegistered<T>();
+        }
+
+        public Type ConcreteType<T>()
+        {
+            IComponentRegistration registration = scope.ComponentRegistry.RegistrationsFor(new TypedService(typeof(T))).FirstOrDefault();
+
+            if (registration != null)
+            {
+                return registration.Activator.LimitType;
+            }
+            return null;
         }
     }
 }

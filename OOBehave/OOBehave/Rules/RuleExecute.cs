@@ -11,9 +11,9 @@ namespace OOBehave.Rules
 
     public interface IRuleExecute<T>
     {
-        IReadOnlyCollection<IRule<T>> Rules { get; }
+        IEnumerable<IRule<T>> Rules { get; }
 
-        IReadOnlyList<IRuleResult> Results { get; }
+        IEnumerable<IRuleResult> Results { get; }
 
         void CheckRulesForProperty(string propertyName);
 
@@ -36,16 +36,21 @@ namespace OOBehave.Rules
             this.Target = target;
         }
 
-        IReadOnlyCollection<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
+        IEnumerable<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
 
         private List<IRule<T>> Rules { get; } = new List<IRule<T>>();
 
-        IReadOnlyList<IRuleResult> IRuleExecute<T>.Results => Results.Values.ToList().AsReadOnly();
+        IEnumerable<IRuleResult> IRuleExecute<T>.Results => Results.Values;
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rule"></param>
         public void AddRule(IRule<T> rule)
         {
+            // TODO - Only allow Rule Types to be added - not instances
             Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 

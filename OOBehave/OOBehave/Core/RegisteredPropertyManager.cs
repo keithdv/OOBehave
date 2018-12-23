@@ -51,14 +51,14 @@ namespace OOBehave.Core
             return ret;
         }
 
-        public IReadOnlyList<IRegisteredProperty> GetRegisteredPropertiesForType(Type objectType)
+        public IEnumerable<IRegisteredProperty> GetRegisteredPropertiesForType(Type objectType)
         {
             if (!RegisteredProperties.ContainsKey(objectType))
             {
                 return new List<IRegisteredProperty>().AsReadOnly();
             }
 
-            return RegisteredProperties[objectType].Values.ToList().AsReadOnly();
+            return RegisteredProperties[objectType].Values;
         }
 
 

@@ -13,8 +13,8 @@ namespace OOBehave
     public interface IValidateBase : IBase, IValidateMetaProperties
     {
         Task WaitForRules();
-        IReadOnlyList<string> BrokenRuleMessages { get; }
-        IReadOnlyList<string> BrokenRulePropertyMessages(string propertyName);
+        IEnumerable<string> BrokenRuleMessages { get; }
+        IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
     }
 
     public interface IValidateBase<T> : IValidateBase, IBase<T>
@@ -67,19 +67,19 @@ namespace OOBehave
             return RuleExecute.WaitForRules;
         }
 
-        public IReadOnlyList<string> BrokenRuleMessages
+        public IEnumerable<string> BrokenRuleMessages
         {
             get
             {
                 return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value)
-                                .Union(RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.TargetErrorMessages))).ToList().AsReadOnly();
+                                .Union(RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.TargetErrorMessages)));
 
             }
         }
 
-        public IReadOnlyList<string> BrokenRulePropertyMessages(string propertyName)
+        public IEnumerable<string> BrokenRulePropertyMessages(string propertyName)
         {
-            return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p=>p.Value)).ToList().AsReadOnly();
+            return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
     }
