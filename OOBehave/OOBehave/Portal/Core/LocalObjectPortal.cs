@@ -21,150 +21,83 @@ namespace OOBehave.Portal.Core
 
         public async Task<T> Create()
         {
-            return await CallOperationMethod(Operation.Create, false);
+            return await CallOperationMethod(PortalOperation.Create, false);
         }
 
         public async Task<T> Create(object criteria)
         {
-            return await CallOperationMethod(criteria, Operation.Create);
+            return await CallOperationMethod(criteria, PortalOperation.Create);
         }
 
         public async Task<T> CreateChild()
         {
-            return await CallOperationMethod(Operation.CreateChild, false);
+            return await CallOperationMethod(PortalOperation.CreateChild, false);
         }
 
         public async Task<T> CreateChild(object criteria)
         {
-            return await CallOperationMethod(criteria, Operation.CreateChild);
+            return await CallOperationMethod(criteria, PortalOperation.CreateChild);
         }
 
         public async Task<T> Fetch()
         {
-            return await CallOperationMethod(Operation.Fetch);
+            return await CallOperationMethod(PortalOperation.Fetch);
         }
 
         public async Task<T> Fetch(object criteria)
         {
-            return await CallOperationMethod(criteria, Operation.Fetch);
+            return await CallOperationMethod(criteria, PortalOperation.Fetch);
         }
 
         public async Task<T> FetchChild()
         {
-            return await CallOperationMethod(Operation.FetchChild);
+            return await CallOperationMethod(PortalOperation.FetchChild);
         }
 
         public async Task<T> FetchChild(object criteria)
         {
-            return await CallOperationMethod(criteria, Operation.FetchChild);
+            return await CallOperationMethod(criteria, PortalOperation.FetchChild);
         }
 
-        protected async Task<T> CallOperationMethod(Operation operation, bool throwException = false)
+        protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = false)
         {
-            return await CallOperationMethod(Scope.Resolve<T>(), operation, throwException);
+            var target = Scope.Resolve<T>();
+            await CallOperationMethod(target, operation, throwException);
+            return target;
         }
 
-        protected async Task<T> CallOperationMethod(T target, Operation operation, bool throwException = false)
+        protected async Task CallOperationMethod(T target, PortalOperation operation, bool throwException = false)
         {
             await CheckAccess(operation.ToAuthorizationOperation());
 
-            var methods = RegisteredOperationManager.MethodsForOperation(operation) ?? new List<MethodInfo>();
+            var success = await OperationManager.TryCallOperation(target, operation);
 
-            var invoked = false;
-
-            foreach (var method in methods)
-            {
-                var success = true;
-                var parameters = method.GetParameters().ToList();
-                var parameterValues = new object[parameters.Count()];
-
-                for (var i = 0; i < parameterValues.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    if (!Scope.IsRegistered(parameter.ParameterType))
-                    {
-                        // Assume it's a criteria not a dependency
-                        success = false;
-                        break;
-                    }
-                }
-
-                if (success)
-                {
-                    // No parameters or all of the parameters are dependencies
-                    for (var i = 0; i < parameterValues.Length; i++)
-                    {
-                        var parameter = parameters[i];
-                        parameterValues[i] = Scope.Resolve(parameter.ParameterType);
-                    }
-
-                    invoked = true;
-
-                    var result = method.Invoke(target, parameterValues);
-                    if (method.ReturnType == typeof(Task))
-                    {
-                        await (Task)result;
-                    }
-
-                    break;
-                }
-            }
-
-            if (!invoked && throwException)
+            if(!success && throwException)
             {
                 throw new OperationMethodCallFailedException($"{operation.ToString()} method with no criteria not found on {target.GetType().FullName}.");
             }
 
-            return target;
-
         }
 
-        protected async Task<T> CallOperationMethod(object criteria, Operation operation)
+        protected async Task<T> CallOperationMethod(object criteria, PortalOperation operation)
         {
-            return await CallOperationMethod(Scope.Resolve<T>(), criteria, operation);
+            var target = Scope.Resolve<T>();
+            await CallOperationMethod(target, criteria, operation);
+            return target;
         }
-        protected async Task<T> CallOperationMethod(T target, object criteria, Operation operation)
+        protected async Task CallOperationMethod(T target, object criteria, PortalOperation operation)
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
             await CheckAccess(operation.ToAuthorizationOperation(), criteria);
 
-            // This needs to be target.GetType() instead of a generic method
-            // because T will be an interface but tager.GetType() will be the concrete
-            var method = RegisteredOperationManager.MethodForOperation(operation, criteria.GetType());
+            var success = await OperationManager.TryCallOperation(target, criteria, operation);
 
-            if (method == null)
+            if (!success)
             {
                 throw new OperationMethodCallFailedException($"{operation.ToString()} method with criteria {criteria.GetType().FullName} not found.");
             }
 
-            var parameters = method.GetParameters().ToList();
-            var parameterValues = new object[parameters.Count()];
-
-            for (var i = 0; i < parameterValues.Length; i++)
-            {
-                var parameter = parameters[i];
-                if (parameter.ParameterType == criteria.GetType())
-                {
-                    parameterValues[i] = criteria;
-                }
-                else
-                {
-                    if (Scope.TryResolve(parameter.ParameterType, out var pv))
-                    {
-                        parameterValues[i] = pv;
-                    }
-                }
-            }
-
-            var result = method.Invoke(target, parameterValues);
-
-            if (method.ReturnType == typeof(Task))
-            {
-                await (Task)result;
-            }
-
-            return target;
         }
 
     }
@@ -181,44 +114,44 @@ namespace OOBehave.Portal.Core
 
         public async Task Update(T child)
         {
-            await CallOperationMethod(child, Operation.Update);
+            await CallOperationMethod(child, PortalOperation.Update);
         }
 
         public async Task Update(T child, object criteria)
         {
-            await CallOperationMethod(child, criteria, Operation.Update);
+            await CallOperationMethod(child, criteria, PortalOperation.Update);
         }
 
 
         public async Task UpdateChild(T child)
         {
-            await CallOperationMethod(child, Operation.UpdateChild);
+            await CallOperationMethod(child, PortalOperation.UpdateChild);
         }
 
         public async Task UpdateChild(T child, object criteria)
         {
-            await CallOperationMethod(child, criteria, Operation.UpdateChild);
+            await CallOperationMethod(child, criteria, PortalOperation.UpdateChild);
         }
 
         public async Task Delete(T child)
         {
-            await CallOperationMethod(child, Operation.Delete);
+            await CallOperationMethod(child, PortalOperation.Delete);
         }
 
         public async Task Delete(T child, object criteria)
         {
-            await CallOperationMethod(child, criteria, Operation.Delete);
+            await CallOperationMethod(child, criteria, PortalOperation.Delete);
         }
 
 
         public async Task DeleteChild(T child)
         {
-            await CallOperationMethod(child, Operation.DeleteChild);
+            await CallOperationMethod(child, PortalOperation.DeleteChild);
         }
 
         public async Task DeleteChild(T child, object criteria)
         {
-            await CallOperationMethod(child, criteria, Operation.DeleteChild);
+            await CallOperationMethod(child, criteria, PortalOperation.DeleteChild);
         }
 
     }

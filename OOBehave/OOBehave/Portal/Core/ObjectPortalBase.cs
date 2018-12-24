@@ -16,7 +16,7 @@ namespace OOBehave.Portal.Core
     {
 
         protected IServiceScope Scope { get; }
-        protected IRegisteredOperationManager RegisteredOperationManager { get; }
+        protected IPortalOperationManager OperationManager { get; }
         protected IAuthorizationRuleManager AuthorizationRuleManager { get; }
         public ObjectPortalBase(IServiceScope scope)
         {
@@ -24,7 +24,7 @@ namespace OOBehave.Portal.Core
 
             // To find the static method this needs to be the concrete type
             var concreteType = scope.ConcreteType<T>() ?? throw new Exception($"Type {typeof(T).FullName} is not registered");
-            RegisteredOperationManager = scope.Resolve(typeof(IRegisteredOperationManager<>).MakeGenericType(concreteType)) as IRegisteredOperationManager;
+            OperationManager = scope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(concreteType)) as IPortalOperationManager;
             AuthorizationRuleManager = scope.Resolve(typeof(IAuthorizationRuleManager<>).MakeGenericType(concreteType)) as IAuthorizationRuleManager;
         }
 

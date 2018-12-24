@@ -33,15 +33,15 @@ namespace OOBehave.UnitTest
                 // Meta Data about the properties and methods of Classes
                 // This will not change during runtime
                 // So SingleInstance
-                builder.RegisterGeneric(typeof(RegisteredOperationManager<>)).As(typeof(IRegisteredOperationManager<>)).SingleInstance();
+                builder.RegisterGeneric(typeof(PortalOperationManager<>)).As(typeof(IPortalOperationManager<>)).SingleInstance();
                 builder.RegisterGeneric(typeof(RegisteredPropertyManager<>)).As(typeof(IRegisteredPropertyManager<>)).SingleInstance();
                 // Should not be singleinstance because AuthorizationRules can have constructor dependencies
                 builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
 
                 // Stored values for each Domain Object instance
                 // MUST BE per instance
-                builder.RegisterGeneric(typeof(RegisteredPropertyDataManager<>)).As(typeof(IRegisteredPropertyDataManager<>));
-                builder.RegisterGeneric(typeof(RegisteredPropertyValidateDataManager<>)).As(typeof(IRegisteredPropertyValidateDataManager<>));
+                builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>));
+                builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
 
                 // Takes IServiceScope so these need to match it's lifetime
                 builder.RegisterGeneric(typeof(LocalReceivePortal<>)).As(typeof(IReceivePortal<>)).InstancePerLifetimeScope();
@@ -55,9 +55,11 @@ namespace OOBehave.UnitTest
                 // Unit Test Library
                 builder.RegisterType<Base.Base>();
                 builder.RegisterType<Base.Authorization.BaseAuthorizationGrantedObject>().As<Base.Authorization.IBaseAuthorizationGrantedObject>();
-                builder.RegisterType<Base.Authorization.BaseAuthorizationAsyncObject>().As<Base.Authorization.IBaseAuthorizationAsyncObject>();
-                builder.RegisterType<Base.Authorization.AuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-                builder.RegisterType<Base.Authorization.AuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<Base.Authorization.BaseAuthorizationGrantedAsyncObject>().As<Base.Authorization.IBaseAuthorizationGrantedAsyncObject>();
+                builder.RegisterType<Base.Authorization.BaseAuthorizationGrantedDependencyObject>().As<Base.Authorization.IBaseAuthorizationGrantedDependencyObject>();
+                builder.RegisterType<Base.Authorization.AuthorizationGrantedRule>().As<Base.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<Base.Authorization.AuthorizationGrantedAsyncRule>().As<Base.Authorization.IAuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<Base.Authorization.AuthorizationGrantedDependencyRule>().As<Base.Authorization.IAuthorizationGrantedDependencyRule>().InstancePerLifetimeScope();
 
                 builder.RegisterType<ValidateBase.Validate>();
                 builder.RegisterType<ValidateBase.ValidateAsyncRules>();

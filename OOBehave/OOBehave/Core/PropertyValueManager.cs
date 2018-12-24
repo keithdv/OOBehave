@@ -6,49 +6,49 @@ using System.Text;
 
 namespace OOBehave.Core
 {
-    public interface IRegisteredPropertyDataManager<T>
+    public interface IPropertyValueManager<T>
     {
         void Load<P>(string name, P newValue);
         P Read<P>(string name);
     }
 
-    public interface IRegisteredPropertyData
+    public interface IPropertyValue
     {
         string Name { get; }
 
     }
 
-    public interface IRegisteredPropertyData<T> : IRegisteredPropertyData
+    public interface IPropertyValue<T> : IPropertyValue
     {
         T Value { get; set; }
     }
 
-    public class RegisteredPropertyData<T> : IRegisteredPropertyData<T>, IRegisteredPropertyData
+    public class PropertyValue<T> : IPropertyValue<T>, IPropertyValue
     {
         public string Name { get; private set; }
         public virtual T Value { get; set; }
 
-        public RegisteredPropertyData(string name, T value)
+        public PropertyValue(string name, T value)
         {
             this.Name = name;
             this.Value = value;
         }
     }
 
-    public class RegisteredPropertyDataManager<T> : IRegisteredPropertyDataManager<T>
+    public class PropertyValueManager<T> : IPropertyValueManager<T>
     {
 
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
-        protected IDictionary<uint, IRegisteredPropertyData> fieldData = new ConcurrentDictionary<uint, IRegisteredPropertyData>();
+        protected IDictionary<uint, IPropertyValue> fieldData = new ConcurrentDictionary<uint, IPropertyValue>();
 
-        public RegisteredPropertyDataManager(IRegisteredPropertyManager<T> registeredPropertyManager)
+        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager)
         {
             this.registeredPropertyManager = registeredPropertyManager;
         }
 
-        protected virtual IRegisteredPropertyData<P> CreateRegisteredPropertyData<P>(string name, P value)
+        protected virtual IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
         {
-            return new RegisteredPropertyData<P>(name, value);
+            return new PropertyValue<P>(name, value);
         }
 
         private IRegisteredProperty<P> GetRegisteredProperty<P>(string name)
@@ -65,11 +65,11 @@ namespace OOBehave.Core
         {
             if (!fieldData.ContainsKey(registeredProperty.Index))
             {
-                fieldData[registeredProperty.Index] = CreateRegisteredPropertyData(registeredProperty.Name, newValue);
+                fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty.Name, newValue);
             }
             else
             {
-                var fd = fieldData[registeredProperty.Index] as IRegisteredPropertyData<P> ?? throw new PropertyTypeMismatchException($"FieldData is not {typeof(P).FullName}");
+                var fd = fieldData[registeredProperty.Index] as IPropertyValue<P> ?? throw new PropertyTypeMismatchException($"FieldData is not {typeof(P).FullName}");
                 fd.Value = newValue;
             }
         }
@@ -86,7 +86,7 @@ namespace OOBehave.Core
                 return default(P);
             }
 
-            IRegisteredPropertyData<P> fd = value as IRegisteredPropertyData<P> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(P).FullName}");
+            IPropertyValue<P> fd = value as IPropertyValue<P> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(P).FullName}");
 
             return fd.Value;
         }

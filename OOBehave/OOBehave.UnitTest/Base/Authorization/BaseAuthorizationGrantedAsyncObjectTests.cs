@@ -11,7 +11,16 @@ using System.Threading.Tasks;
 namespace OOBehave.UnitTest.Base.Authorization
 {
 
-    public class AuthorizationGrantedAsyncRule : AuthorizationRule
+    public interface IAuthorizationGrantedAsyncRule : IAuthorizationRule
+    {
+        int Criteria { get; set; }
+        bool ExecuteCreateCalled { get; }
+        bool ExecuteFetchCalled { get; set; }
+        bool ExecuteUpdateCalled { get; set; }
+        bool ExecuteDeleteCalled { get; set; }
+    }
+
+    public class AuthorizationGrantedAsyncRule : AuthorizationRule, IAuthorizationGrantedAsyncRule
     {
         public int Criteria { get; set; }
         public bool ExecuteCreateCalled { get; set; }
@@ -69,12 +78,12 @@ namespace OOBehave.UnitTest.Base.Authorization
         }
     }
 
-    public interface IBaseAuthorizationAsyncObject : IBase { }
+    public interface IBaseAuthorizationGrantedAsyncObject : IBase { }
 
-    public class BaseAuthorizationAsyncObject : Base<BaseAuthorizationAsyncObject>, IBaseAuthorizationAsyncObject
+    public class BaseAuthorizationGrantedAsyncObject : Base<BaseAuthorizationGrantedAsyncObject>, IBaseAuthorizationGrantedAsyncObject
     {
 
-        public BaseAuthorizationAsyncObject(IBaseServices<BaseAuthorizationAsyncObject> services) : base(services)
+        public BaseAuthorizationGrantedAsyncObject(IBaseServices<BaseAuthorizationGrantedAsyncObject> services) : base(services)
         {
 
         }
@@ -82,7 +91,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         [AuthorizationRules]
         public static void RegisterAuthorizationRules(IAuthorizationRuleManager authorizationRuleManager)
         {
-            authorizationRuleManager.AddRule<AuthorizationGrantedAsyncRule>();
+            authorizationRuleManager.AddRule<IAuthorizationGrantedAsyncRule>();
         }
 
         [Create]
@@ -97,51 +106,51 @@ namespace OOBehave.UnitTest.Base.Authorization
     }
 
     [TestClass]
-    public class BaseAuthorizationAsyncTests
+    public class BaseAuthorizationGrantedAsyncTests
     {
 
         ILifetimeScope scope;
-        IReceivePortal<IBaseAuthorizationAsyncObject> portal;
+        IReceivePortal<IBaseAuthorizationGrantedAsyncObject> portal;
 
         [TestInitialize]
         public void TestInitialize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            portal = scope.Resolve<IReceivePortal<IBaseAuthorizationAsyncObject>>();
+            portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedAsyncObject>>();
         }
 
         [TestMethod]
-        public async Task BaseAuthorizationAsync_Create()
+        public async Task BaseAuthorizationGrantedAsync_Create()
         {
             var obj = await portal.Create();
-            var authRule = scope.Resolve<AuthorizationGrantedAsyncRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
         }
 
         [TestMethod]
-        public async Task BaseAuthorizationAsync_Create_Criteria()
+        public async Task BaseAuthorizationGrantedAsync_Create_Criteria()
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Create(criteria);
-            var authRule = scope.Resolve<AuthorizationGrantedAsyncRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }
 
         [TestMethod]
-        public async Task BaseAuthorizationAsync_Fetch()
+        public async Task BaseAuthorizationGrantedAsync_Fetch()
         {
             var obj = await portal.Fetch();
-            var authRule = scope.Resolve<AuthorizationGrantedAsyncRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
         }
 
         [TestMethod]
-        public async Task BaseAuthorizationAsync_Fetch_Criteria()
+        public async Task BaseAuthorizationGrantedAsync_Fetch_Criteria()
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Fetch(criteria);
-            var authRule = scope.Resolve<AuthorizationGrantedAsyncRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }

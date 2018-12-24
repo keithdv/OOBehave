@@ -20,7 +20,7 @@ namespace OOBehave
     public class EditableBaseServices<T> : ValidateBaseServices<T>, IEditableBaseServices<T>
     {
 
-        public EditableBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager,
+        public EditableBaseServices(IValidatePropertyValueManager<T> registeredPropertyManager,
                                         IFactory factory) : base(registeredPropertyManager, factory) { }
     }
 }

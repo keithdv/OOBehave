@@ -24,25 +24,23 @@ namespace OOBehave
         where T : Base<T>
     {
 
-        protected IRegisteredPropertyDataManager<T> FieldDataManager { get; }
+        protected IPropertyValueManager<T> PropertyValueManager { get; }
 
 
         public Base(IBaseServices<T> services)
         {
-            FieldDataManager = services.RegisteredPropertyDataManager;
+            PropertyValueManager = services.PropertyValueManager;
         }
 
         protected P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            return FieldDataManager.Read<P>(propertyName);
+            return PropertyValueManager.Read<P>(propertyName);
         }
 
         protected void LoadProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            FieldDataManager.Load(propertyName, value);
+            PropertyValueManager.Load(propertyName, value);
         }
-
-
 
     }
 

@@ -6,22 +6,22 @@ using System.Text;
 
 namespace OOBehave.Core
 {
-    public interface IRegisteredPropertyValidateDataManager<T> : IRegisteredPropertyDataManager<T>
+    public interface IValidatePropertyValueManager<T> : IPropertyValueManager<T>
     {
         bool IsValid { get; }
     }
 
-    internal interface IRegisteredPropertyValidateData : IRegisteredPropertyData
+    internal interface IValidatePropertyValue : IPropertyValue
     {
         bool IsValid { get; }
     }
 
-    internal interface IRegisteredPropertyValidateData<T> : IRegisteredPropertyValidateData, IRegisteredPropertyData<T>
+    internal interface IValidatePropertyValue<T> : IValidatePropertyValue, IPropertyValue<T>
     {
 
     }
 
-    internal class RegisteredPropertyValidateChild<T> : RegisteredPropertyData<T>, IRegisteredPropertyValidateData<T>
+    internal class RegisteredPropertyValidateChild<T> : PropertyValue<T>, IValidatePropertyValue<T>
     {
 
         private readonly IValidateBase child;
@@ -34,10 +34,10 @@ namespace OOBehave.Core
 
     }
 
-    internal class RegisteredPropertyValidateData<T> : RegisteredPropertyData<T>, IRegisteredPropertyValidateData<T>
+    internal class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>
     {
 
-        public RegisteredPropertyValidateData(string name, T value) : base(name, value)
+        public ValidatePropertyValue(string name, T value) : base(name, value)
         {
         }
 
@@ -45,10 +45,10 @@ namespace OOBehave.Core
 
     }
 
-    public class RegisteredPropertyValidateDataManager<T> : RegisteredPropertyDataManager<T>, IRegisteredPropertyValidateDataManager<T>
+    public class ValidatePropertyValueManager<T> : PropertyValueManager<T>, IValidatePropertyValueManager<T>
     {
 
-        public RegisteredPropertyValidateDataManager(IRegisteredPropertyManager<T> registeredPropertyManager) : base(registeredPropertyManager)
+        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager) : base(registeredPropertyManager)
         {
         }
 
@@ -56,16 +56,16 @@ namespace OOBehave.Core
         {
             get
             {
-                return !fieldData.Values.Cast<IRegisteredPropertyValidateData>().Any(_ => !_.IsValid);
+                return !fieldData.Values.Cast<IValidatePropertyValue>().Any(_ => !_.IsValid);
             }
         }
 
-        protected override IRegisteredPropertyData<P> CreateRegisteredPropertyData<P>(string name, P value)
+        protected override IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
         {
             var child = value as IValidateBase;
             if (child == null)
             {
-                return new RegisteredPropertyValidateData<P>(name, value);
+                return new ValidatePropertyValue<P>(name, value);
             }
             else
             {

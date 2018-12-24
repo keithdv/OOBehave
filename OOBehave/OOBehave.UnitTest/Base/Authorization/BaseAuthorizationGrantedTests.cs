@@ -9,8 +9,15 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.Base.Authorization
 {
-
-    public class AuthorizationGrantedRule : AuthorizationRule
+    public interface IAuthorizationGrantedRule : IAuthorizationRule
+    {
+        int Criteria { get; set; }
+        bool ExecuteCreateCalled { get; }
+        bool ExecuteFetchCalled { get; set; }
+        bool ExecuteUpdateCalled { get; set; }
+        bool ExecuteDeleteCalled { get; set; }
+    }
+    public class AuthorizationGrantedRule : AuthorizationRule, IAuthorizationGrantedRule
     {
         public int Criteria { get; set; }
         public bool ExecuteCreateCalled { get; set; }
@@ -76,7 +83,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         [AuthorizationRules]
         public static void RegisterAuthorizationRules(IAuthorizationRuleManager authorizationRuleManager)
         {
-            authorizationRuleManager.AddRule<AuthorizationGrantedRule>();
+            authorizationRuleManager.AddRule<IAuthorizationGrantedRule>();
         }
 
         [Create]
@@ -108,7 +115,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         public async Task BaseAuthorization_Create()
         {
             var obj = await portal.Create();
-            var authRule = scope.Resolve<AuthorizationGrantedRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
         }
 
@@ -117,7 +124,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Create(criteria);
-            var authRule = scope.Resolve<AuthorizationGrantedRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }
@@ -126,7 +133,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         public async Task BaseAuthorization_Fetch()
         {
             var obj = await portal.Fetch();
-            var authRule = scope.Resolve<AuthorizationGrantedRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
         }
 
@@ -135,7 +142,7 @@ namespace OOBehave.UnitTest.Base.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Fetch(criteria);
-            var authRule = scope.Resolve<AuthorizationGrantedRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }

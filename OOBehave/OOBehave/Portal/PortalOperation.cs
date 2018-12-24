@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OOBehave.Portal
 {
-    public enum Operation
+    public enum PortalOperation
     {
         Create, CreateChild,
         Fetch, FetchChild,
@@ -12,27 +12,27 @@ namespace OOBehave.Portal
         Update, UpdateChild
     }
 
-    public static class OperationExtension
+    public static class PortalOperationExtension
     {
-        public static AuthorizationRules.AuthorizeOperation ToAuthorizationOperation(this Operation operation)
+        public static AuthorizationRules.AuthorizeOperation ToAuthorizationOperation(this PortalOperation operation)
         {
             switch (operation)
             {
-                case Operation.Create:
+                case PortalOperation.Create:
                     return AuthorizationRules.AuthorizeOperation.Create;
-                case Operation.CreateChild:
+                case PortalOperation.CreateChild:
                     return AuthorizationRules.AuthorizeOperation.Create;
-                case Operation.Fetch:
+                case PortalOperation.Fetch:
                     return AuthorizationRules.AuthorizeOperation.Fetch;
-                case Operation.FetchChild:
+                case PortalOperation.FetchChild:
                     return AuthorizationRules.AuthorizeOperation.Fetch;
-                case Operation.Delete:
+                case PortalOperation.Delete:
                     return AuthorizationRules.AuthorizeOperation.Delete;
-                case Operation.DeleteChild:
+                case PortalOperation.DeleteChild:
                     return AuthorizationRules.AuthorizeOperation.Delete;
-                case Operation.Update:
+                case PortalOperation.Update:
                     return AuthorizationRules.AuthorizeOperation.Update;
-                case Operation.UpdateChild:
+                case PortalOperation.UpdateChild:
                     return AuthorizationRules.AuthorizeOperation.Update;
                 default:
                     break;
