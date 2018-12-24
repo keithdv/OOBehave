@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class PersonAsyncRule<T> : TargetAsyncRule<T>
+
+    public interface IPersonAsyncRule<T> : IRule<T> where T : IPersonBase { }
+    public class PersonAsyncRule<T> : TargetAsyncRule<T>, IPersonAsyncRule<T>
         where T : IPersonBase
     {
 

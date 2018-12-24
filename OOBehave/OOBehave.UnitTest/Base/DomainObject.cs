@@ -10,10 +10,18 @@ namespace OOBehave.UnitTest.Base
 
     public class B : IB { }
 
-    public class Base : Base<Base>
+    public interface IDomainObject : IBase<IDomainObject>
+    {
+        Guid Id { get; set; }
+        string FirstName { get; set; }
+        string LastName { get; set; }
+        IA TestPropertyType { get; set; }
+        void LoadPropertyTest(B propertyValue);
+    }
+    public class DomainObject : Base<DomainObject>, IDomainObject
     {
 
-        public Base(IBaseServices<Base> services) : base(services) { }
+        public DomainObject(IBaseServices<DomainObject> services) : base(services) { }
 
         public Guid Id
         {

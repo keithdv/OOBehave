@@ -22,6 +22,7 @@ namespace OOBehave.Rules
         bool IsValid { get; }
 
         void AddRule(IRule<T> rule);
+        void AddRules(params IRule<T>[] rules);
 
     }
 
@@ -43,6 +44,12 @@ namespace OOBehave.Rules
         IEnumerable<IRuleResult> IRuleExecute<T>.Results => Results.Values;
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
+
+
+        public void AddRules(params IRule<T>[] rules)
+        {
+            foreach (var r in rules) { AddRule(r); }
+        }
 
         /// <summary>
         /// 

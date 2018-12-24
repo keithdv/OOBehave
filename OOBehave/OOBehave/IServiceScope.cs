@@ -2,8 +2,9 @@
 
 namespace OOBehave
 {
-    public interface IServiceScope
+    public interface IServiceScope : IDisposable
     {
+        IServiceScope BeginNewScope(object tag = null);
         T Resolve<T>();
 
         object Resolve(Type t);

@@ -16,11 +16,9 @@ namespace OOBehave.Core
         private static uint index = 0;
         private static uint NextIndex() { index++; return index; } // This may be overly simple and in the wrong spot
 
-        private IServiceScope scope { get; }
 
-        public DefaultFactory(IServiceScope scope)
+        public DefaultFactory()
         {
-            this.scope = scope;
         }
 
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)

@@ -5,7 +5,9 @@ using System;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class FullNameDependencyRule<T> : CascadeRule<T>
+    public interface IFullNameDependencyRule<T> : IRule<T> where T : IPersonBase { }
+
+    public class FullNameDependencyRule<T> : CascadeRule<T>, IFullNameDependencyRule<T>
         where T : IPersonBase
     {
 

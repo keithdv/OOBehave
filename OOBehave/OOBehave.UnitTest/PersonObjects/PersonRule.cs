@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class PersonRule<T> : TargetRule<T>
+    public interface IPersonRule<T> : IRule<T> where T : IPersonBase { }
+
+    public class PersonRule<T> : TargetRule<T>, IPersonRule<T>
         where T : IPersonBase
     {
 

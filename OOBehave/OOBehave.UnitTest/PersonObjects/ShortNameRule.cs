@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class ShortNameRule<T> : CascadeRule<T>
+    public interface IShortNameRule<T> : IRule<T> where T : IPersonBase { }
+
+    public class ShortNameRule<T> : CascadeRule<T>, IShortNameRule<T>
         where T : IPersonBase
     {
 

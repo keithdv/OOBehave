@@ -19,11 +19,12 @@ namespace OOBehave.UnitTest.ValidateBase
 
     public class ParentChild : PersonBase<ParentChild>, IParentChild
     {
-        public ParentChild(IValidateBaseServices<ParentChild> services) : base(services)
+        public ParentChild(IValidateBaseServices<ParentChild> services,
+            IShortNameRule<ParentChild> shortNameRule,
+            IFullNameRule<ParentChild> fullNameRule,
+            IPersonRule<ParentChild> personRule) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameRule<ParentChild>());
-            RuleExecute.AddRule(new FullNameRule<ParentChild>());
-            RuleExecute.AddRule(new PersonRule<ParentChild>());
+            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
 
         public IPersonBase Child

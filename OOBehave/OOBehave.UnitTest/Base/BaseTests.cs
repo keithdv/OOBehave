@@ -9,12 +9,12 @@ namespace OOBehave.UnitTest.Base
     [TestClass]
     public class BaseTests
     {
-        private Base single;
+        private IDomainObject single;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            single = AutofacContainer.GetLifetimeScope().Resolve<Base>();
+            single = AutofacContainer.GetLifetimeScope().Resolve<IDomainObject>();
         }
         [TestMethod]
         public void Base_Construct()

@@ -14,7 +14,13 @@ namespace OOBehave.UnitTest
         public ServiceScope(ILifetimeScope scope)
         {
             this.scope = scope;
-           
+
+        }
+
+
+        public IServiceScope BeginNewScope(object tag = null)
+        {
+            return new ServiceScope(scope.BeginLifetimeScope(tag));
         }
 
         public T Resolve<T>()
@@ -56,6 +62,11 @@ namespace OOBehave.UnitTest
                 return registration.Activator.LimitType;
             }
             return null;
+        }
+
+        public void Dispose()
+        {
+            scope.Dispose();
         }
     }
 }

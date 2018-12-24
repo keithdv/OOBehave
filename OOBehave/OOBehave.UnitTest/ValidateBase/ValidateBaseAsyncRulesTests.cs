@@ -11,14 +11,17 @@ using System.Threading.Tasks;
 namespace OOBehave.UnitTest.ValidateBase
 {
 
-    public class ValidateAsyncRules : PersonBase<ValidateAsyncRules>, IValidate
+    public interface IValidateAsyncRules : IPersonBase { }
+
+    public class ValidateAsyncRules : PersonBase<ValidateAsyncRules>, IValidateAsyncRules
     {
 
-        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services)
+        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services,
+            IShortNameAsyncRule<ValidateAsyncRules> shortNameRule,
+            IFullNameAsyncRule<ValidateAsyncRules> fullNameRule,
+            IPersonAsyncRule<ValidateAsyncRules> personRule) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameAsyncRule<ValidateAsyncRules>());
-            RuleExecute.AddRule(new FullNameAsyncRule<ValidateAsyncRules>());
-            RuleExecute.AddRule(new PersonAsyncRule<ValidateAsyncRules>());
+            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
 
     }
@@ -28,12 +31,12 @@ namespace OOBehave.UnitTest.ValidateBase
     {
 
 
-        ValidateAsyncRules validate;
+        IValidateAsyncRules validate;
 
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.GetLifetimeScope().Resolve<ValidateAsyncRules>();
+            validate = AutofacContainer.GetLifetimeScope().Resolve<IValidateAsyncRules>();
         }
 
         [TestMethod]
