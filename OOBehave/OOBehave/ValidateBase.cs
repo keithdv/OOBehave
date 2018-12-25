@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,11 +44,16 @@ namespace OOBehave
 
         public bool IsChild => throw new NotImplementedException();
 
+        public bool IsSelfBusy => RuleExecute.IsBusy;
+
+        public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy;
+
         protected void SetProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName]  string propertyName = "")
         {
             LoadProperty(value, propertyName);
             PropertyHasChanged(propertyName);
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -64,7 +70,7 @@ namespace OOBehave
 
         public virtual Task WaitForRules()
         {
-            return RuleExecute.WaitForRules;
+            return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, ValidatePropertyValueManager.WaitForRules() });
         }
 
         public IEnumerable<string> BrokenRuleMessages

@@ -32,6 +32,16 @@ namespace OOBehave.Core
             return new RuleExecute<T>(target);
         }
 
+        public IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
+        {
+            return new PropertyValue<P>(name, value);
+        }
+        public IValidatePropertyValue<P> CreateValidatePropertyValue<P>(string name, P value)
+        {
+            return new ValidatePropertyValue<P>(name, value);
+        }
+
+
     }
 
     [Serializable]

@@ -39,9 +39,17 @@ namespace OOBehave.UnitTest.ValidateBase
             validate = AutofacContainer.GetLifetimeScope().Resolve<IValidate>();
         }
 
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
+        }
+
         [TestMethod]
         public void Validate_Constructor()
         {
+
         }
 
 

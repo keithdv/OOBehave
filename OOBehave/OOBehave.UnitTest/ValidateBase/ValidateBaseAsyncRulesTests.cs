@@ -39,6 +39,13 @@ namespace OOBehave.UnitTest.ValidateBase
             validate = AutofacContainer.GetLifetimeScope().Resolve<IValidateAsyncRules>();
         }
 
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
+        }
+
         [TestMethod]
         public void ValidateAsyncRules_Const()
         {
@@ -47,17 +54,30 @@ namespace OOBehave.UnitTest.ValidateBase
 
 
         [TestMethod]
-        public void ValidateAsyncRules_Set()
+        public async Task ValidateAsyncRules_Set()
         {
             validate.FirstName = "Keith";
+            await validate.WaitForRules();
         }
 
         [TestMethod]
-        public void ValidateAsyncRules_SetGet()
+        public async Task ValidateAsyncRules_Set_IsBusy_True()
+        {
+            validate.FirstName = "Keith";
+            Assert.IsTrue(validate.IsBusy);
+            Assert.IsTrue(validate.IsSelfBusy);
+            await validate.WaitForRules();
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
+        }
+
+        [TestMethod]
+        public async Task ValidateAsyncRules_SetGet()
         {
             var name = Guid.NewGuid().ToString();
             validate.ShortName = name;
             Assert.AreEqual(name, validate.ShortName);
+            await validate.WaitForRules();
         }
 
         //[TestMethod]

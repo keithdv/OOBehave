@@ -3,75 +3,72 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave.Core
 {
     public interface IValidatePropertyValueManager<T> : IPropertyValueManager<T>
     {
         bool IsValid { get; }
+        bool IsBusy { get; }
+
+        Task WaitForRules();
+
     }
 
-    internal interface IValidatePropertyValue : IPropertyValue
+    public interface IValidatePropertyValue : IPropertyValue
     {
         bool IsValid { get; }
+        bool IsBusy { get; }
+        Task WaitForRules();
     }
 
-    internal interface IValidatePropertyValue<T> : IValidatePropertyValue, IPropertyValue<T>
+    public interface IValidatePropertyValue<T> : IValidatePropertyValue, IPropertyValue<T>
     {
 
     }
 
-    internal class RegisteredPropertyValidateChild<T> : PropertyValue<T>, IValidatePropertyValue<T>
+    public class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>
     {
 
-        private readonly IValidateBase child;
-        public RegisteredPropertyValidateChild(string name, T value) : base(name, value)
-        {
-            child = value as IValidateBase ?? throw new RegisteredPropertyValidateChildDataWrongTypeException($"{typeof(T).FullName} does not implement IValidateBase");
-        }
-
-        public bool IsValid => child.IsValid;
-
-    }
-
-    internal class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>
-    {
-
+        public IValidateBase Child { get; }
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
+            Child = value as IValidateBase ?? throw new RegisteredPropertyValidateChildDataWrongTypeException($"{typeof(T)} is not ValidateBase");
         }
 
-        public bool IsValid => true;
+        public bool IsValid => Child.IsValid;
+        public bool IsBusy => Child.IsBusy;
 
+        public Task WaitForRules() { return Child.WaitForRules(); }
     }
 
     public class ValidatePropertyValueManager<T> : PropertyValueManager<T>, IValidatePropertyValueManager<T>
     {
-
-        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager) : base(registeredPropertyManager)
+        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
         {
+
         }
 
-        public bool IsValid
+        public bool IsValid => !fieldData.Values.OfType<IValidatePropertyValue>().Any(_ => !_.IsValid);
+
+        public bool IsBusy => fieldData.Values.OfType<IValidatePropertyValue>().Any(_ => _.IsBusy);
+
+        public Task WaitForRules()
         {
-            get
-            {
-                return !fieldData.Values.Cast<IValidatePropertyValue>().Any(_ => !_.IsValid);
-            }
+            return Task.WhenAll(fieldData.Values.OfType<IValidatePropertyValue>().Select(x => x.WaitForRules()));
         }
+
 
         protected override IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
         {
-            var child = value as IValidateBase;
-            if (child == null)
+            if(value is IValidateBase)
             {
-                return new ValidatePropertyValue<P>(name, value);
+                return Factory.CreateValidatePropertyValue(name, value);
             }
-            else
-            {
-                return new RegisteredPropertyValidateChild<P>(name, value);
-            }
+            return base.CreatePropertyValue(name, value);
         }
+
     }
 
 

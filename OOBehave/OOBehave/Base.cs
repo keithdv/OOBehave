@@ -32,12 +32,12 @@ namespace OOBehave
             PropertyValueManager = services.PropertyValueManager;
         }
 
-        protected P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        protected virtual P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
             return PropertyValueManager.Read<P>(propertyName);
         }
 
-        protected void LoadProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        protected virtual void LoadProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
             PropertyValueManager.Load(propertyName, value);
         }

@@ -21,6 +21,8 @@ namespace OOBehave.Rules
 
         bool IsValid { get; }
 
+        bool IsBusy { get; }
+
         void AddRule(IRule<T> rule);
         void AddRules(params IRule<T>[] rules);
 
@@ -31,7 +33,7 @@ namespace OOBehave.Rules
 
         protected T Target { get; }
         protected IDictionary<uint, IRuleResult> Results { get; } = new ConcurrentDictionary<uint, IRuleResult>();
-
+        public bool IsBusy => isRunningRules;
         public RuleExecute(T target)
         {
             this.Target = target;

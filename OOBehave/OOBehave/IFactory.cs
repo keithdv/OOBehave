@@ -1,4 +1,5 @@
-﻿using OOBehave.Rules;
+﻿using OOBehave.Core;
+using OOBehave.Rules;
 
 namespace OOBehave
 {
@@ -6,7 +7,8 @@ namespace OOBehave
     {
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
         IRuleExecute<T> CreateRuleExecute<T>(T target);
-
+        IPropertyValue<P> CreatePropertyValue<P>(string name, P value);
+        IValidatePropertyValue<P> CreateValidatePropertyValue<P>(string name, P value);
     }
 
 }

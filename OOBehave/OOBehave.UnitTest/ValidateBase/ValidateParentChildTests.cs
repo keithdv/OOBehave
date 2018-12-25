@@ -20,9 +20,9 @@ namespace OOBehave.UnitTest.ValidateBase
     public class ParentChild : PersonBase<ParentChild>, IParentChild
     {
         public ParentChild(IValidateBaseServices<ParentChild> services,
-            IShortNameRule<ParentChild> shortNameRule,
-            IFullNameRule<ParentChild> fullNameRule,
-            IPersonRule<ParentChild> personRule) : base(services)
+            IShortNameAsyncRule<ParentChild> shortNameRule,
+            IFullNameAsyncRule<ParentChild> fullNameRule,
+            IPersonAsyncRule<ParentChild> personRule) : base(services)
         {
             RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
@@ -59,18 +59,23 @@ namespace OOBehave.UnitTest.ValidateBase
     public class ValidateParentChildTests
     {
         private ILifetimeScope scope;
-        private Task<IParentChild> parentTask;
+        private IParentChild parent;
+        private IPersonBase child;
+
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
             var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
-            parentTask = scope.Resolve<IReceivePortal<IParentChild>>().Fetch(parentDto);
+            parent = scope.Resolve<IReceivePortal<IParentChild>>().Fetch(parentDto).Result;
+            child = parent.Child;
         }
+
 
         [TestCleanup]
         public void TestInitalize()
         {
+            Assert.IsFalse(parent.IsBusy);
             scope.Dispose();
         }
 
@@ -80,32 +85,52 @@ namespace OOBehave.UnitTest.ValidateBase
         }
 
         [TestMethod]
-        public async Task ValidateParentChildTests_Fetch()
+        public void ValidateParentChildTests_Fetch()
         {
-            var parent = await parentTask;
             Assert.IsTrue(parent.IsValid);
         }
 
         [TestMethod]
         public async Task ValidateParentChildTests_ParentInvalid()
         {
-            var parent = await parentTask;
             parent.FirstName = "Error";
+            await parent.WaitForRules();
+            Assert.IsFalse(parent.IsBusy);
             Assert.IsFalse(parent.IsValid);
             Assert.IsFalse(parent.IsSelfValid);
-            Assert.IsTrue(parent.Child.IsValid);
-            Assert.IsTrue(parent.Child.IsSelfValid);
+            Assert.IsTrue(child.IsValid);
+            Assert.IsTrue(child.IsSelfValid);
         }
 
         [TestMethod]
         public async Task ValidateParentChildTests_ChildInvalid()
         {
-            var parent = await parentTask;
-            parent.Child.FirstName = "Error";
+            child.FirstName = "Error";
+            await parent.WaitForRules();
+            Assert.IsFalse(parent.IsBusy);
             Assert.IsFalse(parent.IsValid);
             Assert.IsTrue(parent.IsSelfValid);
-            Assert.IsFalse(parent.Child.IsValid);
-            Assert.IsFalse(parent.Child.IsSelfValid);
+            Assert.IsFalse(child.IsValid);
+            Assert.IsFalse(child.IsSelfValid);
+        }
+
+        [TestMethod]
+        public async Task ValidateParentChildTests_Child_IsBusy()
+        {
+            child.FirstName = "Error";
+
+            Assert.IsTrue(parent.IsBusy);
+            Assert.IsFalse(parent.IsSelfBusy);
+            Assert.IsTrue(child.IsBusy);
+            Assert.IsTrue(child.IsSelfBusy);
+
+            await parent.WaitForRules();
+
+            Assert.IsFalse(parent.IsBusy);
+            Assert.IsFalse(parent.IsValid);
+            Assert.IsTrue(parent.IsSelfValid);
+            Assert.IsFalse(child.IsValid);
+            Assert.IsFalse(child.IsSelfValid);
         }
     }
 }

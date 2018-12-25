@@ -38,20 +38,22 @@ namespace OOBehave.Core
     public class PropertyValueManager<T> : IPropertyValueManager<T>
     {
 
+        protected IFactory Factory { get; }
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
         protected IDictionary<uint, IPropertyValue> fieldData = new ConcurrentDictionary<uint, IPropertyValue>();
 
-        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager)
+        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory)
         {
             this.registeredPropertyManager = registeredPropertyManager;
+            Factory = factory;
         }
 
         protected virtual IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
         {
-            return new PropertyValue<P>(name, value);
+            return Factory.CreatePropertyValue(name, value);
         }
 
-        private IRegisteredProperty<P> GetRegisteredProperty<P>(string name)
+        protected IRegisteredProperty<P> GetRegisteredProperty<P>(string name)
         {
             return registeredPropertyManager.RegisterProperty<P>(name);
         }
