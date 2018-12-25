@@ -8,6 +8,7 @@ namespace OOBehave.Core
 {
     public interface IPropertyValueManager<T>
     {
+        void Set<P>(string name, P newValue);
         void Load<P>(string name, P newValue);
         P Read<P>(string name);
     }
@@ -25,8 +26,13 @@ namespace OOBehave.Core
 
     public class PropertyValue<T> : IPropertyValue<T>, IPropertyValue
     {
-        public string Name { get; private set; }
+        public string Name { get; }
         public virtual T Value { get; set; }
+
+        public PropertyValue(string name)
+        {
+            this.Name = name;
+        }
 
         public PropertyValue(string name, T value)
         {
@@ -58,6 +64,26 @@ namespace OOBehave.Core
             return registeredPropertyManager.RegisterProperty<P>(name);
         }
 
+
+
+        public virtual void Set<P>(string name, P newValue)
+        {
+            Set(GetRegisteredProperty<P>(name), newValue);
+        }
+
+        public virtual void Set<P>(IRegisteredProperty registeredProperty, P newValue)
+        {
+            if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
+            {
+                fieldData[registeredProperty.Index] = value = CreatePropertyValue(registeredProperty.Name, newValue);
+            }
+
+            IPropertyValue<P> fd = value as IPropertyValue<P> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(P).FullName}");
+
+            fd.Value = newValue;
+
+        }
+
         public virtual void Load<P>(string name, P newValue)
         {
             Load(GetRegisteredProperty<P>(name), newValue);
@@ -67,13 +93,11 @@ namespace OOBehave.Core
         {
             if (!fieldData.ContainsKey(registeredProperty.Index))
             {
-                fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty.Name, newValue);
+                // TODO Destroy and Delink to old value
             }
-            else
-            {
-                var fd = fieldData[registeredProperty.Index] as IPropertyValue<P> ?? throw new PropertyTypeMismatchException($"FieldData is not {typeof(P).FullName}");
-                fd.Value = newValue;
-            }
+
+            fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty.Name, newValue);
+
         }
 
         public P Read<P>(string name)
@@ -92,6 +116,9 @@ namespace OOBehave.Core
 
             return fd.Value;
         }
+
+
+
     }
 
 

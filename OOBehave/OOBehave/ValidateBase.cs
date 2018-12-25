@@ -50,7 +50,7 @@ namespace OOBehave
 
         protected void SetProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName]  string propertyName = "")
         {
-            LoadProperty(value, propertyName);
+            PropertyValueManager.Set(propertyName, value);
             PropertyHasChanged(propertyName);
         }
 

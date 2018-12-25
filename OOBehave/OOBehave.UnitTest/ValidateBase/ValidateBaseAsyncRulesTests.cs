@@ -13,7 +13,7 @@ namespace OOBehave.UnitTest.ValidateBase
 
     public interface IValidateAsyncRules : IPersonBase { }
 
-    public class ValidateAsyncRules : PersonBase<ValidateAsyncRules>, IValidateAsyncRules
+    public class ValidateAsyncRules : PersonValidateBase<ValidateAsyncRules>, IValidateAsyncRules
     {
 
         public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services,

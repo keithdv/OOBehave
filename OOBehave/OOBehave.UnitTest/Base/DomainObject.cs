@@ -58,6 +58,7 @@ namespace OOBehave.UnitTest.Base
             /// of the Property
             /// The <IA> in this case
             LoadProperty<IA>(propertyValue, nameof(TestPropertyType));
+
         }
     }
 }

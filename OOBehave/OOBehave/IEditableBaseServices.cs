@@ -15,12 +15,17 @@ namespace OOBehave
     /// </summary>
     public interface IEditableBaseServices<T> : IValidateBaseServices<T>
     {
+        IEditPropertyValueManager<T> EditPropertyValueManager { get; }
     }
 
     public class EditableBaseServices<T> : ValidateBaseServices<T>, IEditableBaseServices<T>
     {
 
-        public EditableBaseServices(IValidatePropertyValueManager<T> registeredPropertyManager,
-                                        IFactory factory) : base(registeredPropertyManager, factory) { }
+        public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
+        public EditableBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
+                                        IFactory factory) : base(registeredPropertyManager, factory)
+        {
+            EditPropertyValueManager = registeredPropertyManager;
+        }
     }
 }

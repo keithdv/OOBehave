@@ -31,16 +31,28 @@ namespace OOBehave.Core
     public class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>
     {
 
-        public IValidateBase Child { get; }
+        public virtual IValidateBase Child { get; protected set; }
+        public ValidatePropertyValue(string name) : base(name) { }
+
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
-            Child = value as IValidateBase ?? throw new RegisteredPropertyValidateChildDataWrongTypeException($"{typeof(T)} is not ValidateBase");
+
         }
 
-        public bool IsValid => Child.IsValid;
-        public bool IsBusy => Child.IsBusy;
+        public override T Value
+        {
+            get => base.Value;
+            set
+            {
+                Child = value as IValidateBase;
+                base.Value = value;
+            }
+        }
 
-        public Task WaitForRules() { return Child.WaitForRules(); }
+        public bool IsValid => (Child?.IsValid ?? true);
+        public bool IsBusy => (Child?.IsBusy ?? false);
+
+        public Task WaitForRules() { return Child?.WaitForRules() ?? Task.CompletedTask; }
     }
 
     public class ValidatePropertyValueManager<T> : PropertyValueManager<T>, IValidatePropertyValueManager<T>
@@ -62,11 +74,7 @@ namespace OOBehave.Core
 
         protected override IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
         {
-            if(value is IValidateBase)
-            {
-                return Factory.CreateValidatePropertyValue(name, value);
-            }
-            return base.CreatePropertyValue(name, value);
+            return Factory.CreateValidatePropertyValue(name, value);
         }
 
     }

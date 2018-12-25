@@ -12,7 +12,7 @@ namespace OOBehave.UnitTest.ValidateBase
 {
     public interface IValidateDependencyRules : IPersonBase { }
 
-    public class ValidateDependencyRules : PersonBase<ValidateDependencyRules>, IValidateDependencyRules
+    public class ValidateDependencyRules : PersonValidateBase<ValidateDependencyRules>, IValidateDependencyRules
     {
 
         public ValidateDependencyRules(IValidateBaseServices<ValidateDependencyRules> services,

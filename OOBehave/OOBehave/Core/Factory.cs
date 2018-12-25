@@ -15,10 +15,11 @@ namespace OOBehave.Core
     {
         private static uint index = 0;
         private static uint NextIndex() { index++; return index; } // This may be overly simple and in the wrong spot
+        private IServiceScope Scope { get; }
 
-
-        public DefaultFactory()
+        public DefaultFactory(IServiceScope scope)
         {
+            Scope = scope;
         }
 
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
@@ -41,6 +42,10 @@ namespace OOBehave.Core
             return new ValidatePropertyValue<P>(name, value);
         }
 
+        public IEditPropertyValue<P> CreateEditPropertyValue<P>(string name, P value)
+        {
+            return new EditPropertyValue<P>(Scope.Resolve<IValuesDiffer>(), name, value);
+        }
 
     }
 

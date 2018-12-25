@@ -9,6 +9,7 @@ namespace OOBehave
         IRuleExecute<T> CreateRuleExecute<T>(T target);
         IPropertyValue<P> CreatePropertyValue<P>(string name, P value);
         IValidatePropertyValue<P> CreateValidatePropertyValue<P>(string name, P value);
+        IEditPropertyValue<P> CreateEditPropertyValue<P>(string name, P value);
     }
 
 }

@@ -95,6 +95,9 @@ namespace OOBehave.UnitTest
                 // SingleInstance as long it is isn't modified to accept dependencies
                 builder.RegisterType<DefaultFactory>().As<IFactory>().SingleInstance();
 
+                // Tools - More or less Static classes - but now they can be changed! (For better or worse...)
+                builder.RegisterType<Core.ValuesDiffer>().As<IValuesDiffer>().SingleInstance();
+
                 // Scope Wrapper
                 builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
 
@@ -110,6 +113,7 @@ namespace OOBehave.UnitTest
                 // MUST BE per instance
                 builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>));
                 builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
+                builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
 
                 // Takes IServiceScope so these need to match it's lifetime
                 builder.RegisterGeneric(typeof(LocalReceivePortal<>)).As(typeof(IReceivePortal<>)).InstancePerLifetimeScope();

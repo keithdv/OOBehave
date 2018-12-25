@@ -17,7 +17,7 @@ namespace OOBehave.UnitTest.ValidateBase
         IPersonBase Child { get; }
     }
 
-    public class ParentChild : PersonBase<ParentChild>, IParentChild
+    public class ParentChild : PersonValidateBase<ParentChild>, IParentChild
     {
         public ParentChild(IValidateBaseServices<ParentChild> services,
             IShortNameAsyncRule<ParentChild> shortNameRule,

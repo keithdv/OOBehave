@@ -59,14 +59,14 @@ namespace OOBehave.Portal.Core
             return await CallOperationMethod(criteria, PortalOperation.FetchChild);
         }
 
-        protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = false)
+        protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = true)
         {
             var target = Scope.Resolve<T>();
             await CallOperationMethod(target, operation, throwException);
             return target;
         }
 
-        protected async Task CallOperationMethod(T target, PortalOperation operation, bool throwException = false)
+        protected async Task CallOperationMethod(T target, PortalOperation operation, bool throwException = true)
         {
             await CheckAccess(operation.ToAuthorizationOperation());
 

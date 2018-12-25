@@ -6,11 +6,11 @@ using OOBehave.Rules;
 namespace OOBehave.UnitTest.PersonObjects
 
 {
-    public abstract class PersonBase<T> : ValidateBase<T>, IPersonBase
-        where T : PersonBase<T>
+    public abstract class PersonEditBase<T> : EditBase<T>, IPersonBase
+        where T : PersonEditBase<T>
     {
 
-        public PersonBase(IValidateBaseServices<T> services) : base(services)
+        public PersonEditBase(IEditableBaseServices<T> services) : base(services)
         {
         }
 

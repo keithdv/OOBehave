@@ -4,7 +4,7 @@ using System;
 namespace OOBehave
 {
 
-    public interface IEditBase : IValidateBase
+    public interface IEditBase : IValidateBase, IEditMetaProperties
     {
 
     }
@@ -18,10 +18,22 @@ namespace OOBehave
         where T : EditBase<T>
     {
 
+        protected IEditPropertyValueManager<T> EditPropertyValueManager { get; }
 
         public EditBase(IEditableBaseServices<T> services) : base(services)
         {
+            EditPropertyValueManager = services.EditPropertyValueManager;
         }
+
+
+        public bool IsModified => EditPropertyValueManager.IsModified;
+        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
+
+        public bool IsSavable => IsModified && IsValid && !IsBusy;
+
+        public bool IsNew => throw new NotImplementedException();
+
+        public bool IsDeleted => throw new NotImplementedException();
 
 
     }

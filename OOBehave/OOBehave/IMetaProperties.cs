@@ -22,5 +22,6 @@ namespace OOBehave
         bool IsNew { get; }
         bool IsSavable { get; }
 
+        bool IsDeleted { get; }
     }
 }
