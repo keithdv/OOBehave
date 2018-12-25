@@ -1,12 +1,13 @@
 ﻿using OOBehave.Core;
 using System;
+using System.Collections.Generic;
 
 namespace OOBehave
 {
 
     public interface IEditBase : IValidateBase, IEditMetaProperties
     {
-
+        IEnumerable<string> ModifiedProperties { get; }
     }
 
     public interface IEditBase<T> : IEditBase, IValidateBase<T>
@@ -35,6 +36,7 @@ namespace OOBehave
 
         public bool IsDeleted => throw new NotImplementedException();
 
+        public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
 
     }
 

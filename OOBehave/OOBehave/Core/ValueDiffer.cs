@@ -14,7 +14,7 @@ namespace OOBehave.Core
     {
         public bool Check<P>(P oldValue, P newValue)
         {
-            if (typeof(P).IsClass)
+            if (!typeof(P).IsValueType)
             {
                 if(oldValue == null && newValue == null)
                 {

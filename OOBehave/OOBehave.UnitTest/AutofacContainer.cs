@@ -104,8 +104,13 @@ namespace OOBehave.UnitTest
                 // Meta Data about the properties and methods of Classes
                 // This will not change during runtime
                 // So SingleInstance
-                builder.RegisterGeneric(typeof(PortalOperationManager<>)).As(typeof(IPortalOperationManager<>)).SingleInstance();
                 builder.RegisterGeneric(typeof(RegisteredPropertyManager<>)).As(typeof(IRegisteredPropertyManager<>)).SingleInstance();
+
+
+                // This was single instance; but now it resolves the Authorization Rules 
+                // When single instance it receives the root scopewhich is no good
+                builder.RegisterGeneric(typeof(PortalOperationManager<>)).As(typeof(IPortalOperationManager<>)).InstancePerLifetimeScope();
+
                 // Should not be singleinstance because AuthorizationRules can have constructor dependencies
                 builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
 

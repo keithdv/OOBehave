@@ -14,45 +14,52 @@ namespace OOBehave.UnitTest.PersonObjects
         {
         }
 
-        public Guid PersonId { get { return ReadProperty<Guid>(); } }
+        public Guid PersonId { get { return Getter<Guid>(); } }
 
         public string FirstName
         {
-            get { return ReadProperty<string>(); }
-            set { SetProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public string LastName
         {
-            get { return ReadProperty<string>(); }
-            set { SetProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public string ShortName
         {
-            get { return ReadProperty<string>(); }
-            set { SetProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public string Title
         {
-            get { return ReadProperty<string>(); }
-            set { SetProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public string FullName
         {
-            get { return ReadProperty<string>(); }
-            set { SetProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
+        public uint? Age
+        {
+            get => Getter<uint>(); set => Setter(value);
+        }
 
         protected void FillFromDto(PersonDto dto)
         {
-            LoadProperty(dto.PersonId, nameof(PersonId));
-            LoadProperty(dto.FirstName, nameof(FirstName));
-            LoadProperty(dto.LastName, nameof(LastName));
-            LoadProperty(dto.Title, nameof(Title));
+            LoadProperty(nameof(PersonId), dto.PersonId);
+
+            // These will not mark IsModified to true
+            // as long as within ObjectPortal operation
+            FirstName = dto.FirstName;
+            LastName = dto.LastName;
+            Title = dto.Title;
         }
     }
 }

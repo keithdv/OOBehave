@@ -11,6 +11,8 @@ namespace OOBehave.Core
     {
         bool IsModified { get; }
         bool IsSelfModified { get; }
+
+        IEnumerable<string> ModifiedProperties { get; }
     }
 
     public interface IEditPropertyValue : IValidatePropertyValue
@@ -56,21 +58,22 @@ namespace OOBehave.Core
     }
 
 
-    public class EditPropertyValueManager<T> : ValidatePropertyValueManager<T>, IEditPropertyValueManager<T>
+    public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
     {
         public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
         {
 
         }
 
-        protected override IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
+        protected override IEditPropertyValue CreatePropertyValue<PV>(string name, PV value)
         {
             return Factory.CreateEditPropertyValue(name, value);
         }
 
-        public bool IsModified => fieldData.Values.Cast<IEditPropertyValue>().Any(p => p.IsModified);
-        public bool IsSelfModified => fieldData.Values.Cast<IEditPropertyValue>().Any(p => p.IsSelfModified);
+        public bool IsModified => fieldData.Values.Any(p => p.IsModified);
+        public bool IsSelfModified => fieldData.Values.Any(p => p.IsSelfModified);
 
+        public IEnumerable<string> ModifiedProperties => fieldData.Values.Where(f => f.IsModified).Select(f => f.Name);
     }
 
 

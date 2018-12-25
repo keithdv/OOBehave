@@ -25,26 +25,26 @@ namespace OOBehave.UnitTest.Base
 
         public Guid Id
         {
-            get { return ReadProperty<Guid>(); }
-            set { LoadProperty(value); }
+            get { return Getter<Guid>(); }
+            set { Setter(value); }
         }
 
         public string FirstName
         {
-            get { return ReadProperty<string>(); }
-            set { LoadProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public string LastName
         {
-            get { return ReadProperty<string>(); }
-            set { LoadProperty(value); }
+            get { return Getter<string>(); }
+            set { Setter(value); }
         }
 
         public IA TestPropertyType
         {
-            get { return ReadProperty<IA>(); }
-            set { LoadProperty(value); }
+            get { return Getter<IA>(); }
+            set { Setter(value); }
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace OOBehave.UnitTest.Base
             /// Example - If the types are different you need to explicitly define the type
             /// of the Property
             /// The <IA> in this case
-            LoadProperty<IA>(propertyValue, nameof(TestPropertyType));
+            LoadProperty<IA>(nameof(TestPropertyType), propertyValue);
 
         }
     }

@@ -29,8 +29,8 @@ namespace OOBehave.UnitTest.ValidateBase
 
         public IPersonBase Child
         {
-            get { return ReadProperty<IPersonBase>(); }
-            set { SetProperty(value); }
+            get { return Getter<IPersonBase>(); }
+            set { Setter(value); }
         }
 
         [Fetch]
@@ -38,11 +38,11 @@ namespace OOBehave.UnitTest.ValidateBase
         {
             base.FillFromDto(person);
 
-            var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+            var childDto = personTable.FirstOrDefault(p => p.FatherId == PersonId);
 
-            if (child != null)
+            if (childDto != null)
             {
-                LoadProperty<IPersonBase>(await portal.FetchChild(child), nameof(Child));
+                Child = await portal.FetchChild(childDto);
             }
         }
 

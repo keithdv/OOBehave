@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace OOBehave
 {
 
-    public interface IBase : IOOBehaveObject
+    public interface IBase : IOOBehaveObject, IPortalTarget
     {
-
+        bool IsStopped { get; }
     }
 
     public interface IBase<T> : IBase
@@ -32,14 +33,55 @@ namespace OOBehave
             PropertyValueManager = services.PropertyValueManager;
         }
 
-        protected virtual P ReadProperty<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            return ReadProperty<P>(propertyName);
+        }
+
+        protected virtual void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            LoadProperty(propertyName, value);
+        }
+
+        protected virtual P ReadProperty<P>(string propertyName)
         {
             return PropertyValueManager.Read<P>(propertyName);
         }
 
-        protected virtual void LoadProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        protected virtual void LoadProperty<P>(string propertyName, P value)
         {
             PropertyValueManager.Load(propertyName, value);
+        }
+
+        public bool IsStopped { get; protected set; }
+
+        public virtual Task<IDisposable> StopAllActions()
+        {
+            if (IsStopped) { return Task.FromResult<IDisposable>(null); } // You are a nested using; You get nothing!!
+            IsStopped = true;
+            return Task.FromResult<IDisposable>(new Stopped(this));
+        }
+
+        public void StartAllActions()
+        {
+            if (IsStopped)
+            {
+                IsStopped = false;
+            }
+        }
+
+        protected class Stopped : IDisposable
+        {
+            Base<T> Target { get; }
+            public Stopped(Base<T> target)
+            {
+                this.Target = target;
+            }
+
+            public void Dispose()
+            {
+                Target.StartAllActions();
+            }
         }
 
     }

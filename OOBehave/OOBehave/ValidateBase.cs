@@ -16,6 +16,8 @@ namespace OOBehave
         Task WaitForRules();
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
+
+
     }
 
     public interface IValidateBase<T> : IValidateBase, IBase<T>
@@ -48,7 +50,21 @@ namespace OOBehave
 
         public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy;
 
-        protected void SetProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName]  string propertyName = "")
+
+
+        protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            if (!IsStopped)
+            {
+                SetProperty(propertyName, value);
+            }
+            else
+            {
+                LoadProperty(propertyName, value);
+            }
+        }
+
+        protected virtual void SetProperty<P>(string propertyName, P value)
         {
             PropertyValueManager.Set(propertyName, value);
             PropertyHasChanged(propertyName);
@@ -73,6 +89,13 @@ namespace OOBehave
             return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, ValidatePropertyValueManager.WaitForRules() });
         }
 
+        public override async Task<IDisposable> StopAllActions()
+        {
+            var result = await base.StopAllActions();
+            await WaitForRules();
+            return result;
+        }
+
         public IEnumerable<string> BrokenRuleMessages
         {
             get
@@ -87,6 +110,7 @@ namespace OOBehave
         {
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
+
 
     }
 }

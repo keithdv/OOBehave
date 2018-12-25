@@ -43,15 +43,50 @@ namespace OOBehave.UnitTest.EditBase
         }
 
         [TestMethod]
-        public void EditBaseTest_SameValue()
+        public void EditBaseTest_SetSameString_IsModified_False()
         {
-            Assert.Fail("Do test");
+            var firstName = editPerson.FirstName;
+            editPerson.FirstName = firstName;
+            Assert.IsFalse(editPerson.IsModified);
+            Assert.IsFalse(editPerson.IsSelfModified);
         }
 
         [TestMethod]
-        public void EditBaseTest_SameClass()
+        public void EditBaseTest_SetNonLoadedProperty_IsModified()
         {
-            Assert.Fail("Do Test");
+            // Set a property that isn't loaded during the Fetch/Create
+            editPerson.Age = 10;
+            Assert.IsTrue(editPerson.IsModified);
+            Assert.IsTrue(editPerson.IsSelfModified);
+        }
+
+
+        [TestMethod]
+        public void EditBaseTest_InitiallyDefined_SameInstance_IsModified_False()
+        {
+            var list = editPerson.InitiallyDefined;
+            Assert.IsNotNull(list);
+            editPerson.InitiallyDefined = list;
+            Assert.IsFalse(editPerson.IsModified);
+            Assert.IsFalse(editPerson.IsSelfModified);
+
+        }
+
+        [TestMethod]
+        public void EditBaseTest_InitiallyDefined_NewInstance_IsModified_True()
+        {
+            editPerson.InitiallyDefined = editPerson.InitiallyDefined.ToList();
+            Assert.IsTrue(editPerson.IsModified);
+            Assert.IsTrue(editPerson.IsSelfModified);
+        }
+
+        [TestMethod]
+        public void EditBaseTest_InitiallyNull_IsModified()
+        {
+            editPerson.InitiallyNull = new List<int>() { 3, 4, 5 };
+            Assert.IsTrue(editPerson.IsModified);
+            Assert.IsTrue(editPerson.IsSelfModified);
+
         }
 
     }

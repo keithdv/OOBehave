@@ -6,7 +6,7 @@ namespace OOBehave.Portal
     // Note: A non generic IObjectPortal with generic functions
     // is a service locator pattern which is bad!!
 
-    public interface IReceivePortal<T> where T : IBase
+    public interface IReceivePortal<T> where T : IPortalTarget
     {
 
         Task<T> Create();
@@ -23,7 +23,7 @@ namespace OOBehave.Portal
 
     }
 
-    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IEditBase
+    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IPortalTarget
     {
         Task Update(T target, object criteria);
         Task Update(T target);

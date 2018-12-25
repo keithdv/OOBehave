@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.AuthorizationRules;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,17 @@ using System.Threading.Tasks;
 namespace OOBehave.Portal.Core
 {
     public class PortalOperationManager<T> : IPortalOperationManager<T>
+        where T : IPortalTarget
     {
 
-
-        private IDictionary<PortalOperation, List<MethodInfo>> RegisteredOperations { get; } = new ConcurrentDictionary<PortalOperation, List<MethodInfo>>();
+        // TODO (?) make these depedencies that can be set to single instance??
+        protected static IDictionary<PortalOperation, List<MethodInfo>> RegisteredOperations { get; } = new ConcurrentDictionary<PortalOperation, List<MethodInfo>>();
+        protected static bool IsRegistered { get; set; }
 
         private IServiceScope Scope { get; }
+
+        protected IAuthorizationRuleManager AuthorizationRuleManager { get; }
+
 
         public PortalOperationManager(IServiceScope scope)
         {
@@ -23,12 +29,14 @@ namespace OOBehave.Portal.Core
 #endif
             RegisterPortalOperations();
             Scope = scope;
+            AuthorizationRuleManager = scope.Resolve<IAuthorizationRuleManager<T>>();
         }
 
 
-        // TODO: This should be handled by ObjectPortal
         protected virtual void RegisterPortalOperations()
         {
+            if (!IsRegistered)
+            {
                 var methods = typeof(T).GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
                     .Where(m => m.GetCustomAttribute<PortalOperationAttributeAttribute>() != null);
 
@@ -37,6 +45,12 @@ namespace OOBehave.Portal.Core
                     var attribute = m.GetCustomAttribute<PortalOperationAttributeAttribute>();
                     RegisterOperation(attribute.Operation, m);
                 }
+                IsRegistered = true;
+            }
+            else
+            {
+
+            }
         }
 
         public void RegisterOperation(PortalOperation operation, string methodName)
@@ -97,92 +111,113 @@ namespace OOBehave.Portal.Core
             return null;
         }
 
-        public async Task<bool> TryCallOperation(object target, PortalOperation operation)
+        protected async Task CheckAccess(AuthorizeOperation operation)
         {
+            await AuthorizationRuleManager.CheckAccess(operation);
+        }
+
+        protected async Task CheckAccess(AuthorizeOperation operation, object criteria)
+        {
+            if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
+
+            await AuthorizationRuleManager.CheckAccess(operation, criteria);
+        }
+
+        public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation)
+        {
+            await CheckAccess(operation.ToAuthorizationOperation());
+
             var methods = MethodsForOperation(operation) ?? new List<MethodInfo>();
 
-            var invoked = false;
-
-            foreach (var method in methods)
+            using (await target.StopAllActions())
             {
-                var success = true;
-                var parameters = method.GetParameters().ToList();
-                var parameterValues = new object[parameters.Count()];
+                var invoked = false;
 
-                for (var i = 0; i < parameterValues.Length; i++)
+                foreach (var method in methods)
                 {
-                    var parameter = parameters[i];
-                    if (!Scope.IsRegistered(parameter.ParameterType))
+                    var success = true;
+                    var parameters = method.GetParameters().ToList();
+                    var parameterValues = new object[parameters.Count()];
+
+                    for (var i = 0; i < parameterValues.Length; i++)
                     {
-                        // Assume it's a criteria not a dependency
-                        success = false;
+                        var parameter = parameters[i];
+                        if (!Scope.IsRegistered(parameter.ParameterType))
+                        {
+                            // Assume it's a criteria not a dependency
+                            success = false;
+                            break;
+                        }
+                    }
+
+                    if (success)
+                    {
+                        // No parameters or all of the parameters are dependencies
+                        for (var i = 0; i < parameterValues.Length; i++)
+                        {
+                            var parameter = parameters[i];
+                            parameterValues[i] = Scope.Resolve(parameter.ParameterType);
+                        }
+
+                        invoked = true;
+
+                        var result = method.Invoke(target, parameterValues);
+                        if (method.ReturnType == typeof(Task))
+                        {
+                            await (Task)result;
+                        }
+
                         break;
                     }
                 }
 
-                if (success)
+                return invoked;
+            }
+        }
+        public async Task<bool> TryCallOperation(IPortalTarget target, object criteria, PortalOperation operation)
+        {
+            await CheckAccess(operation.ToAuthorizationOperation(), criteria);
+
+            using (await target.StopAllActions())
+            {
+                // This needs to be target.GetType() instead of a generic method
+                // because T will be an interface but tager.GetType() will be the concrete
+                var method = MethodForOperation(operation, criteria.GetType());
+
+                if (method != null)
                 {
-                    // No parameters or all of the parameters are dependencies
+
+                    var parameters = method.GetParameters().ToList();
+                    var parameterValues = new object[parameters.Count()];
+
                     for (var i = 0; i < parameterValues.Length; i++)
                     {
                         var parameter = parameters[i];
-                        parameterValues[i] = Scope.Resolve(parameter.ParameterType);
-                    }
-
-                    invoked = true;
-
-                    var result = method.Invoke(target, parameterValues);
-                    if (method.ReturnType == typeof(Task))
-                    {
-                        await(Task)result;
-                    }
-
-                    break;
-                }
-            }
-
-            return invoked;
-
-        }
-        public async Task<bool> TryCallOperation(object target, object criteria, PortalOperation operation)
-        {
-            // This needs to be target.GetType() instead of a generic method
-            // because T will be an interface but tager.GetType() will be the concrete
-            var method = MethodForOperation(operation, criteria.GetType());
-
-            if (method != null)
-            {
-
-                var parameters = method.GetParameters().ToList();
-                var parameterValues = new object[parameters.Count()];
-
-                for (var i = 0; i < parameterValues.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    if (parameter.ParameterType == criteria.GetType())
-                    {
-                        parameterValues[i] = criteria;
-                    }
-                    else
-                    {
-                        if (Scope.TryResolve(parameter.ParameterType, out var pv))
+                        if (parameter.ParameterType == criteria.GetType())
                         {
-                            parameterValues[i] = pv;
+                            parameterValues[i] = criteria;
+                        }
+                        else
+                        {
+                            if (Scope.TryResolve(parameter.ParameterType, out var pv))
+                            {
+                                parameterValues[i] = pv;
+                            }
                         }
                     }
+
+                    var result = method.Invoke(target, parameterValues);
+
+                    if (method.ReturnType == typeof(Task))
+                    {
+                        await (Task)result;
+                    }
+
+                    return true;
                 }
 
-                var result = method.Invoke(target, parameterValues);
-
-                if (method.ReturnType == typeof(Task))
-                {
-                    await (Task)result;
-                }
-
-                return true;
+                return false;
             }
-
-            return false;
         }
 
 

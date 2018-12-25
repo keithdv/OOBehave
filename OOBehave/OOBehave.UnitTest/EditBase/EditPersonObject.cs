@@ -11,7 +11,9 @@ namespace OOBehave.UnitTest.EditBase
 
     public interface IEditPerson : IPersonBase, IEditBase<IEditPerson>
     {
-        IEditPerson Child { get; }
+        IEditPerson Child { get; set; }
+        List<int> InitiallyNull { get; set; }
+        List<int> InitiallyDefined { get; set; }
     }
 
     public class EditPerson : PersonEditBase<EditPerson>, IEditPerson
@@ -26,8 +28,8 @@ namespace OOBehave.UnitTest.EditBase
 
         public IEditPerson Child
         {
-            get { return ReadProperty<IEditPerson>(); }
-            set { SetProperty(value); }
+            get { return Getter<IEditPerson>(); }
+            set { Setter(value); }
         }
 
         [Fetch]
@@ -35,14 +37,19 @@ namespace OOBehave.UnitTest.EditBase
         {
             base.FillFromDto(person);
 
-            var child = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+            var childDto = personTable.FirstOrDefault(p => p.FatherId == PersonId);
 
-            if (child != null)
+            if (childDto != null)
             {
-                LoadProperty(await portal.FetchChild(child), nameof(Child));
+                Child = await portal.FetchChild(childDto);
             }
+
+            InitiallyDefined = new List<int>() { 1, 2, 3 };
+
         }
 
+        public List<int> InitiallyNull { get => Getter<List<int>>(); set => Setter(value); }
+        public List<int> InitiallyDefined { get => Getter<List<int>>(); set => Setter(value); }
 
         [FetchChild]
         public void Fetch(PersonDto dto)

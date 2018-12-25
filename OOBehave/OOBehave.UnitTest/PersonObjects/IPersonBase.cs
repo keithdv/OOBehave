@@ -7,5 +7,6 @@
         string LastName { get; set; }
         string ShortName { get; set; }
         string Title { get; set; }
+        uint? Age { get; set; }
     }
 }

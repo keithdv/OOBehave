@@ -12,37 +12,21 @@ namespace OOBehave.Portal.Core
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ObjectPortalBase<T>
-        where T : IBase
+        where T : IPortalTarget
     {
 
         protected IServiceScope Scope { get; }
         protected IPortalOperationManager OperationManager { get; }
-        protected IAuthorizationRuleManager AuthorizationRuleManager { get; }
         public ObjectPortalBase(IServiceScope scope)
         {
             Scope = scope;
 
             // To find the static method this needs to be the concrete type
             var concreteType = scope.ConcreteType<T>() ?? throw new Exception($"Type {typeof(T).FullName} is not registered");
-            OperationManager = scope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(concreteType)) as IPortalOperationManager;
-            AuthorizationRuleManager = scope.Resolve(typeof(IAuthorizationRuleManager<>).MakeGenericType(concreteType)) as IAuthorizationRuleManager;
-        }
+            OperationManager = (IPortalOperationManager)scope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(concreteType));
 
-
-        protected async Task CheckAccess(AuthorizeOperation operation)
-        {
-            await AuthorizationRuleManager.CheckAccess(operation);
-        }
-
-        protected async Task CheckAccess(AuthorizeOperation operation, object criteria)
-        {
-            if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
-
-            await AuthorizationRuleManager.CheckAccess(operation, criteria);
         }
 
     }
-
-
 
 }

@@ -11,7 +11,7 @@ namespace OOBehave.Portal.Core
 
 
     public class LocalReceivePortal<T> : ObjectPortalBase<T>, IReceivePortal<T>
-        where T : IBase
+        where T : IPortalTarget
     {
 
         public LocalReceivePortal(IServiceScope scope)
@@ -68,11 +68,10 @@ namespace OOBehave.Portal.Core
 
         protected async Task CallOperationMethod(T target, PortalOperation operation, bool throwException = true)
         {
-            await CheckAccess(operation.ToAuthorizationOperation());
 
             var success = await OperationManager.TryCallOperation(target, operation);
 
-            if(!success && throwException)
+            if (!success && throwException)
             {
                 throw new OperationMethodCallFailedException($"{operation.ToString()} method with no criteria not found on {target.GetType().FullName}.");
             }
@@ -89,8 +88,6 @@ namespace OOBehave.Portal.Core
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
-            await CheckAccess(operation.ToAuthorizationOperation(), criteria);
-
             var success = await OperationManager.TryCallOperation(target, criteria, operation);
 
             if (!success)
@@ -104,7 +101,7 @@ namespace OOBehave.Portal.Core
 
 
     public class LocalSendReceivePortal<T> : LocalReceivePortal<T>, ISendReceivePortal<T>
-        where T : IEditBase
+        where T : IPortalTarget
     {
 
         public LocalSendReceivePortal(IServiceScope scope)

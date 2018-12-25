@@ -33,16 +33,16 @@ namespace OOBehave.Core
             return new RuleExecute<T>(target);
         }
 
-        public IPropertyValue<P> CreatePropertyValue<P>(string name, P value)
+        public IPropertyValue CreatePropertyValue<P>(string name, P value)
         {
             return new PropertyValue<P>(name, value);
         }
-        public IValidatePropertyValue<P> CreateValidatePropertyValue<P>(string name, P value)
+        public IValidatePropertyValue CreateValidatePropertyValue<P>(string name, P value)
         {
             return new ValidatePropertyValue<P>(name, value);
         }
 
-        public IEditPropertyValue<P> CreateEditPropertyValue<P>(string name, P value)
+        public IEditPropertyValue CreateEditPropertyValue<P>(string name, P value)
         {
             return new EditPropertyValue<P>(Scope.Resolve<IValuesDiffer>(), name, value);
         }

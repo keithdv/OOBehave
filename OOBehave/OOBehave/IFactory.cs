@@ -7,9 +7,9 @@ namespace OOBehave
     {
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
         IRuleExecute<T> CreateRuleExecute<T>(T target);
-        IPropertyValue<P> CreatePropertyValue<P>(string name, P value);
-        IValidatePropertyValue<P> CreateValidatePropertyValue<P>(string name, P value);
-        IEditPropertyValue<P> CreateEditPropertyValue<P>(string name, P value);
+        IPropertyValue CreatePropertyValue<P>(string name, P value);
+        IValidatePropertyValue CreateValidatePropertyValue<P>(string name, P value);
+        IEditPropertyValue CreateEditPropertyValue<P>(string name, P value);
     }
 
 }
