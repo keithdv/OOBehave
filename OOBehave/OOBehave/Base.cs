@@ -19,8 +19,6 @@ namespace OOBehave
         /// </summary>
         bool IsStopped { get; }
 
-        bool IsChild { get; }
-
     }
 
     public interface IBase<T> : IBase
@@ -33,7 +31,7 @@ namespace OOBehave
     {
 
         protected IPropertyValueManager<T> PropertyValueManager { get; }
-        public bool IsChild { get; protected set; }
+
 
 
         public Base(IBaseServices<T> services)
@@ -88,45 +86,6 @@ namespace OOBehave
             StartAllActions();
         }
 
-        protected virtual void MarkAsChild()
-        {
-            IsChild = true;
-        }
-
-        void IPortalTarget.MarkAsChild()
-        {
-            MarkAsChild();
-        }
-
-        protected virtual void MarkClean()
-        {
-            // This is an EditBase concept
-        }
-
-        void IPortalTarget.MarkClean()
-        {
-            MarkClean();
-        }
-
-        protected virtual void MarkNew()
-        {
-            // This is an EditBase concept
-        }
-
-        void IPortalTarget.MarkNew()
-        {
-            MarkNew();
-        }
-
-        protected virtual void MarkOld()
-        {
-            // This is an EditBase concept
-        }
-
-        void IPortalTarget.MarkOld()
-        {
-            MarkOld();
-        }
 
 
         protected class Stopped : IDisposable

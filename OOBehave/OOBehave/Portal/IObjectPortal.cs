@@ -23,7 +23,7 @@ namespace OOBehave.Portal
 
     }
 
-    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IPortalTarget
+    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IPortalEditTarget
     {
         Task Update(T target, object criteria);
         Task Update(T target);

@@ -11,7 +11,6 @@ namespace OOBehave.UnitTest.EditBase
 
     public interface IEditPerson : IPersonBase, IEditBase<IEditPerson>
     {
-        IEditPerson Child { get; set; }
         List<int> InitiallyNull { get; set; }
         List<int> InitiallyDefined { get; set; }
     }
@@ -26,23 +25,10 @@ namespace OOBehave.UnitTest.EditBase
             RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
 
-        public IEditPerson Child
-        {
-            get { return Getter<IEditPerson>(); }
-            set { Setter(value); }
-        }
-
         [Fetch]
-        public async Task Fetch(PersonDto person, IReceivePortal<IEditPerson> portal, IReadOnlyList<PersonDto> personTable)
+        public void Fetch(PersonDto person, IReceivePortal<IEditPerson> portal, IReadOnlyList<PersonDto> personTable)
         {
             base.FillFromDto(person);
-
-            var childDto = personTable.FirstOrDefault(p => p.FatherId == PersonId);
-
-            if (childDto != null)
-            {
-                Child = await portal.FetchChild(childDto);
-            }
 
             InitiallyDefined = new List<int>() { 1, 2, 3 };
 
@@ -51,11 +37,6 @@ namespace OOBehave.UnitTest.EditBase
         public List<int> InitiallyNull { get => Getter<List<int>>(); set => Setter(value); }
         public List<int> InitiallyDefined { get => Getter<List<int>>(); set => Setter(value); }
 
-        [FetchChild]
-        public void Fetch(PersonDto dto)
-        {
-            base.FillFromDto(dto);
-        }
 
     }
 }

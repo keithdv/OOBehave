@@ -136,10 +136,12 @@ namespace OOBehave.UnitTest.ObjectPortal
         public async Task SendReceivePortal_Update()
         {
             editObject = await portal.Create();
+            editObject.Name = Guid.NewGuid().ToString();
             await portal.Update(editObject);
             Assert.IsTrue(editObject.UpdateCalled);
             Assert.IsFalse(editObject.IsNew);
             Assert.IsFalse(editObject.IsChild);
+            Assert.IsFalse(editObject.IsModified);
         }
 
         [TestMethod]

@@ -38,18 +38,17 @@ namespace OOBehave.Portal.Core
             if (!IsRegistered)
             {
                 var methods = typeof(T).GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
-                    .Where(m => m.GetCustomAttribute<PortalOperationAttributeAttribute>() != null);
+                    .Where(m => m.GetCustomAttributes<PortalOperationAttributeAttribute>() != null);
 
                 foreach (var m in methods)
                 {
-                    var attribute = m.GetCustomAttribute<PortalOperationAttributeAttribute>();
-                    RegisterOperation(attribute.Operation, m);
+                    var attributes = m.GetCustomAttributes<PortalOperationAttributeAttribute>();
+                    foreach (var o in attributes)
+                    {
+                        RegisterOperation(o.Operation, m);
+                    }
                 }
                 IsRegistered = true;
-            }
-            else
-            {
-
             }
         }
 
@@ -226,34 +225,40 @@ namespace OOBehave.Portal.Core
 
         protected virtual void PostOperation(IPortalTarget target, PortalOperation operation)
         {
-            switch (operation)
+            var editTarget = target as IPortalEditTarget;
+            if (editTarget != null)
             {
-                case PortalOperation.Create:
-                    target.MarkNew();
-                    break;
-                case PortalOperation.CreateChild:
-                    target.MarkAsChild();
-                    target.MarkNew();
-                    break;
-                case PortalOperation.Fetch:
-                    break;
-                case PortalOperation.FetchChild:
-                    target.MarkAsChild();
-                    break;
-                case PortalOperation.Delete:
-                    break;
-                case PortalOperation.DeleteChild:
-                    break;
-                case PortalOperation.Update:
-                    target.MarkClean();
-                    target.MarkOld();
-                    break;
-                case PortalOperation.UpdateChild:
-                    target.MarkClean();
-                    target.MarkOld();
-                    break;
-                default:
-                    break;
+
+
+                switch (operation)
+                {
+                    case PortalOperation.Create:
+                        editTarget.MarkNew();
+                        break;
+                    case PortalOperation.CreateChild:
+                        editTarget.MarkAsChild();
+                        editTarget.MarkNew();
+                        break;
+                    case PortalOperation.Fetch:
+                        break;
+                    case PortalOperation.FetchChild:
+                        editTarget.MarkAsChild();
+                        break;
+                    case PortalOperation.Delete:
+                        break;
+                    case PortalOperation.DeleteChild:
+                        break;
+                    case PortalOperation.Update:
+                        editTarget.MarkUnmodified();
+                        editTarget.MarkOld();
+                        break;
+                    case PortalOperation.UpdateChild:
+                        editTarget.MarkUnmodified();
+                        editTarget.MarkOld();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

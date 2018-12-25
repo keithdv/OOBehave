@@ -1,4 +1,5 @@
 ﻿using OOBehave.Core;
+using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,9 +7,10 @@ using System.ComponentModel;
 namespace OOBehave
 {
 
-    public interface IEditBase : IValidateBase, IEditMetaProperties
+    public interface IEditBase : IValidateBase, IEditMetaProperties, IPortalEditTarget
     {
         IEnumerable<string> ModifiedProperties { get; }
+        bool IsChild { get; }
     }
 
     public interface IEditBase<T> : IEditBase, IValidateBase<T>
@@ -30,27 +32,50 @@ namespace OOBehave
 
         public bool IsModified => EditPropertyValueManager.IsModified;
         public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
-        public bool IsSavable => (IsModified || IsNew) && IsValid && !IsBusy;
+        public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }
         public bool IsDeleted => throw new NotImplementedException();
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
+        public bool IsChild { get; protected set; }
 
-        protected override void MarkClean()
+        protected virtual void MarkAsChild()
         {
-            base.MarkClean();
-            EditPropertyValueManager.MarkClean();
+            IsChild = true;
         }
 
-        protected override void MarkNew()
+        void IPortalEditTarget.MarkAsChild()
         {
-            base.MarkNew();
+            MarkAsChild();
+        }
+
+        protected virtual void MarkUnmodified()
+        {
+            EditPropertyValueManager.MarkSelfUnmodified();
+        }
+
+        void IPortalEditTarget.MarkUnmodified()
+        {
+            MarkUnmodified();
+        }
+
+        protected virtual void MarkNew()
+        {
             IsNew = true;
         }
 
-        protected override void MarkOld()
+        void IPortalEditTarget.MarkNew()
         {
-            base.MarkOld();
+            MarkNew();
+        }
+
+        protected virtual void MarkOld()
+        {
             IsNew = false;
+        }
+
+        void IPortalEditTarget.MarkOld()
+        {
+            MarkOld();
         }
     }
 

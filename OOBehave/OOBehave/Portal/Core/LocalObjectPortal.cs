@@ -101,7 +101,7 @@ namespace OOBehave.Portal.Core
 
 
     public class LocalSendReceivePortal<T> : LocalReceivePortal<T>, ISendReceivePortal<T>
-        where T : IPortalTarget
+        where T : IPortalEditTarget
     {
 
         public LocalSendReceivePortal(IServiceScope scope)

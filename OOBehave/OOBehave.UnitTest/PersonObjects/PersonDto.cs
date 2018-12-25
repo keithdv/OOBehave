@@ -44,12 +44,16 @@ namespace OOBehave.UnitTest.PersonObjects
             result.AddRange(children);
 
             father = children.First();
-            mother = new PersonDto() { FirstName = "C", LastName = "Johnson", Title = "Mrs." };
+            result.Add(mother = new PersonDto() { FirstName = "C", LastName = "Johnson", Title = "Mrs." });
             children.Clear();
 
             children.Add(new PersonDto() { FirstName = "AB1C1", LastName = "Smith", Title = "Mr." });
             children.Add(new PersonDto() { FirstName = "AB1C2", LastName = "Smith", Title = "Mr." });
             children.Add(new PersonDto() { FirstName = "AB1C3", LastName = "Smith", Title = "Mr." });
+
+            children.ForEach(c => { c.FatherId = father.PersonId; c.MotherId = mother.PersonId; });
+
+            result.AddRange(children);
 
             return result.AsReadOnly();
 

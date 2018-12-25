@@ -10,7 +10,11 @@ namespace OOBehave.Portal
     {
         Task<IDisposable> StopAllActions();
         void StartAllActions();
+    }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IPortalEditTarget : IPortalTarget
+    {
         [EditorBrowsable(EditorBrowsableState.Never)]
         void MarkAsChild();
 
@@ -21,8 +25,7 @@ namespace OOBehave.Portal
         void MarkOld();
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        void MarkClean();
-
+        void MarkUnmodified();
     }
 
 }

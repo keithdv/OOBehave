@@ -4,6 +4,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 {
     public interface IEditObject : IEditBase<IReadOnlyObject>
     {
+        string Name { get; set; }
         int IntCriteria { get; }
         Guid GuidCriteria { get; }
         bool CreateCalled { get; set; }

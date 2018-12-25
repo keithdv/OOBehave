@@ -12,6 +12,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
         }
 
+        public string Name { get => Getter<string>(); set => Setter(value); }
         public Guid GuidCriteria { get; set; } = Guid.Empty;
         public int IntCriteria { get; set; } = -1;
 
