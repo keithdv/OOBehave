@@ -44,13 +44,9 @@ namespace OOBehave
 
         public bool IsSelfValid => RuleExecute.IsValid;
 
-        public bool IsChild => throw new NotImplementedException();
-
         public bool IsSelfBusy => RuleExecute.IsBusy;
 
         public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy;
-
-
 
         protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {

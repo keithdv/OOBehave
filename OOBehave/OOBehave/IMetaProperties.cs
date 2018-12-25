@@ -10,7 +10,6 @@ namespace OOBehave
     {
         bool IsValid { get; }
         bool IsSelfValid { get; }
-        bool IsChild { get; }
         bool IsBusy { get; }
         bool IsSelfBusy { get; }
     }

@@ -13,12 +13,14 @@ namespace OOBehave.Core
         bool IsSelfModified { get; }
 
         IEnumerable<string> ModifiedProperties { get; }
+        void MarkClean();
     }
 
     public interface IEditPropertyValue : IValidatePropertyValue
     {
         bool IsModified { get; }
         bool IsSelfModified { get; }
+        void MarkClean();
     }
 
     public interface IEditPropertyValue<T> : IEditPropertyValue, IValidatePropertyValue<T>
@@ -55,6 +57,11 @@ namespace OOBehave.Core
 
         public bool IsModified => IsSelfModified || (EditChild?.IsModified ?? false);
         public bool IsSelfModified { get; private set; } = false;
+
+        public void MarkClean()
+        {
+            EditChild?.MarkClean();
+        }
     }
 
 
@@ -74,6 +81,14 @@ namespace OOBehave.Core
         public bool IsSelfModified => fieldData.Values.Any(p => p.IsSelfModified);
 
         public IEnumerable<string> ModifiedProperties => fieldData.Values.Where(f => f.IsModified).Select(f => f.Name);
+
+        public void MarkClean()
+        {
+            foreach(var fd in fieldData.Values)
+            {
+                fd.MarkClean();
+            }
+        }
     }
 
 

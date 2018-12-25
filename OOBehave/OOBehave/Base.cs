@@ -10,10 +10,17 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
-
     public interface IBase : IOOBehaveObject, IPortalTarget
     {
+        /// <summary>
+        /// Stop events, rules and ismodified
+        /// Only affects the Setter method
+        /// Not SetProperty or LoadProperty
+        /// </summary>
         bool IsStopped { get; }
+
+        bool IsChild { get; }
+
     }
 
     public interface IBase<T> : IBase
@@ -21,11 +28,12 @@ namespace OOBehave
 
     }
 
-    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>
+    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>, IPortalTarget
         where T : Base<T>
     {
 
         protected IPropertyValueManager<T> PropertyValueManager { get; }
+        public bool IsChild { get; protected set; }
 
 
         public Base(IBaseServices<T> services)
@@ -69,6 +77,57 @@ namespace OOBehave
                 IsStopped = false;
             }
         }
+
+        Task<IDisposable> IPortalTarget.StopAllActions()
+        {
+            return StopAllActions();
+        }
+
+        void IPortalTarget.StartAllActions()
+        {
+            StartAllActions();
+        }
+
+        protected virtual void MarkAsChild()
+        {
+            IsChild = true;
+        }
+
+        void IPortalTarget.MarkAsChild()
+        {
+            MarkAsChild();
+        }
+
+        protected virtual void MarkClean()
+        {
+            // This is an EditBase concept
+        }
+
+        void IPortalTarget.MarkClean()
+        {
+            MarkClean();
+        }
+
+        protected virtual void MarkNew()
+        {
+            // This is an EditBase concept
+        }
+
+        void IPortalTarget.MarkNew()
+        {
+            MarkNew();
+        }
+
+        protected virtual void MarkOld()
+        {
+            // This is an EditBase concept
+        }
+
+        void IPortalTarget.MarkOld()
+        {
+            MarkOld();
+        }
+
 
         protected class Stopped : IDisposable
         {

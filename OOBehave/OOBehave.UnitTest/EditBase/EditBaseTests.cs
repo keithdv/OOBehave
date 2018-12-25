@@ -40,6 +40,7 @@ namespace OOBehave.UnitTest.EditBase
             editPerson.FirstName = Guid.NewGuid().ToString();
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
+            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FirstName), }, editPerson.ModifiedProperties.ToList());
         }
 
         [TestMethod]
@@ -58,6 +59,7 @@ namespace OOBehave.UnitTest.EditBase
             editPerson.Age = 10;
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
+            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.Age), }, editPerson.ModifiedProperties.ToList());
         }
 
 
@@ -69,7 +71,7 @@ namespace OOBehave.UnitTest.EditBase
             editPerson.InitiallyDefined = list;
             Assert.IsFalse(editPerson.IsModified);
             Assert.IsFalse(editPerson.IsSelfModified);
-
+            Assert.AreEqual(0, editPerson.ModifiedProperties.Count());
         }
 
         [TestMethod]
@@ -78,6 +80,7 @@ namespace OOBehave.UnitTest.EditBase
             editPerson.InitiallyDefined = editPerson.InitiallyDefined.ToList();
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
+            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.InitiallyDefined), }, editPerson.ModifiedProperties.ToList());
         }
 
         [TestMethod]

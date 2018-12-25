@@ -34,6 +34,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             editObject = await portal.Create();
             Assert.IsTrue(editObject.CreateCalled);
+            Assert.IsTrue(editObject.IsNew);
+            Assert.IsFalse(editObject.IsChild);
         }
 
         [TestMethod]
@@ -58,6 +60,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             editObject = await portal.CreateChild();
             Assert.IsTrue(editObject.CreateChildCalled);
+            Assert.IsTrue(editObject.IsNew);
+            Assert.IsTrue(editObject.IsChild);
         }
 
         [TestMethod]
@@ -82,6 +86,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             editObject = await portal.Fetch();
             Assert.IsTrue(editObject.FetchCalled);
+            Assert.IsFalse(editObject.IsNew);
+            Assert.IsFalse(editObject.IsChild);
         }
 
         [TestMethod]
@@ -106,6 +112,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             editObject = await portal.FetchChild();
             Assert.IsTrue(editObject.FetchChildCalled);
+            Assert.IsFalse(editObject.IsNew);
+            Assert.IsTrue(editObject.IsChild);
         }
 
         [TestMethod]
@@ -130,6 +138,8 @@ namespace OOBehave.UnitTest.ObjectPortal
             editObject = await portal.Create();
             await portal.Update(editObject);
             Assert.IsTrue(editObject.UpdateCalled);
+            Assert.IsFalse(editObject.IsNew);
+            Assert.IsFalse(editObject.IsChild);
         }
 
         [TestMethod]
@@ -153,9 +163,11 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task SendReceivePortal_UpdateChild()
         {
-            editObject = await portal.Create();
+            editObject = await portal.CreateChild();
             await portal.UpdateChild(editObject);
             Assert.IsTrue(editObject.UpdateChildCalled);
+            Assert.IsFalse(editObject.IsNew);
+            Assert.IsTrue(editObject.IsChild);
         }
 
         [TestMethod]

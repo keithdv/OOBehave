@@ -1,6 +1,7 @@
 ﻿using OOBehave.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace OOBehave
 {
@@ -29,15 +30,28 @@ namespace OOBehave
 
         public bool IsModified => EditPropertyValueManager.IsModified;
         public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
-
-        public bool IsSavable => IsModified && IsValid && !IsBusy;
-
-        public bool IsNew => throw new NotImplementedException();
-
+        public bool IsSavable => (IsModified || IsNew) && IsValid && !IsBusy;
+        public bool IsNew { get; protected set; }
         public bool IsDeleted => throw new NotImplementedException();
-
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
 
+        protected override void MarkClean()
+        {
+            base.MarkClean();
+            EditPropertyValueManager.MarkClean();
+        }
+
+        protected override void MarkNew()
+        {
+            base.MarkNew();
+            IsNew = true;
+        }
+
+        protected override void MarkOld()
+        {
+            base.MarkOld();
+            IsNew = false;
+        }
     }
 
 

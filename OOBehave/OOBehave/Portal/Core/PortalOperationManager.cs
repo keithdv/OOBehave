@@ -167,6 +167,8 @@ namespace OOBehave.Portal.Core
                             await (Task)result;
                         }
 
+                        PostOperation(target, operation);
+
                         break;
                     }
                 }
@@ -213,6 +215,8 @@ namespace OOBehave.Portal.Core
                         await (Task)result;
                     }
 
+                    PostOperation(target, operation);
+
                     return true;
                 }
 
@@ -220,6 +224,38 @@ namespace OOBehave.Portal.Core
             }
         }
 
+        protected virtual void PostOperation(IPortalTarget target, PortalOperation operation)
+        {
+            switch (operation)
+            {
+                case PortalOperation.Create:
+                    target.MarkNew();
+                    break;
+                case PortalOperation.CreateChild:
+                    target.MarkAsChild();
+                    target.MarkNew();
+                    break;
+                case PortalOperation.Fetch:
+                    break;
+                case PortalOperation.FetchChild:
+                    target.MarkAsChild();
+                    break;
+                case PortalOperation.Delete:
+                    break;
+                case PortalOperation.DeleteChild:
+                    break;
+                case PortalOperation.Update:
+                    target.MarkClean();
+                    target.MarkOld();
+                    break;
+                case PortalOperation.UpdateChild:
+                    target.MarkClean();
+                    target.MarkOld();
+                    break;
+                default:
+                    break;
+            }
+        }
 
     }
 
