@@ -9,14 +9,19 @@ using System.Text;
 
 namespace OOBehave.UnitTest.ValidateBase
 {
-    public class Validate : PersonBase<Validate>, IValidate
+
+    public interface IValidate : IPersonBase { }
+
+    public class Validate : PersonValidateBase<Validate>, IValidate
     {
 
-        public Validate(IValidateBaseServices<Validate> services) : base(services)
+        public Validate(IValidateBaseServices<Validate> services,
+            IShortNameRule<Validate> shortNameRule,
+            IFullNameRule<Validate> fullNameRule,
+            IPersonRule<Validate> personRule
+            ) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameRule<Validate>());
-            RuleExecute.AddRule(new FullNameRule<Validate>());
-            RuleExecute.AddRule(new PersonRule<Validate>());
+            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
 
     }
@@ -26,17 +31,25 @@ namespace OOBehave.UnitTest.ValidateBase
     {
 
 
-        Validate validate;
+        IValidate validate;
 
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.GetLifetimeScope().Resolve<Validate>();
+            validate = AutofacContainer.GetLifetimeScope().Resolve<IValidate>();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
         }
 
         [TestMethod]
         public void Validate_Constructor()
         {
+
         }
 
 

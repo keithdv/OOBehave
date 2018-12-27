@@ -1,4 +1,6 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
+using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,17 +14,18 @@ namespace OOBehave
     /// </summary>
     public interface IBaseServices<T>
     {
-        IRegisteredPropertyDataManager<T> RegisteredPropertyDataManager { get; }
+        IPropertyValueManager<T> PropertyValueManager { get; }
     }
 
     public class BaseServices<T> : IBaseServices<T>
     {
 
-        public BaseServices(IRegisteredPropertyDataManager<T> registeredPropertyDataManager)
+        public BaseServices(IPropertyValueManager<T> registeredPropertyDataManager)
         {
-            this.RegisteredPropertyDataManager = registeredPropertyDataManager;
+            this.PropertyValueManager = registeredPropertyDataManager;
         }
 
-        public IRegisteredPropertyDataManager<T> RegisteredPropertyDataManager { get; }
+        public IPropertyValueManager<T> PropertyValueManager { get; }
+
     }
 }

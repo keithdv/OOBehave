@@ -7,52 +7,43 @@ using System.Text;
 namespace OOBehave.Core
 {
 
-    public class RegisteredPropertyManager : IRegisteredPropertyManager
+    public class RegisteredPropertyManager<T> : IRegisteredPropertyManager<T>
     {
 
         private IFactory Factory { get; }
+        private IDictionary<string, IRegisteredProperty> RegisteredProperties { get; } = new ConcurrentDictionary<string, IRegisteredProperty>();
         public RegisteredPropertyManager(IFactory factory)
         {
             this.Factory = factory;
+
+#if DEBUG
+            if (typeof(T).IsInterface) { throw new Exception($"RegisteredPropertyManager should be service type not interface. {typeof(T).FullName}"); }
+#endif
         }
 
-        IDictionary<Type, IDictionary<string, IRegisteredProperty>> RegisteredProperties { get; } = new ConcurrentDictionary<Type, IDictionary<string, IRegisteredProperty>>();
-
-        public IRegisteredProperty<P> RegisterProperty<T, P>(string name)
-        {
-            return RegisterProperty<P>(typeof(T), name);
-        }
-
-        private IRegisteredProperty<P> RegisterProperty<P>(Type objectType, string name)
+        public IRegisteredProperty<P> RegisterProperty<P>(string name)
         {
 
-            if (!RegisteredProperties.TryGetValue(objectType, out var keyValuePairs))
+            if (!RegisteredProperties.TryGetValue(name, out var prop))
             {
-                RegisteredProperties.Add(objectType, new ConcurrentDictionary<string, IRegisteredProperty>());
-                keyValuePairs = RegisteredProperties[objectType];
-            }
+                // Check that the correct type of object is being sent in
+                var property = typeof(T).GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
+                    .Where(f => f.Name == name).FirstOrDefault();
 
-            if (!keyValuePairs.TryGetValue(name, out var prop))
-            {
+                if (property == null) { throw new PropertyNotFoundException($"Property {name} not found on {typeof(T).FullName}"); }
+                if (property.PropertyType != typeof(P)) { throw new PropertyNotFoundException($"Property {name} isn't of type {typeof(P).FullName}. Explicitly define type of LoadProperty method to LoadProperty<{property.PropertyType.Name}> for this senario."); }
+
                 prop = Factory.CreateRegisteredProperty<P>(name);
-                keyValuePairs.Add(name, prop);
+                RegisteredProperties.Add(name, prop);
             }
 
-            return (IRegisteredProperty<P>) prop;
+            var ret = prop as IRegisteredProperty<P> ?? throw new PropertyTypeMismatchException($"Cannot cast {prop.GetType().FullName} to {typeof(IRegisteredProperty<P>).FullName}.");
+            return ret;
         }
 
-        public IReadOnlyList<IRegisteredProperty> GetRegisteredPropertiesForType(Type objectType)
+        public IEnumerable<IRegisteredProperty> GetRegisteredProperties()
         {
-            if (!RegisteredProperties.ContainsKey(objectType))
-            {
-                return new List<IRegisteredProperty>().AsReadOnly();
-            }
-
-            return RegisteredProperties[objectType].Values.ToList().AsReadOnly();
+            return RegisteredProperties.Values;
         }
-
-
     }
-
-
 }

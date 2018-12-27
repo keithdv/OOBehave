@@ -11,14 +11,17 @@ using System.Threading.Tasks;
 namespace OOBehave.UnitTest.ValidateBase
 {
 
-    public class ValidateAsyncRules : PersonBase<ValidateAsyncRules>, IValidate
+    public interface IValidateAsyncRules : IPersonBase { }
+
+    public class ValidateAsyncRules : PersonValidateBase<ValidateAsyncRules>, IValidateAsyncRules
     {
 
-        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services) : base(services)
+        public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services,
+            IShortNameAsyncRule<ValidateAsyncRules> shortNameRule,
+            IFullNameAsyncRule<ValidateAsyncRules> fullNameRule,
+            IPersonAsyncRule<ValidateAsyncRules> personRule) : base(services)
         {
-            RuleExecute.AddRule(new ShortNameAsyncRule<ValidateAsyncRules>());
-            RuleExecute.AddRule(new FullNameAsyncRule<ValidateAsyncRules>());
-            RuleExecute.AddRule(new PersonAsyncRule<ValidateAsyncRules>());
+            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
         }
 
     }
@@ -28,12 +31,19 @@ namespace OOBehave.UnitTest.ValidateBase
     {
 
 
-        ValidateAsyncRules validate;
+        IValidateAsyncRules validate;
 
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.GetLifetimeScope().Resolve<ValidateAsyncRules>();
+            validate = AutofacContainer.GetLifetimeScope().Resolve<IValidateAsyncRules>();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
         }
 
         [TestMethod]
@@ -44,17 +54,30 @@ namespace OOBehave.UnitTest.ValidateBase
 
 
         [TestMethod]
-        public void ValidateAsyncRules_Set()
+        public async Task ValidateAsyncRules_Set()
         {
             validate.FirstName = "Keith";
+            await validate.WaitForRules();
         }
 
         [TestMethod]
-        public void ValidateAsyncRules_SetGet()
+        public async Task ValidateAsyncRules_Set_IsBusy_True()
+        {
+            validate.FirstName = "Keith";
+            Assert.IsTrue(validate.IsBusy);
+            Assert.IsTrue(validate.IsSelfBusy);
+            await validate.WaitForRules();
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsSelfBusy);
+        }
+
+        [TestMethod]
+        public async Task ValidateAsyncRules_SetGet()
         {
             var name = Guid.NewGuid().ToString();
             validate.ShortName = name;
             Assert.AreEqual(name, validate.ShortName);
+            await validate.WaitForRules();
         }
 
         //[TestMethod]

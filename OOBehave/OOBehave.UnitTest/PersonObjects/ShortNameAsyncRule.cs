@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class ShortNameAsyncRule<T> : CascadeAsyncRule<T>
+    public interface IShortNameAsyncRule<T> : IRule<T> where T : IPersonBase { }
+
+    public class ShortNameAsyncRule<T> : CascadeAsyncRule<T>, IShortNameAsyncRule<T>
         where T : IPersonBase
     {
 

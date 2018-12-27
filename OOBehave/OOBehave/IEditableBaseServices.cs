@@ -1,4 +1,6 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
+using OOBehave.Portal;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -13,11 +15,17 @@ namespace OOBehave
     /// </summary>
     public interface IEditableBaseServices<T> : IValidateBaseServices<T>
     {
+        IEditPropertyValueManager<T> EditPropertyValueManager { get; }
     }
 
     public class EditableBaseServices<T> : ValidateBaseServices<T>, IEditableBaseServices<T>
     {
 
-        public EditableBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory) { }
+        public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
+        public EditableBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
+                                        IFactory factory) : base(registeredPropertyManager, factory)
+        {
+            EditPropertyValueManager = registeredPropertyManager;
+        }
     }
 }

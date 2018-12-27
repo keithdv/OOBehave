@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class FullNameAsyncRule<T> : CascadeAsyncRule<T>
+
+    public interface IFullNameAsyncRule<T> : IRule<T> where T : IPersonBase { }
+
+    public class FullNameAsyncRule<T> : CascadeAsyncRule<T>, IFullNameAsyncRule<T>
         where T : IPersonBase
     {
 

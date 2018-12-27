@@ -1,4 +1,6 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.AuthorizationRules;
+using OOBehave.Core;
+using OOBehave.Portal;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace OOBehave
     /// </summary>
     public interface IValidateBaseServices<T> : IBaseServices<T>
     {
-        IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
+        IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
         IRuleExecute<T> CreateRuleExecute(T target);
 
@@ -23,17 +25,18 @@ namespace OOBehave
     {
 
         private IFactory Factory { get; }
-        public ValidateBaseServices(IRegisteredPropertyValidateDataManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager)
+        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyManager,
+            IFactory factory) : base(registeredPropertyManager)
         {
-            this.RegisteredPropertyValidateDataManager = registeredPropertyManager;
+            this.ValidatePropertyValueManager = registeredPropertyManager;
             this.Factory = factory;
         }
 
-        public IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
+        public IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
-        IRegisteredPropertyDataManager<T> IBaseServices<T>.RegisteredPropertyDataManager
+        IPropertyValueManager<T> IBaseServices<T>.PropertyValueManager
         {
-            get { return RegisteredPropertyValidateDataManager; }
+            get { return ValidatePropertyValueManager; }
         }
 
         public IRuleExecute<T> CreateRuleExecute(T target)

@@ -10,13 +10,15 @@ using System.Text;
 
 namespace OOBehave.UnitTest.ValidateBase
 {
-    public class ValidateDependencyRules : PersonBase<ValidateDependencyRules>, IValidate
+    public interface IValidateDependencyRules : IPersonBase { }
+
+    public class ValidateDependencyRules : PersonValidateBase<ValidateDependencyRules>, IValidateDependencyRules
     {
 
         public ValidateDependencyRules(IValidateBaseServices<ValidateDependencyRules> services,
-                ShortNameDependencyRule<ValidateDependencyRules> shortNameRule,
-                FullNameDependencyRule<ValidateDependencyRules> fullNameRule,
-                PersonDependencyRule<ValidateDependencyRules> firstNameRule) : base(services)
+                IShortNameDependencyRule<ValidateDependencyRules> shortNameRule,
+                IFullNameDependencyRule<ValidateDependencyRules> fullNameRule,
+                IPersonDependencyRule<ValidateDependencyRules> firstNameRule) : base(services)
         {
             RuleExecute.AddRule(shortNameRule);
             RuleExecute.AddRule(fullNameRule);
@@ -30,14 +32,14 @@ namespace OOBehave.UnitTest.ValidateBase
     {
 
 
-        ValidateDependencyRules validate;
+        IValidateDependencyRules validate;
         ILifetimeScope scope;
 
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            validate = scope.Resolve<ValidateDependencyRules>();
+            validate = scope.Resolve<IValidateDependencyRules>();
         }
 
         [TestCleanup]

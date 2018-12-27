@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace OOBehave.Rules
 
         IReadOnlyDictionary<string, string> PropertyErrorMessages { get; }
 
-        IReadOnlyList<string> TargetErrorMessages { get; }
+        IEnumerable<string> TargetErrorMessages { get; }
 
     }
 
@@ -22,11 +23,11 @@ namespace OOBehave.Rules
 
         protected Dictionary<string, string> PropertyErrorMessages { get; } = new Dictionary<string, string>();
 
-        IReadOnlyDictionary<string, string> IRuleResult.PropertyErrorMessages => PropertyErrorMessages;
+        IReadOnlyDictionary<string, string> IRuleResult.PropertyErrorMessages => new ReadOnlyDictionary<string, string>(PropertyErrorMessages);
 
         protected List<string> TargetErrorMessages { get; } = new List<string>();
 
-        IReadOnlyList<string> IRuleResult.TargetErrorMessages => TargetErrorMessages.AsReadOnly();
+        IEnumerable<string> IRuleResult.TargetErrorMessages => TargetErrorMessages.AsEnumerable();
 
         public bool IsError { get { return PropertyErrorMessages.Any() || TargetErrorMessages.Any(); } }
 

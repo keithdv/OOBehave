@@ -9,31 +9,53 @@ namespace OOBehave.UnitTest.Base
     [TestClass]
     public class BaseTests
     {
-        private Base single;
+        private IDomainObject single;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            single = AutofacContainer.GetLifetimeScope().Resolve<Base>();
+            single = AutofacContainer.GetLifetimeScope().Resolve<IDomainObject>();
         }
         [TestMethod]
         public void Base_Construct()
         {
-            var name = single.Name;
+            var name = single.FirstName;
         }
 
         [TestMethod]
         public void Base_Set()
         {
-            single.Name = Guid.NewGuid().ToString();
+            single.Id = Guid.NewGuid();
+            single.FirstName = Guid.NewGuid().ToString();
+            single.LastName = Guid.NewGuid().ToString();
         }
 
         [TestMethod]
         public void Base_SetGet()
         {
-            var name = Guid.NewGuid().ToString();
-            single.Name = name;
-            Assert.AreEqual(name, single.Name);
+            var id = single.Id = Guid.NewGuid();
+            var firstName = single.FirstName = Guid.NewGuid().ToString();
+            var lastName = single.LastName = Guid.NewGuid().ToString();
+
+            Assert.AreEqual(id, single.Id);
+            Assert.AreEqual(firstName, single.FirstName);
+            Assert.AreEqual(lastName, single.LastName);
         }
+
+        [TestMethod]
+        public void Base_Set_Inherited_Type_Setter()
+        {
+            var B = new B();
+            single.TestPropertyType = B;
+        }
+
+        [TestMethod]
+        public void Base_Set_Inherited_Type_LoadProperty()
+        {
+            var B = new B();
+            single.LoadPropertyTest(B);
+        }
+
+
     }
 }

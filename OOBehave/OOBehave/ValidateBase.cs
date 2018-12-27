@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,8 +14,10 @@ namespace OOBehave
     public interface IValidateBase : IBase, IValidateMetaProperties
     {
         Task WaitForRules();
-        IReadOnlyList<string> BrokenRuleMessages { get; }
-        IReadOnlyList<string> BrokenRulePropertyMessages(string propertyName);
+        IEnumerable<string> BrokenRuleMessages { get; }
+        IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
+
+
     }
 
     public interface IValidateBase<T> : IValidateBase, IBase<T>
@@ -25,29 +28,44 @@ namespace OOBehave
     public abstract class ValidateBase<T> : Base<T>, IValidateBase<T>, INotifyPropertyChanged
         where T : ValidateBase<T>
     {
-        protected IRegisteredPropertyValidateDataManager<T> RegisteredPropertyValidateDataManager { get; }
+        protected IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
         protected IRuleExecute<T> RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices<T> services) : base(services)
         {
-            this.RegisteredPropertyValidateDataManager = services.RegisteredPropertyValidateDataManager;
+            this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
 
             // TODO - Why do I need to cast to T??
             this.RuleExecute = services.CreateRuleExecute((T)this);
         }
 
-        public bool IsValid => RuleExecute.IsValid; // And Child.IsValidate from RegisteredPropertyDataManager
+        public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid;
 
         public bool IsSelfValid => RuleExecute.IsValid;
 
-        public bool IsChild => throw new NotImplementedException();
+        public bool IsSelfBusy => RuleExecute.IsBusy;
 
-        protected void SetProperty<P>(P value, [System.Runtime.CompilerServices.CallerMemberName]  string propertyName = "")
+        public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy;
+
+        protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            LoadProperty(value, propertyName);
+            if (!IsStopped)
+            {
+                SetProperty(propertyName, value);
+            }
+            else
+            {
+                LoadProperty(propertyName, value);
+            }
+        }
+
+        protected virtual void SetProperty<P>(string propertyName, P value)
+        {
+            PropertyValueManager.Set(propertyName, value);
             PropertyHasChanged(propertyName);
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -64,23 +82,31 @@ namespace OOBehave
 
         public virtual Task WaitForRules()
         {
-            return RuleExecute.WaitForRules;
+            return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, ValidatePropertyValueManager.WaitForRules() });
         }
 
-        public IReadOnlyList<string> BrokenRuleMessages
+        public override async Task<IDisposable> StopAllActions()
+        {
+            var result = await base.StopAllActions();
+            await WaitForRules();
+            return result;
+        }
+
+        public IEnumerable<string> BrokenRuleMessages
         {
             get
             {
                 return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value)
-                                .Union(RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.TargetErrorMessages))).ToList().AsReadOnly();
+                                .Union(RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.TargetErrorMessages)));
 
             }
         }
 
-        public IReadOnlyList<string> BrokenRulePropertyMessages(string propertyName)
+        public IEnumerable<string> BrokenRulePropertyMessages(string propertyName)
         {
-            return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p=>p.Value)).ToList().AsReadOnly();
+            return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
+
 
     }
 }

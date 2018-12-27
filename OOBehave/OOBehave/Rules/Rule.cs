@@ -10,6 +10,9 @@ namespace OOBehave.Rules
 
     public interface IRule
     {
+        /// <summary>
+        /// Must be unique for every rule across all types
+        /// </summary>
         uint UniqueIndex { get; }
 
     }
@@ -26,6 +29,7 @@ namespace OOBehave.Rules
 
         protected Rule()
         {
+            /// Must be unique for every rule across all types so Static counter is important
             UniqueIndex = indexer;
             indexer++;
         }

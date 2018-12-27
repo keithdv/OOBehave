@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public class PersonDependencyRule<T> : TargetRule<T>
+
+    public interface IPersonDependencyRule<T> : IRule<T>
+    {
+
+    }
+
+    public class PersonDependencyRule<T> : TargetRule<T>, IPersonDependencyRule<T>
         where T : IPersonBase
     {
         public PersonDependencyRule(IDisposableDependency dd)

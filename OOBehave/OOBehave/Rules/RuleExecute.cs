@@ -11,9 +11,9 @@ namespace OOBehave.Rules
 
     public interface IRuleExecute<T>
     {
-        IReadOnlyCollection<IRule<T>> Rules { get; }
+        IEnumerable<IRule<T>> Rules { get; }
 
-        IReadOnlyList<IRuleResult> Results { get; }
+        IEnumerable<IRuleResult> Results { get; }
 
         void CheckRulesForProperty(string propertyName);
 
@@ -21,7 +21,10 @@ namespace OOBehave.Rules
 
         bool IsValid { get; }
 
+        bool IsBusy { get; }
+
         void AddRule(IRule<T> rule);
+        void AddRules(params IRule<T>[] rules);
 
     }
 
@@ -30,22 +33,33 @@ namespace OOBehave.Rules
 
         protected T Target { get; }
         protected IDictionary<uint, IRuleResult> Results { get; } = new ConcurrentDictionary<uint, IRuleResult>();
-
+        public bool IsBusy => isRunningRules;
         public RuleExecute(T target)
         {
             this.Target = target;
         }
 
-        IReadOnlyCollection<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
+        IEnumerable<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
 
         private List<IRule<T>> Rules { get; } = new List<IRule<T>>();
 
-        IReadOnlyList<IRuleResult> IRuleExecute<T>.Results => Results.Values.ToList().AsReadOnly();
+        IEnumerable<IRuleResult> IRuleExecute<T>.Results => Results.Values;
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
 
+
+        public void AddRules(params IRule<T>[] rules)
+        {
+            foreach (var r in rules) { AddRule(r); }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rule"></param>
         public void AddRule(IRule<T> rule)
         {
+            // TODO - Only allow Rule Types to be added - not instances
             Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 

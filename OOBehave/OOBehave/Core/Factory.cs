@@ -6,11 +6,6 @@ using System.Threading;
 
 namespace OOBehave.Core
 {
-    public interface IFactory
-    {
-        IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
-        IRuleExecute<T> CreateRuleExecute<T>(T target);
-    }
 
     /// <summary>
     /// You can't register generic delegates in C#
@@ -18,19 +13,40 @@ namespace OOBehave.Core
     /// </summary>
     public class DefaultFactory : IFactory
     {
+        private static uint index = 0;
+        private static uint NextIndex() { index++; return index; } // This may be overly simple and in the wrong spot
+        private IServiceScope Scope { get; }
 
+        public DefaultFactory(IServiceScope scope)
+        {
+            Scope = scope;
+        }
 
         public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
         {
             System.Diagnostics.Debug.WriteLine($"Register Property {name}");
-            return new RegisteredProperty<T>(name);
+            return new RegisteredProperty<T>(name, NextIndex());
         }
-
 
         public IRuleExecute<T> CreateRuleExecute<T>(T target)
         {
             return new RuleExecute<T>(target);
         }
+
+        public IPropertyValue CreatePropertyValue<P>(string name, P value)
+        {
+            return new PropertyValue<P>(name, value);
+        }
+        public IValidatePropertyValue CreateValidatePropertyValue<P>(string name, P value)
+        {
+            return new ValidatePropertyValue<P>(name, value);
+        }
+
+        public IEditPropertyValue CreateEditPropertyValue<P>(string name, P value)
+        {
+            return new EditPropertyValue<P>(Scope.Resolve<IValuesDiffer>(), name, value);
+        }
+
     }
 
     [Serializable]
