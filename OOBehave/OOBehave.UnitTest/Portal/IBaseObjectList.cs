@@ -2,7 +2,7 @@
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public interface IReadOnlyObject : IBase<IReadOnlyObject>
+    public interface IBaseObjectList : IListBase<IBaseObject>
     {
         int IntCriteria { get; }
         Guid GuidCriteria { get; }

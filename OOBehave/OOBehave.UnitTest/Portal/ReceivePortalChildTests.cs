@@ -9,16 +9,16 @@ namespace OOBehave.UnitTest.ObjectPortal
 {
 
     [TestClass]
-    public class ReceivePortalTests
+    public class ReceivePortalChildTests
     {
         private ILifetimeScope scope = AutofacContainer.GetLifetimeScope();
-        private IReceivePortal<IBaseObject> portal;
+        private IReceivePortalChild<IBaseObject> portal;
         private IBaseObject domainObject;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            portal = scope.Resolve<IReceivePortal<IBaseObject>>();
+            portal = scope.Resolve<IReceivePortalChild<IBaseObject>>();
         }
 
         [TestCleanup]
@@ -30,48 +30,48 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task ReceivePortal_Create()
+        public async Task ReceivePortalChild_CreateChild()
         {
-            domainObject = await portal.Create();
-            Assert.IsTrue(domainObject.CreateCalled);
+            domainObject = await portal.CreateChild();
+            Assert.IsTrue(domainObject.CreateChildCalled);
         }
 
         [TestMethod]
-        public async Task ReceivePortal_CreateGuidCriteriaCalled()
+        public async Task ReceivePortalChild_CreateChildGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            domainObject = await portal.Create(crit);
+            domainObject = await portal.CreateChild(crit);
             Assert.AreEqual(crit, domainObject.GuidCriteria);
         }
 
         [TestMethod]
-        public async Task ReceivePortal_CreateIntCriteriaCalled()
+        public async Task ReceivePortalChild_CreateChildIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            domainObject = await portal.Create(crit);
+            domainObject = await portal.CreateChild(crit);
             Assert.AreEqual(crit, domainObject.IntCriteria);
         }
 
         [TestMethod]
-        public async Task ReceivePortal_Fetch()
+        public async Task ReceivePortalChild_FetchChild()
         {
-            domainObject = await portal.Fetch();
-            Assert.IsTrue(domainObject.FetchCalled);
+            domainObject = await portal.FetchChild();
+            Assert.IsTrue(domainObject.FetchChildCalled);
         }
 
         [TestMethod]
-        public async Task ReceivePortal_FetchGuidCriteriaCalled()
+        public async Task ReceivePortalChild_FetchChildGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            domainObject = await portal.Fetch(crit);
+            domainObject = await portal.FetchChild(crit);
             Assert.AreEqual(crit, domainObject.GuidCriteria);
         }
 
         [TestMethod]
-        public async Task ReceivePortal_FetchIntCriteriaCalled()
+        public async Task ReceivePortalChild_FetchChildIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            domainObject = await portal.Fetch(crit);
+            domainObject = await portal.FetchChild(crit);
             Assert.AreEqual(crit, domainObject.IntCriteria);
         }
 

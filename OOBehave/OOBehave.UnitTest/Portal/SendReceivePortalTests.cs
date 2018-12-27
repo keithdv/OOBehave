@@ -56,32 +56,6 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task SendReceivePortal_CreateChild()
-        {
-            editObject = await portal.CreateChild();
-            Assert.IsTrue(editObject.CreateChildCalled);
-            Assert.IsTrue(editObject.IsNew);
-            Assert.IsTrue(editObject.IsChild);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_CreateChildGuidCriteriaCalled()
-        {
-            var crit = Guid.NewGuid();
-            editObject = await portal.CreateChild(crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_CreateChildIntCriteriaCalled()
-        {
-            int crit = DateTime.Now.Millisecond;
-            editObject = await portal.CreateChild(crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-        }
-
-
-        [TestMethod]
         public async Task SendReceivePortal_Fetch()
         {
             editObject = await portal.Fetch();
@@ -107,30 +81,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
 
-        [TestMethod]
-        public async Task SendReceivePortal_FetchChild()
-        {
-            editObject = await portal.FetchChild();
-            Assert.IsTrue(editObject.FetchChildCalled);
-            Assert.IsFalse(editObject.IsNew);
-            Assert.IsTrue(editObject.IsChild);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_FetchChildGuidCriteriaCalled()
-        {
-            var crit = Guid.NewGuid();
-            editObject = await portal.FetchChild(crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_FetchChildIntCriteriaCalled()
-        {
-            int crit = DateTime.Now.Millisecond;
-            editObject = await portal.FetchChild(crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-        }
 
         [TestMethod]
         public async Task SendReceivePortal_Update()
@@ -162,34 +112,6 @@ namespace OOBehave.UnitTest.ObjectPortal
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
 
-        [TestMethod]
-        public async Task SendReceivePortal_UpdateChild()
-        {
-            editObject = await portal.CreateChild();
-            await portal.UpdateChild(editObject);
-            Assert.IsTrue(editObject.UpdateChildCalled);
-            Assert.IsFalse(editObject.IsNew);
-            Assert.IsTrue(editObject.IsChild);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_UpdateChildGuidCriteriaCalled()
-        {
-            var crit = Guid.NewGuid();
-            editObject = await portal.Create();
-            await portal.UpdateChild(editObject, crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_UpdateChildIntCriteriaCalled()
-        {
-            int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Create();
-            await portal.UpdateChild(editObject, crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-        }
-
 
         [TestMethod]
         public async Task SendReceivePortal_Delete()
@@ -217,30 +139,5 @@ namespace OOBehave.UnitTest.ObjectPortal
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
 
-        [TestMethod]
-        public async Task SendReceivePortal_DeleteChild()
-        {
-            editObject = await portal.Create();
-            await portal.DeleteChild(editObject);
-            Assert.IsTrue(editObject.DeleteChildCalled);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_DeleteChildGuidCriteriaCalled()
-        {
-            var crit = Guid.NewGuid();
-            editObject = await portal.Create();
-            await portal.DeleteChild(editObject, crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-        }
-
-        [TestMethod]
-        public async Task SendReceivePortal_DeleteChildIntCriteriaCalled()
-        {
-            int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Create();
-            await portal.DeleteChild(editObject, crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-        }
     }
 }

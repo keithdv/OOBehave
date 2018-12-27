@@ -2,13 +2,14 @@
 using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class ReadOnlyObject : Base<ReadOnlyObject>, IReadOnlyObject
+    public class BaseObjectList : ListBase<BaseObjectList, IBaseObject>, IBaseObjectList
     {
 
-        public ReadOnlyObject(IBaseServices<ReadOnlyObject> baseServices) : base(baseServices)
+        public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> baseServices) : base(baseServices)
         {
         }
 
@@ -18,111 +19,99 @@ namespace OOBehave.UnitTest.ObjectPortal
         public bool CreateCalled { get; set; } = false;
 
         [Create]
-        private void Create()
+        private async Task Create()
         {
             CreateCalled = true;
+            Add(await ItemPortal.CreateChild());
         }
 
         [Create]
-        private void Create(int criteria)
+        private async Task Create(int criteria)
         {
             IntCriteria = criteria;
+            Add(await ItemPortal.CreateChild(criteria));
         }
 
         [Create]
-        private void Create(Guid criteria)
-        {
-            GuidCriteria = criteria;
-        }
-
-
-        [Create]
-        private void Create(Guid criteria, IDisposableDependency dependency)
+        private async Task Create(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            Add(await ItemPortal.CreateChild(criteria));
         }
 
         public bool CreateChildCalled { get; set; } = false;
 
         [CreateChild]
-        private void CreateChild()
+        private async Task CreateChild()
         {
             CreateChildCalled = true;
+            Add(await ItemPortal.CreateChild());
         }
 
         [CreateChild]
-        private void CreateChild(int criteria)
+        private async Task CreateChild(int criteria)
         {
             IntCriteria = criteria;
+            Add(await ItemPortal.CreateChild(criteria));
         }
 
         [CreateChild]
-        private void CreateChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
-        }
-
-        [CreateChild]
-        private void CreateChild(Guid criteria, IDisposableDependency dependency)
+        private async Task CreateChild(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            Add(await ItemPortal.CreateChild(criteria));
         }
 
         public bool FetchCalled { get; set; } = false;
 
         [Fetch]
-        private void Fetch()
+        private async Task Fetch()
         {
             FetchCalled = true;
+            Add(await ItemPortal.FetchChild());
         }
 
         [Fetch]
-        private void Fetch(int criteria)
+        private async Task Fetch(int criteria)
         {
             IntCriteria = criteria;
+            Add(await ItemPortal.FetchChild(criteria));
         }
-
+               
         [Fetch]
-        private void Fetch(Guid criteria)
-        {
-            GuidCriteria = criteria;
-        }
-
-
-        [Fetch]
-        private void Fetch(Guid criteria, IDisposableDependency dependency)
+        private async Task Fetch(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            Add(await ItemPortal.FetchChild(criteria));
         }
 
         public bool FetchChildCalled { get; set; } = false;
 
         [FetchChild]
-        private void FetchChild()
+        private async Task FetchChild()
         {
             FetchChildCalled = true;
+            Add(await ItemPortal.FetchChild());
         }
 
         [FetchChild]
-        private void FetchChild(int criteria)
+        private async Task FetchChild(int criteria)
         {
             IntCriteria = criteria;
+            Add(await ItemPortal.FetchChild(criteria));
         }
 
-        [FetchChild]
-        private void FetchChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
-        }
 
         [FetchChild]
-        private void FetchChild(Guid criteria, IDisposableDependency dependency)
+        private async Task FetchChild(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            Add(await ItemPortal.FetchChild(criteria));
+
         }
 
     }

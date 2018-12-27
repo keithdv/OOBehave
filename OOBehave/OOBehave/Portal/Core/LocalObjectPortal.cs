@@ -10,7 +10,7 @@ namespace OOBehave.Portal.Core
 {
 
 
-    public class LocalReceivePortal<T> : ObjectPortalBase<T>, IReceivePortal<T>
+    public class LocalReceivePortal<T> : ObjectPortalBase<T>, IReceivePortal<T>, IReceivePortalChild<T>
         where T : IPortalTarget
     {
 
@@ -100,7 +100,7 @@ namespace OOBehave.Portal.Core
     }
 
 
-    public class LocalSendReceivePortal<T> : LocalReceivePortal<T>, ISendReceivePortal<T>
+    public class LocalSendReceivePortal<T> : LocalReceivePortal<T>, ISendReceivePortal<T>, ISendReceivePortalChild<T>
         where T : IPortalEditTarget
     {
 

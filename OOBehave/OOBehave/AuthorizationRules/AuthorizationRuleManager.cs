@@ -34,7 +34,6 @@ namespace OOBehave.AuthorizationRules
     }
 
     public class AuthorizationRuleManager<T> : IAuthorizationRuleManager<T>
-        where T : IBase
     {
 
         private IDictionary<AuthorizeOperation, IList<AuthorizationRuleMethod>> AuthorizationMethods = new ConcurrentDictionary<AuthorizeOperation, IList<AuthorizationRuleMethod>>();

@@ -2,7 +2,10 @@
 using OOBehave.Core;
 using OOBehave.Portal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -10,33 +13,30 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
-    public interface IBase : IOOBehaveObject, IPortalTarget
-    {
-        /// <summary>
-        /// Stop events, rules and ismodified
-        /// Only affects the Setter method
-        /// Not SetProperty or LoadProperty
-        /// </summary>
-        bool IsStopped { get; }
-
-    }
-
-    public interface IBase<T> : IBase
+    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable, ICollection, IList
     {
 
     }
 
-    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>, IPortalTarget
-        where T : Base<T>
+    public interface IListBase<T> : IListBase, ICollection<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    {
+        Task<T> CreateAdd();
+        Task<T> CreateAdd(object criteria);
+        new int Count { get; }
+    }
+
+    public abstract partial class ListBase<L, T> : ObservableCollection<T>, IOOBehaveObject<T>, IListBase<T>, IPortalTarget
+        where L : ListBase<L, T>
+        where T : IBase<T>
     {
 
-        protected IPropertyValueManager<T> PropertyValueManager { get; }
+        protected IPropertyValueManager<L> PropertyValueManager { get; }
+        protected IReceivePortalChild<T> ItemPortal { get; }
 
-
-
-        public Base(IBaseServices<T> services)
+        public ListBase(IListBaseServices<L, T> services)
         {
             PropertyValueManager = services.PropertyValueManager;
+            ItemPortal = services.ReceivePortal;
         }
 
         protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -84,6 +84,20 @@ namespace OOBehave
         void IPortalTarget.StartAllActions()
         {
             StartAllActions();
+        }
+
+        public async Task<T> CreateAdd()
+        {
+            var item = await ItemPortal.CreateChild();
+            base.Add(item);
+            return item;
+        }
+
+        public async Task<T> CreateAdd(object criteria)
+        {
+            var item = await ItemPortal.CreateChild(criteria);
+            base.Add(item);
+            return item;
         }
 
     }

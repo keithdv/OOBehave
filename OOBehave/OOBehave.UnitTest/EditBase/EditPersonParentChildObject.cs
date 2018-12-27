@@ -30,7 +30,7 @@ namespace OOBehave.UnitTest.EditBase
 
         [Fetch]
         [FetchChild]
-        public async Task Fetch(PersonDto person, ISendReceivePortal<IEditPersonParentChild> portal, IReadOnlyList<PersonDto> personTable)
+        public async Task Fetch(PersonDto person, IReceivePortalChild<IEditPersonParentChild> portal, IReadOnlyList<PersonDto> personTable)
         {
             base.FillFromDto(person);
 

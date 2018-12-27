@@ -121,11 +121,19 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
 
                 // Takes IServiceScope so these need to match it's lifetime
-                builder.RegisterGeneric(typeof(LocalReceivePortal<>)).As(typeof(IReceivePortal<>)).InstancePerLifetimeScope();
-                builder.RegisterGeneric(typeof(LocalSendReceivePortal<>)).As(typeof(ISendReceivePortal<>)).InstancePerLifetimeScope();
+                builder.RegisterGeneric(typeof(LocalReceivePortal<>))
+                    .As(typeof(IReceivePortal<>))
+                    .As(typeof(IReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
+
+                builder.RegisterGeneric(typeof(LocalSendReceivePortal<>))
+                    .As(typeof(ISendReceivePortal<>))
+                    .As(typeof(ISendReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
 
                 // Simple wrapper - Always InstancePerDependency
                 builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
+                builder.RegisterGeneric(typeof(ListBaseServices<,>)).As(typeof(IListBaseServices<,>));
                 builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
                 builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
 

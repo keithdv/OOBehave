@@ -34,7 +34,7 @@ namespace OOBehave.UnitTest.ValidateBase
         }
 
         [Fetch]
-        public async Task Fetch(PersonDto person, IReceivePortal<IParentChild> portal, IReadOnlyList<PersonDto> personTable)
+        public async Task Fetch(PersonDto person, IReceivePortalChild<IParentChild> portal, IReadOnlyList<PersonDto> personTable)
         {
             base.FillFromDto(person);
 
