@@ -25,7 +25,7 @@ namespace OOBehave
 
     }
 
-    public abstract class ValidateBase<T> : Base<T>, IValidateBase<T>, INotifyPropertyChanged
+    public abstract class ValidateBase<T> : Base<T>, IValidateBase<T>, INotifyPropertyChanged, IPropertyAccess
         where T : ValidateBase<T>
     {
         protected IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
@@ -107,6 +107,9 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Set(registeredProperty, value);
+        }
     }
 }

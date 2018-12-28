@@ -14,18 +14,20 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IEditBaseServices<T> : IValidateBaseServices<T>
+        where T : EditBase<T>
     {
         IEditPropertyValueManager<T> EditPropertyValueManager { get; }
     }
 
     public class EditBaseServices<T> : ValidateBaseServices<T>, IEditBaseServices<T>
+        where T : EditBase<T>
     {
 
         public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
-        public EditBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
-                                        IFactory factory) : base(registeredPropertyManager, factory)
+        public EditBaseServices(IEditPropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager,
+                                        IFactory factory) : base(registeredPropertyValueManager, registeredPropertyManager, factory)
         {
-            EditPropertyValueManager = registeredPropertyManager;
+            EditPropertyValueManager = registeredPropertyValueManager;
         }
     }
 }

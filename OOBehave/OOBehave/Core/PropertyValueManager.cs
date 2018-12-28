@@ -9,8 +9,11 @@ namespace OOBehave.Core
     public interface IPropertyValueManager<T>
     {
         void Set<P>(string name, P newValue);
+        void Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         void Load<P>(string name, P newValue);
+        void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         P Read<P>(string name);
+        P Read<P>(IRegisteredProperty<P> registeredProperty);
     }
 
     public interface IPropertyValue
@@ -69,7 +72,7 @@ namespace OOBehave.Core
         }
 
         protected abstract P CreatePropertyValue<PV>(string name, PV value);
-        
+
         protected IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
         {
             return registeredPropertyManager.RegisterProperty<PV>(name);
@@ -82,7 +85,7 @@ namespace OOBehave.Core
             Set(GetRegisteredProperty<PV>(name), newValue);
         }
 
-        public virtual void Set<PV>(IRegisteredProperty registeredProperty, PV newValue)
+        public virtual void Set<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
         {
             if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
             {
@@ -91,7 +94,7 @@ namespace OOBehave.Core
                 fieldData[registeredProperty.Index] = value = CreatePropertyValue(registeredProperty.Name, default(PV));
             }
 
-            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(P).FullName}");
+            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(PV).FullName}");
             fd.Value = newValue;
 
         }
@@ -101,7 +104,7 @@ namespace OOBehave.Core
             Load(GetRegisteredProperty<PV>(name), newValue);
         }
 
-        public virtual void Load<PV>(IRegisteredProperty registeredProperty, PV newValue)
+        public virtual void Load<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
         {
             if (!fieldData.ContainsKey(registeredProperty.Index))
             {

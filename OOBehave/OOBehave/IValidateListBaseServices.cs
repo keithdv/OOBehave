@@ -14,6 +14,7 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IValidateListBaseServices<L, T> : IListBaseServices<L, T>
+        where L : ValidateListBase<L, T>
         where T : IValidateBase
     {
         IValidatePropertyValueManager<L> ValidatePropertyValueManager { get; }
@@ -23,6 +24,7 @@ namespace OOBehave
     }
 
     public class ValidateListBaseServices<L, T> : ListBaseServices<L, T>, IValidateListBaseServices<L, T>
+        where L : ValidateListBase<L, T>
         where T : IValidateBase
     {
 

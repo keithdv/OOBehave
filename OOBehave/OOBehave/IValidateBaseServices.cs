@@ -14,6 +14,7 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IValidateBaseServices<T> : IBaseServices<T>
+        where T : ValidateBase<T>
     {
         IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
@@ -22,13 +23,14 @@ namespace OOBehave
     }
 
     public class ValidateBaseServices<T> : BaseServices<T>, IValidateBaseServices<T>
+        where T : ValidateBase<T>
     {
 
         private IFactory Factory { get; }
-        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyManager,
-            IFactory factory) : base(registeredPropertyManager)
+        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager,
+            IFactory factory) : base(registeredPropertyValueManager, registeredPropertyManager)
         {
-            this.ValidatePropertyValueManager = registeredPropertyManager;
+            this.ValidatePropertyValueManager = registeredPropertyValueManager;
             this.Factory = factory;
         }
 

@@ -13,6 +13,7 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IListBaseServices<L, T>
+        where L : ListBase<L, T>
         where T : IBase
     {
         IPropertyValueManager<L> PropertyValueManager { get; }
@@ -20,6 +21,7 @@ namespace OOBehave
     }
 
     public class ListBaseServices<L, T> : IListBaseServices<L, T>
+        where L : ListBase<L, T>
         where T : IBase
     {
 

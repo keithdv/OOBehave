@@ -11,7 +11,7 @@ namespace OOBehave.Rules
 
     public interface IRuleExecute<T>
     {
-        IEnumerable<IRule<T>> Rules { get; }
+        IEnumerable<IRule> Rules { get; }
 
         IEnumerable<IRuleResult> Results { get; }
 
@@ -23,12 +23,13 @@ namespace OOBehave.Rules
 
         bool IsBusy { get; }
 
-        void AddRule(IRule<T> rule);
-        void AddRules(params IRule<T>[] rules);
+        void AddRule(IRule rule);
+        void AddRules(params IRule[] rules);
         FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func);
     }
 
     public class RuleExecute<T> : IRuleExecute<T>
+        where T : IBase
     {
 
         protected T Target { get; }
@@ -39,16 +40,16 @@ namespace OOBehave.Rules
             this.Target = target;
         }
 
-        IEnumerable<IRule<T>> IRuleExecute<T>.Rules => Rules.AsReadOnly();
+        IEnumerable<IRule> IRuleExecute<T>.Rules => Rules.AsReadOnly();
 
-        private List<IRule<T>> Rules { get; } = new List<IRule<T>>();
+        private List<IRule> Rules { get; } = new List<IRule>();
 
         IEnumerable<IRuleResult> IRuleExecute<T>.Results => Results.Values;
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
 
 
-        public void AddRules(params IRule<T>[] rules)
+        public void AddRules(params IRule[] rules)
         {
             foreach (var r in rules) { AddRule(r); }
         }
@@ -57,7 +58,7 @@ namespace OOBehave.Rules
         /// 
         /// </summary>
         /// <param name="rule"></param>
-        public void AddRule(IRule<T> rule)
+        public void AddRule(IRule rule)
         {
             // TODO - Only allow Rule Types to be added - not instances
             Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
@@ -188,13 +189,25 @@ namespace OOBehave.Rules
 
         private async Task RunCascadeRulesRecursive(string propertyName, CancellationToken token)
         {
-            foreach (var r in Rules.OfType<ICascadeRule<T>>().Where(r => r.TriggerProperties.Contains(propertyName)).ToList())
+            foreach (var r in Rules.OfType<ICascadeRule>().Where(r => r.TriggerProperties.Contains(propertyName)).ToList())
             {
                 IRuleResult result;
 
                 try
                 {
-                    result = await r.Execute(Target, token);
+                    if (r is ICascadeRule<T> rule)
+                    {
+                        result = await rule.Execute(Target, token);
+                    }
+                    else if (r is ICascadeRule<IBase> sharedRule)
+                    {
+                        result = await sharedRule.Execute(Target, token);
+                    }
+                    else
+                    {
+                        throw new InvalidRuleTypeException($"{r.GetType().FullName} cannot be executed for {typeof(T).FullName}");
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -213,13 +226,25 @@ namespace OOBehave.Rules
 
         private async Task RunTargetRulesSequential(CancellationToken token)
         {
-            foreach (var r in Rules.OfType<ITargetRule<T>>().ToList())
+            foreach (var r in Rules.OfType<ITargetRule>().ToList())
             {
                 IRuleResult result;
 
                 try
                 {
-                    result = await r.Execute(Target, token);
+                    if (r is ITargetRule<T> rule)
+                    {
+                        result = await rule.Execute(Target, token);
+                    }
+                    else if (r is ITargetRule<IBase> baseRule)
+                    {
+                        result = await baseRule.Execute(Target, token);
+                    }
+                    else
+                    {
+                        throw new InvalidRuleTypeException($"{r.GetType().FullName} cannot be executed for {typeof(T).FullName}");
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -245,6 +270,18 @@ namespace OOBehave.Rules
         public TargetRulePropertyChangeException(string message) : base(message) { }
         public TargetRulePropertyChangeException(string message, Exception inner) : base(message, inner) { }
         protected TargetRulePropertyChangeException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class InvalidRuleTypeException : Exception
+    {
+        public InvalidRuleTypeException() { }
+        public InvalidRuleTypeException(string message) : base(message) { }
+        public InvalidRuleTypeException(string message, Exception inner) : base(message, inner) { }
+        protected InvalidRuleTypeException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }

@@ -7,42 +7,43 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Rules
 {
-    public interface ICascadeRule<T> : IRule<T>
+
+    public interface ICascadeRule : IRule
+    {
+        IEnumerable<string> TriggerProperties { get; }
+
+    }
+
+    public interface ICascadeRule<T> : ICascadeRule, IRule<T>
     {
 
-        IEnumerable<string> TriggerProperties { get; }
 
     }
 
     public abstract class CascadeAsyncRule<T> : Rule<T>, ICascadeRule<T>
     {
 
-        protected CascadeAsyncRule() : base()
-        {
+        protected CascadeAsyncRule() : base() { }
 
-        }
+        public CascadeAsyncRule(params string[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
 
-        public CascadeAsyncRule(IEnumerable<string> triggerProperties) : this()
+        public CascadeAsyncRule(IEnumerable<string> triggerProperties)
         {
             TriggerProperties.AddRange(triggerProperties);
         }
 
-        IEnumerable<string> ICascadeRule<T>.TriggerProperties => TriggerProperties.AsEnumerable();
+        IEnumerable<string> ICascadeRule.TriggerProperties => TriggerProperties.AsEnumerable();
         protected List<string> TriggerProperties { get; } = new List<string>();
 
     }
 
     public abstract class CascadeRule<T> : CascadeAsyncRule<T>
     {
-        protected CascadeRule() : base()
-        {
+        protected CascadeRule() : base() { }
 
-        }
+        public CascadeRule(IEnumerable<string> triggerProperties) : base(triggerProperties) { }
 
-        public CascadeRule(IEnumerable<string> triggerProperties) : this()
-        {
-            TriggerProperties.AddRange(triggerProperties);
-        }
+        public CascadeRule(params string[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
 
         public abstract IRuleResult Execute(T target);
 

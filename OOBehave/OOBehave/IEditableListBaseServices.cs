@@ -14,12 +14,14 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IEditListBaseServices<L, T> : IValidateListBaseServices<L, T>
+        where L : EditListBase<L, T>
         where T : IEditBase
     {
         IEditPropertyValueManager<L> EditPropertyValueManager { get; }
     }
 
     public class EditListBaseServices<L, T> : ValidateListBaseServices<L, T>, IEditListBaseServices<L, T>
+        where L : EditListBase<L, T>
         where T : IEditBase
     {
 

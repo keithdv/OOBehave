@@ -28,7 +28,7 @@ namespace OOBehave.Core
             return new RegisteredProperty<T>(name, NextIndex());
         }
 
-        public IRuleExecute<T> CreateRuleExecute<T>(T target)
+        public IRuleExecute<T> CreateRuleExecute<T>(T target) where T : IBase
         {
             return new RuleExecute<T>(target);
         }

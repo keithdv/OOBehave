@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
+
+    internal interface IPropertyAccess
+    {
+        P ReadProperty<P>(IRegisteredProperty<P> registeredProperty);
+        void SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value);
+    }
+
     public interface IBase : IOOBehaveObject, IPortalTarget
     {
         /// <summary>
@@ -26,7 +33,7 @@ namespace OOBehave
 
     }
 
-    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>, IPortalTarget
+    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>, IPortalTarget, IPropertyAccess
         where T : Base<T>
     {
 
@@ -86,6 +93,15 @@ namespace OOBehave
             StartAllActions();
         }
 
+        P IPropertyAccess.ReadProperty<P>(IRegisteredProperty<P> registeredProperty)
+        {
+            return PropertyValueManager.Read(registeredProperty);
+        }
+
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Load(registeredProperty, value);
+        }
     }
 
 }
