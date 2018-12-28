@@ -11,11 +11,8 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
-    public interface IValidateListBase : IListBase, IValidateMetaProperties
+    public interface IValidateListBase : IListBase, IValidateBase, IValidateMetaProperties
     {
-        Task WaitForRules();
-        IEnumerable<string> BrokenRuleMessages { get; }
-        IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
 
     }
 

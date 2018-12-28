@@ -10,47 +10,23 @@ namespace OOBehave.UnitTest.PersonObjects
         where T : PersonEditBase<T>
     {
 
-        public PersonEditBase(IEditableBaseServices<T> services) : base(services)
+        public PersonEditBase(IEditBaseServices<T> services) : base(services)
         {
         }
 
         public Guid PersonId { get { return Getter<Guid>(); } }
 
-        public string FirstName
-        {
-            get { return Getter<string>(); }
-            set { Setter(value); }
-        }
+        public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
 
-        public string LastName
-        {
-            get { return Getter<string>(); }
-            set { Setter(value); }
-        }
+        public string LastName { get { return Getter<string>(); } set { Setter(value); } }
 
-        public string ShortName
-        {
-            get { return Getter<string>(); }
-            set { Setter(value); }
-        }
+        public string ShortName { get { return Getter<string>(); } set { Setter(value); } }
 
-        public string Title
-        {
-            get { return Getter<string>(); }
-            set { Setter(value); }
-        }
+        public string Title { get { return Getter<string>(); } set { Setter(value); } }
 
-        public string FullName
-        {
-            get { return Getter<string>(); }
-            set { Setter(value); }
-        }
+        public string FullName { get { return Getter<string>(); } set { Setter(value); } }
 
-        public uint? Age
-        {
-            get => Getter<uint>(); set => Setter(value);
-        }
-
+        public uint? Age { get => Getter<uint>(); set => Setter(value); }
         protected void FillFromDto(PersonDto dto)
         {
             LoadProperty(nameof(PersonId), dto.PersonId);

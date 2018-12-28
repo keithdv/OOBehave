@@ -17,7 +17,7 @@ namespace OOBehave.UnitTest.EditBase
 
     public class EditPerson : PersonEditBase<EditPerson>, IEditPerson
     {
-        public EditPerson(IEditableBaseServices<EditPerson> services,
+        public EditPerson(IEditBaseServices<EditPerson> services,
             IShortNameAsyncRule<EditPerson> shortNameRule,
             IFullNameAsyncRule<EditPerson> fullNameRule,
             IPersonAsyncRule<EditPerson> personRule) : base(services)
@@ -26,6 +26,7 @@ namespace OOBehave.UnitTest.EditBase
         }
 
         [Fetch]
+        [FetchChild]
         public void Fetch(PersonDto person, IReceivePortal<IEditPerson> portal, IReadOnlyList<PersonDto> personTable)
         {
             base.FillFromDto(person);

@@ -13,16 +13,16 @@ namespace OOBehave
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IEditableBaseServices<T> : IValidateBaseServices<T>
+    public interface IEditBaseServices<T> : IValidateBaseServices<T>
     {
         IEditPropertyValueManager<T> EditPropertyValueManager { get; }
     }
 
-    public class EditableBaseServices<T> : ValidateBaseServices<T>, IEditableBaseServices<T>
+    public class EditBaseServices<T> : ValidateBaseServices<T>, IEditBaseServices<T>
     {
 
         public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
-        public EditableBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
+        public EditBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
                                         IFactory factory) : base(registeredPropertyManager, factory)
         {
             EditPropertyValueManager = registeredPropertyManager;
