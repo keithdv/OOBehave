@@ -47,10 +47,6 @@ namespace OOBehave.UnitTest
                         {
                             reg.SingleInstance();
                         }
-                        else
-                        {
-
-                        }
                     }
                     else
                     {
@@ -64,10 +60,6 @@ namespace OOBehave.UnitTest
                         if (typeof(IRule).IsAssignableFrom(t) && zeroConstructorParams)
                         {
                             reg.SingleInstance();
-                        }
-                        else
-                        {
-
                         }
                     }
                 }
@@ -135,6 +127,7 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
                 builder.RegisterGeneric(typeof(ListBaseServices<,>)).As(typeof(IListBaseServices<,>));
                 builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
+                builder.RegisterGeneric(typeof(ValidateListBaseServices<,>)).As(typeof(IValidateListBaseServices<,>));
                 builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
 
                 // Unit Test Library

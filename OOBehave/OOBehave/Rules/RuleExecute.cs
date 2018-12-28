@@ -25,7 +25,7 @@ namespace OOBehave.Rules
 
         void AddRule(IRule<T> rule);
         void AddRules(params IRule<T>[] rules);
-
+        FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func);
     }
 
     public class RuleExecute<T> : IRuleExecute<T>
@@ -61,6 +61,13 @@ namespace OOBehave.Rules
         {
             // TODO - Only allow Rule Types to be added - not instances
             Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
+        }
+
+        public FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func)
+        {
+            FluentRule<T> rule = new FluentRule<T>(func, triggerProperty); // TODO - DI
+            Rules.Add(rule);
+            return rule;
         }
 
         public void CheckRulesForProperty(string propertyName)

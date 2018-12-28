@@ -92,7 +92,7 @@ namespace OOBehave.Portal.Core
 
             if (!success)
             {
-                throw new OperationMethodCallFailedException($"{operation.ToString()} method with criteria {criteria.GetType().FullName} not found.");
+                throw new OperationMethodCallFailedException($"{operation.ToString()} method on {typeof(T).FullName} with criteria {criteria.GetType().FullName} not found.");
             }
 
         }

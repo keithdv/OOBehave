@@ -43,4 +43,6 @@ namespace OOBehave.Rules
         public abstract Task<IRuleResult> Execute(T target, CancellationToken token);
 
     }
+
+
 }

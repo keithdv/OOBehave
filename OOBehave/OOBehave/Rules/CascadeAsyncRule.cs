@@ -17,21 +17,31 @@ namespace OOBehave.Rules
     public abstract class CascadeAsyncRule<T> : Rule<T>, ICascadeRule<T>
     {
 
-        public CascadeAsyncRule() : base()
+        protected CascadeAsyncRule() : base()
         {
-            TriggerProperties = new List<string>();
+
+        }
+
+        public CascadeAsyncRule(IEnumerable<string> triggerProperties) : this()
+        {
+            TriggerProperties.AddRange(triggerProperties);
         }
 
         IEnumerable<string> ICascadeRule<T>.TriggerProperties => TriggerProperties.AsEnumerable();
-        protected List<string> TriggerProperties { get; }
+        protected List<string> TriggerProperties { get; } = new List<string>();
 
     }
 
     public abstract class CascadeRule<T> : CascadeAsyncRule<T>
     {
-        public CascadeRule() : base()
+        protected CascadeRule() : base()
         {
 
+        }
+
+        public CascadeRule(IEnumerable<string> triggerProperties) : this()
+        {
+            TriggerProperties.AddRange(triggerProperties);
         }
 
         public abstract IRuleResult Execute(T target);
@@ -41,5 +51,19 @@ namespace OOBehave.Rules
             return Task.FromResult(Execute(target));
         }
 
+    }
+
+    public class FluentRule<T> : CascadeRule<T>
+    {
+        private Func<T, IRuleResult> ExecuteFunc { get; }
+        public FluentRule(Func<T, IRuleResult> execute, params string[] triggerProperties) : base(triggerProperties)
+        {
+            this.ExecuteFunc = execute;
+        }
+
+        public override IRuleResult Execute(T target)
+        {
+            return ExecuteFunc(target);
+        }
     }
 }
