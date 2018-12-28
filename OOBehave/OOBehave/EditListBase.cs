@@ -3,34 +3,35 @@ using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace OOBehave
 {
 
-    public interface IEditBase : IValidateBase, IEditMetaProperties, IPortalEditTarget
-    {
-        IEnumerable<string> ModifiedProperties { get; }
-        bool IsChild { get; }
-    }
-
-    public interface IEditBase<T> : IEditBase, IValidateBase<T>
+    public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget
     {
 
     }
 
-    public abstract class EditBase<T> : ValidateBase<T>, IOOBehaveObject<T>, IEditBase<T>
-        where T : EditBase<T>
+    public interface IEditListBase<T> : IEditListBase, IValidateListBase<T>
+        where T : IEditBase
     {
 
-        protected IEditPropertyValueManager<T> EditPropertyValueManager { get; }
+    }
 
-        public EditBase(IEditBaseServices<T> services) : base(services)
+    public abstract class EditListBase<L, T> : ValidateListBase<L, T>, IOOBehaveObject<T>, IEditListBase<T>
+        where L : EditListBase<L, T>
+        where T : IEditBase
+    {
+
+        protected IEditPropertyValueManager<L> EditPropertyValueManager { get; }
+
+        public EditListBase(IEditListBaseServices<L, T> services) : base(services)
         {
             EditPropertyValueManager = services.EditPropertyValueManager;
         }
 
-
-        public bool IsModified => EditPropertyValueManager.IsModified;
+        public bool IsModified => EditPropertyValueManager.IsModified || this.Any(c => c.IsModified);
         public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }

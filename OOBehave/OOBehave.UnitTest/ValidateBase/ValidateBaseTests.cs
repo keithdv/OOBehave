@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OOBehave.Portal;
 using OOBehave.Rules;
 using OOBehave.UnitTest.PersonObjects;
 using System;
@@ -22,6 +23,13 @@ namespace OOBehave.UnitTest.ValidateBase
             ) : base(services)
         {
             RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+        }
+
+        [Fetch]
+        [FetchChild]
+        private void Fetch(PersonDto person)
+        {
+            base.FillFromDto(person);
         }
 
     }

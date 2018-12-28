@@ -47,10 +47,6 @@ namespace OOBehave.UnitTest
                         {
                             reg.SingleInstance();
                         }
-                        else
-                        {
-
-                        }
                     }
                     else
                     {
@@ -64,10 +60,6 @@ namespace OOBehave.UnitTest
                         if (typeof(IRule).IsAssignableFrom(t) && zeroConstructorParams)
                         {
                             reg.SingleInstance();
-                        }
-                        else
-                        {
-
                         }
                     }
                 }
@@ -135,7 +127,9 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
                 builder.RegisterGeneric(typeof(ListBaseServices<,>)).As(typeof(IListBaseServices<,>));
                 builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
-                builder.RegisterGeneric(typeof(EditableBaseServices<>)).As(typeof(IEditableBaseServices<>));
+                builder.RegisterGeneric(typeof(ValidateListBaseServices<,>)).As(typeof(IValidateListBaseServices<,>));
+                builder.RegisterGeneric(typeof(EditBaseServices<>)).As(typeof(IEditBaseServices<>));
+                builder.RegisterGeneric(typeof(EditListBaseServices<,>)).As(typeof(IEditListBaseServices<,>));
 
                 // Unit Test Library
                 builder.RegisterType<Base.Authorization.AuthorizationGrantedRule>().As<Base.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated

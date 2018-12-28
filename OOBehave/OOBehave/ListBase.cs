@@ -27,7 +27,7 @@ namespace OOBehave
 
     public abstract partial class ListBase<L, T> : ObservableCollection<T>, IOOBehaveObject<T>, IListBase<T>, IPortalTarget
         where L : ListBase<L, T>
-        where T : IBase<T>
+        where T : IBase
     {
 
         protected IPropertyValueManager<L> PropertyValueManager { get; }

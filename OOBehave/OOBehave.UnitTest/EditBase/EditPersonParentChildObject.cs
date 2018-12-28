@@ -18,7 +18,7 @@ namespace OOBehave.UnitTest.EditBase
 
     public class EditPersonParentChild : PersonEditBase<EditPersonParentChild>, IEditPersonParentChild
     {
-        public EditPersonParentChild(IEditableBaseServices<EditPersonParentChild> services,
+        public EditPersonParentChild(IEditBaseServices<EditPersonParentChild> services,
             IShortNameAsyncRule<EditPersonParentChild> shortNameRule,
             IFullNameAsyncRule<EditPersonParentChild> fullNameRule,
             IPersonAsyncRule<EditPersonParentChild> personRule) : base(services)
