@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -28,10 +29,11 @@ namespace OOBehave
 
     }
 
-
+    [DataContract]
     public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 
+        [DataMember]
         protected IPropertyValueManager PropertyValueManager { get; }
 
 

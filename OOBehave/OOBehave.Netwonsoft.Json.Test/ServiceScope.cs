@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.UnitTest
+namespace OOBehave.Netwonsoft.Json
 {
     public class ServiceScope : IServiceScope
     {
@@ -58,9 +58,9 @@ namespace OOBehave.UnitTest
             return ConcreteType(typeof(T));
         }
 
-        public Type ConcreteType(Type t)
+        public Type ConcreteType(Type T)
         {
-            IComponentRegistration registration = scope.ComponentRegistry.RegistrationsFor(new TypedService(t)).FirstOrDefault();
+            IComponentRegistration registration = scope.ComponentRegistry.RegistrationsFor(new TypedService(T)).FirstOrDefault();
 
             if (registration != null)
             {

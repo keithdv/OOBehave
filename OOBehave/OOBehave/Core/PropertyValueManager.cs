@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace OOBehave.Core
@@ -41,9 +42,13 @@ namespace OOBehave.Core
         T Value { get; set; }
     }
 
+    [DataContract]
     public class PropertyValue<T> : IPropertyValue<T>, IPropertyValue
     {
+        [DataMember]
         public string Name { get; }
+
+        [DataMember]
         public virtual T Value { get; set; }
 
         public PropertyValue(string name)
@@ -71,12 +76,15 @@ namespace OOBehave.Core
         }
     }
 
+    [DataContract]
     public abstract class PropertyValueManagerBase<T, P> : IPropertyValueManager<T>
         where P : IPropertyValue
     {
 
         protected IFactory Factory { get; }
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
+
+        [DataMember]
         protected IDictionary<uint, P> fieldData = new ConcurrentDictionary<uint, P>();
 
         public PropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory)
