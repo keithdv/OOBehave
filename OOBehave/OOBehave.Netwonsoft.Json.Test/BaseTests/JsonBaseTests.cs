@@ -41,12 +41,13 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         public void JsonBaseTests_Deserialize()
         {
 
-            var json = JsonConvert.SerializeObject(target);
+            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
             {
-                ContractResolver = resolver
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.All
             });
 
             Assert.AreEqual(target.ID, newTarget.ID);
@@ -62,12 +63,13 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
 
-            var json = JsonConvert.SerializeObject(target);
+            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
             {
-                ContractResolver = resolver
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.All
             });
 
 
@@ -75,6 +77,34 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             Assert.AreEqual(child.ID, newTarget.Child.ID);
             Assert.AreEqual(child.Name, newTarget.Child.Name);
 
+        }
+
+        [TestMethod]
+        public void JsonBaseTests_Deserialize_Child_ParentRef()
+        {
+
+            var child = target.Child = scope.Resolve<IBaseObject>();
+
+            child.ID = Guid.NewGuid();
+            child.Name = Guid.NewGuid().ToString();
+            child.Parent = target;
+
+            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, PreserveReferencesHandling = PreserveReferencesHandling.All, Formatting = Formatting.Indented });
+
+            // ITaskRespository and ILogger constructor parameters are injected by Autofac 
+            var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
+            {
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All
+            });
+
+
+            Assert.IsNotNull(newTarget.Child);
+            Assert.AreEqual(child.ID, newTarget.Child.ID);
+            Assert.AreEqual(child.Name, newTarget.Child.Name);
+            Assert.AreSame(newTarget.Child.Parent, newTarget);
+             
         }
 
     }

@@ -37,10 +37,9 @@ namespace OOBehave.Core
     {
 
         protected IValuesDiffer ValuesDiffer { get; }
-        public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name)
+        public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)
         {
             this.ValuesDiffer = valuesDiffer;
-            base.Value = value;
             EditChild = value as IEditBase;
         }
 

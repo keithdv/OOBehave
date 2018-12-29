@@ -51,11 +51,6 @@ namespace OOBehave.Core
         [DataMember]
         public virtual T Value { get; set; }
 
-        public PropertyValue(string name)
-        {
-            this.Name = name;
-        }
-
         public PropertyValue(string name, T value)
         {
             this.Name = name;

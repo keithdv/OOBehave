@@ -11,6 +11,7 @@ using System.Threading;
 using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
+using OOBehave.Netwonsoft.Json.Test.BaseTests;
 
 namespace OOBehave.Netwonsoft.Json.Test
 {
@@ -136,6 +137,7 @@ namespace OOBehave.Netwonsoft.Json.Test
                 // Newtonsoft.Json
                 builder.RegisterType<AutofacContractResolver>();
                 builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>));
+                builder.RegisterType<BaseObject>().AsSelf();
 
 
                 Container = builder.Build();

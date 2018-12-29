@@ -29,7 +29,6 @@ namespace OOBehave
 
     }
 
-    [DataContract]
     public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 
@@ -98,6 +97,24 @@ namespace OOBehave
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
             PropertyValueManager.Load(registeredProperty, value);
+        }
+
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+
+        }
+
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+
         }
     }
 

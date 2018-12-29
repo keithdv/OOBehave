@@ -37,7 +37,6 @@ namespace OOBehave.Core
     {
 
         public virtual IValidateBase Child { get; protected set; }
-        public ValidatePropertyValue(string name) : base(name) { }
 
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
