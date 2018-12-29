@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.EditBase
+namespace OOBehave.UnitTest.EditBaseTests
 {
 
-    public interface IEditPerson : IPersonBase, IEditBase<IEditPerson>
+    public interface IEditPerson : IPersonBase, IEditBase
     {
         List<int> InitiallyNull { get; set; }
         List<int> InitiallyDefined { get; set; }

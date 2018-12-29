@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.Base
+namespace OOBehave.UnitTest.BaseTests
 {
     [TestClass]
     public class ListBaseTests

@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.EditBase
+namespace OOBehave.UnitTest.EditBaseTests
 {
 
     public interface IEditPersonList : IEditListBase<IEditPerson>, IPersonBase
     {
     }
 
-    public class EditPersonList : EditListBase<EditPersonList, IEditPerson>, IEditPersonList
+    public class EditPersonList : EditListBase<IEditPerson>, IEditPersonList
     {
         public EditPersonList(IEditListBaseServices<EditPersonList, IEditPerson> services,
             IShortNameAsyncRule<EditPersonList> shortNameRule,

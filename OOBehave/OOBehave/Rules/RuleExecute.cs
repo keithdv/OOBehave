@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace OOBehave.Rules
 {
 
-    public interface IRuleExecute<T>
+    public interface IRuleExecute
     {
         IEnumerable<IRule> Rules { get; }
 
@@ -22,14 +22,20 @@ namespace OOBehave.Rules
         bool IsValid { get; }
 
         bool IsBusy { get; }
-
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
-        FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func);
+        FluentRule<T> AddRule<T>(string triggerProperty, Func<T, IRuleResult> func);
+
+    }
+
+    public interface IRuleExecute<T> : IRuleExecute
+        where T : IValidateBase
+    {
+
     }
 
     public class RuleExecute<T> : IRuleExecute<T>
-        where T : IBase
+        where T : IValidateBase
     {
 
         protected T Target { get; }
@@ -40,11 +46,11 @@ namespace OOBehave.Rules
             this.Target = target;
         }
 
-        IEnumerable<IRule> IRuleExecute<T>.Rules => Rules.AsReadOnly();
+        IEnumerable<IRule> IRuleExecute.Rules => Rules.AsReadOnly();
 
         private List<IRule> Rules { get; } = new List<IRule>();
 
-        IEnumerable<IRuleResult> IRuleExecute<T>.Results => Results.Values;
+        IEnumerable<IRuleResult> IRuleExecute.Results => Results.Values;
 
         private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
 
@@ -64,9 +70,9 @@ namespace OOBehave.Rules
             Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 
-        public FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func)
+        public FluentRule<T2> AddRule<T2>(string triggerProperty, Func<T2, IRuleResult> func)
         {
-            FluentRule<T> rule = new FluentRule<T>(func, triggerProperty); // TODO - DI
+            FluentRule<T2> rule = new FluentRule<T2>(func, triggerProperty); // TODO - DI
             Rules.Add(rule);
             return rule;
         }

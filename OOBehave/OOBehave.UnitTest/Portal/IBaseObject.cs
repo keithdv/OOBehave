@@ -2,7 +2,7 @@
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public interface IBaseObject : IBase<IBaseObject>
+    public interface IBaseObject : IBase
     {
         int IntCriteria { get; }
         Guid GuidCriteria { get; }

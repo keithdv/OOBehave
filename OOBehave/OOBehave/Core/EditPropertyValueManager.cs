@@ -7,13 +7,18 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Core
 {
-    public interface IEditPropertyValueManager<T> : IValidatePropertyValueManager<T>
+    public interface IEditPropertyValueManager : IValidatePropertyValueManager
     {
         bool IsModified { get; }
         bool IsSelfModified { get; }
 
         IEnumerable<string> ModifiedProperties { get; }
         void MarkSelfUnmodified();
+    }
+
+    public interface IEditPropertyValueManager<T> : IEditPropertyValueManager, IValidatePropertyValueManager<T>
+    {
+
     }
 
     public interface IEditPropertyValue : IValidatePropertyValue
@@ -84,7 +89,7 @@ namespace OOBehave.Core
 
         public void MarkSelfUnmodified()
         {
-            foreach(var fd in fieldData.Values)
+            foreach (var fd in fieldData.Values)
             {
                 fd.MarkSelfUnmodified();
             }

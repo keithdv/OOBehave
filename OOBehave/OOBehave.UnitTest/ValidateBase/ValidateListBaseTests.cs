@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.UnitTest.ValidateBase
+namespace OOBehave.UnitTest.ValidateBaseTests
 {
 
     public interface IValidateList : IPersonBase { }
 
-    public class ValidateList : ValidateListBase<ValidateList, IValidate>, IValidateList
+    public class ValidateList : ValidateListBase<IValidate>, IValidateList
     {
 
         public ValidateList(IValidateListBaseServices<ValidateList, IValidate> services,

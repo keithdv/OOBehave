@@ -19,14 +19,13 @@ namespace OOBehave
 
     }
 
-    public abstract class EditListBase<L, T> : ValidateListBase<L, T>, IOOBehaveObject<T>, IEditListBase<T>
-        where L : EditListBase<L, T>
+    public abstract class EditListBase<T> : ValidateListBase<T>, IOOBehaveObject, IEditListBase<T>
         where T : IEditBase
     {
 
-        protected IEditPropertyValueManager<L> EditPropertyValueManager { get; }
+        protected IEditPropertyValueManager EditPropertyValueManager { get; }
 
-        public EditListBase(IEditListBaseServices<L, T> services) : base(services)
+        public EditListBase(IEditListBaseServices<T> services) : base(services)
         {
             EditPropertyValueManager = services.EditPropertyValueManager;
         }

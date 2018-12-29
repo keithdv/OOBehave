@@ -17,27 +17,20 @@ namespace OOBehave
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
 
-
     }
 
-    public interface IValidateBase<T> : IValidateBase, IBase<T>
+
+    public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
     {
+        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
 
-    }
+        protected IRuleExecute RuleExecute { get; }
 
-    public abstract class ValidateBase<T> : Base<T>, IValidateBase<T>, INotifyPropertyChanged, IPropertyAccess
-        where T : ValidateBase<T>
-    {
-        protected IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
-
-        protected IRuleExecute<T> RuleExecute { get; }
-
-        public ValidateBase(IValidateBaseServices<T> services) : base(services)
+        public ValidateBase(IValidateBaseServices services) : base(services)
         {
             this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
 
-            // TODO - Why do I need to cast to T??
-            this.RuleExecute = services.CreateRuleExecute((T)this);
+            this.RuleExecute = services.CreateRuleExecute(this);
         }
 
         public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid;

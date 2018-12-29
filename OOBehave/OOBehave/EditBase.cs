@@ -13,18 +13,12 @@ namespace OOBehave
         bool IsChild { get; }
     }
 
-    public interface IEditBase<T> : IEditBase, IValidateBase<T>
+    public abstract class EditBase : ValidateBase, IOOBehaveObject, IEditBase
     {
 
-    }
+        protected IEditPropertyValueManager EditPropertyValueManager { get; }
 
-    public abstract class EditBase<T> : ValidateBase<T>, IOOBehaveObject<T>, IEditBase<T>
-        where T : EditBase<T>
-    {
-
-        protected IEditPropertyValueManager<T> EditPropertyValueManager { get; }
-
-        public EditBase(IEditBaseServices<T> services) : base(services)
+        public EditBase(IEditBaseServices services) : base(services)
         {
             EditPropertyValueManager = services.EditPropertyValueManager;
         }

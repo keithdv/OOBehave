@@ -6,7 +6,11 @@ using System.Text;
 
 namespace OOBehave.Core
 {
-    public interface IPropertyValueManager<T>
+
+    /// <summary>
+    /// DO NOT REGISTER IN THE CONTAINER
+    /// </summary>
+    public interface IPropertyValueManager
     {
         void Set<P>(string name, P newValue);
         void Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
@@ -14,6 +18,16 @@ namespace OOBehave.Core
         void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         P Read<P>(string name);
         P Read<P>(IRegisteredProperty<P> registeredProperty);
+    }
+
+
+    /// <summary>
+    /// This is what is registered from the container so that it is Type specific
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IPropertyValueManager<T> : IPropertyValueManager
+    {
+
     }
 
     public interface IPropertyValue

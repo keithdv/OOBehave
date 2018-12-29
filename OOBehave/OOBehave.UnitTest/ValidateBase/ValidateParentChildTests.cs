@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.ValidateBase
+namespace OOBehave.UnitTest.ValidateBaseTests
 {
 
     public interface IParentChild : IPersonBase

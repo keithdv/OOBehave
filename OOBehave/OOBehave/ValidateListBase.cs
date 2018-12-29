@@ -21,20 +21,19 @@ namespace OOBehave
 
     }
 
-    public abstract class ValidateListBase<L, T> : ListBase<L, T>, IValidateListBase<T>, INotifyPropertyChanged
-        where L : ValidateListBase<L, T>
+    public abstract class ValidateListBase<T> : ListBase<T>, IValidateListBase<T>, INotifyPropertyChanged, IPropertyAccess
         where T : IValidateBase
     {
-        protected IValidatePropertyValueManager<L> ValidatePropertyValueManager { get; }
+        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
 
-        protected IRuleExecute<L> RuleExecute { get; }
+        protected IRuleExecute RuleExecute { get; }
 
-        public ValidateListBase(IValidateListBaseServices<L, T> services) : base(services)
+        public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
         {
             this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
 
             // TODO - Why do I need to cast to L??
-            this.RuleExecute = services.CreateRuleExecute((L)this);
+            this.RuleExecute = services.CreateRuleExecute(this);
         }
 
         public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
@@ -99,6 +98,9 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Set(registeredProperty, value);
+        }
     }
 }

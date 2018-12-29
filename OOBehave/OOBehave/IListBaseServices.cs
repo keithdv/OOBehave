@@ -7,21 +7,27 @@ using System.Text;
 
 namespace OOBehave
 {
+    public interface IListBaseServices<T>
+        where T : IBase
+    {
+        IPropertyValueManager PropertyValueManager { get; }
+        IReceivePortalChild<T> ReceivePortal { get; }
+    }
+
+
     /// <summary>
     /// Wrap the OOBehaveBase services into an interface so that 
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IListBaseServices<L, T>
-        where L : ListBase<L, T>
+    public interface IListBaseServices<L, T> : IListBaseServices<T>
+        where L : ListBase<T>
         where T : IBase
     {
-        IPropertyValueManager<L> PropertyValueManager { get; }
-        IReceivePortalChild<T> ReceivePortal { get; }
     }
 
     public class ListBaseServices<L, T> : IListBaseServices<L, T>
-        where L : ListBase<L, T>
+        where L : ListBase<T>
         where T : IBase
     {
 
@@ -31,7 +37,7 @@ namespace OOBehave
             ReceivePortal = receivePortal;
         }
 
-        public IPropertyValueManager<L> PropertyValueManager { get; }
+        public IPropertyValueManager PropertyValueManager { get; }
         public IReceivePortalChild<T> ReceivePortal { get; }
 
     }

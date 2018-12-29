@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OOBehave.UnitTest.Base
+namespace OOBehave.UnitTest.BaseTests
 {
     [TestClass]
     public class BaseTests

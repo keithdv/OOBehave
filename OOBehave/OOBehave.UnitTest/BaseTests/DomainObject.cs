@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OOBehave.UnitTest.Base
+namespace OOBehave.UnitTest.BaseTests
 {
     public interface IA { }
 
@@ -10,7 +10,7 @@ namespace OOBehave.UnitTest.Base
 
     public class B : IB { }
 
-    public interface IDomainObject : IBase<IDomainObject>
+    public interface IDomainObject : IBase
     {
         Guid Id { get; set; }
         string FirstName { get; set; }
@@ -18,7 +18,7 @@ namespace OOBehave.UnitTest.Base
         IA TestPropertyType { get; set; }
         void LoadPropertyTest(B propertyValue);
     }
-    public class DomainObject : Base<DomainObject>, IDomainObject
+    public class DomainObject : Base, IDomainObject
     {
 
         public DomainObject(IBaseServices<DomainObject> services) : base(services) { }

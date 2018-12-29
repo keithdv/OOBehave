@@ -132,9 +132,9 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(EditListBaseServices<,>)).As(typeof(IEditListBaseServices<,>));
 
                 // Unit Test Library
-                builder.RegisterType<Base.Authorization.AuthorizationGrantedRule>().As<Base.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-                builder.RegisterType<Base.Authorization.AuthorizationGrantedAsyncRule>().As<Base.Authorization.IAuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-                builder.RegisterType<Base.Authorization.AuthorizationGrantedDependencyRule>().As<Base.Authorization.IAuthorizationGrantedDependencyRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedRule>().As<BaseTests.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedAsyncRule>().As<BaseTests.Authorization.IAuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedDependencyRule>().As<BaseTests.Authorization.IAuthorizationGrantedDependencyRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
 
                 builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
                 builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();

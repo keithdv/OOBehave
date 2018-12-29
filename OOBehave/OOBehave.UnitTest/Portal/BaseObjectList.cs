@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class BaseObjectList : ListBase<BaseObjectList, IBaseObject>, IBaseObjectList
+    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
     {
 
         public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> baseServices) : base(baseServices)
@@ -79,7 +79,7 @@ namespace OOBehave.UnitTest.ObjectPortal
             IntCriteria = criteria;
             Add(await ItemPortal.FetchChild(criteria));
         }
-               
+
         [Fetch]
         private async Task Fetch(Guid criteria, IDisposableDependency dependency)
         {

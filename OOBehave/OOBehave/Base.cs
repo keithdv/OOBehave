@@ -28,20 +28,15 @@ namespace OOBehave
 
     }
 
-    public interface IBase<T> : IBase
+
+    public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 
-    }
-
-    public abstract class Base<T> : IOOBehaveObject<T>, IBase<T>, IPortalTarget, IPropertyAccess
-        where T : Base<T>
-    {
-
-        protected IPropertyValueManager<T> PropertyValueManager { get; }
+        protected IPropertyValueManager PropertyValueManager { get; }
 
 
 
-        public Base(IBaseServices<T> services)
+        public Base(IBaseServices services)
         {
             PropertyValueManager = services.PropertyValueManager;
         }

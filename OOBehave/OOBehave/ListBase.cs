@@ -25,15 +25,14 @@ namespace OOBehave
         new int Count { get; }
     }
 
-    public abstract partial class ListBase<L, T> : ObservableCollection<T>, IOOBehaveObject<T>, IListBase<T>, IPortalTarget
-        where L : ListBase<L, T>
+    public abstract partial class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess
         where T : IBase
     {
 
-        protected IPropertyValueManager<L> PropertyValueManager { get; }
+        protected IPropertyValueManager PropertyValueManager { get; }
         protected IReceivePortalChild<T> ItemPortal { get; }
 
-        public ListBase(IListBaseServices<L, T> services)
+        public ListBase(IListBaseServices<T> services)
         {
             PropertyValueManager = services.PropertyValueManager;
             ItemPortal = services.ReceivePortal;
@@ -100,6 +99,15 @@ namespace OOBehave
             return item;
         }
 
+        P IPropertyAccess.ReadProperty<P>(IRegisteredProperty<P> registeredProperty)
+        {
+            return PropertyValueManager.Read(registeredProperty);
+        }
+
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Set(registeredProperty, value);
+        }
     }
 
 }

@@ -7,8 +7,5 @@ namespace OOBehave
     public interface IOOBehaveObject
     {
     }
-    public interface IOOBehaveObject<T>
-    {
 
-    }
 }

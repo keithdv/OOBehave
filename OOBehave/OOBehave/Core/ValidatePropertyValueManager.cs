@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Core
 {
-    public interface IValidatePropertyValueManager<T> : IPropertyValueManager<T>
+    public interface IValidatePropertyValueManager : IPropertyValueManager
     {
         bool IsValid { get; }
         bool IsBusy { get; }
 
         Task WaitForRules();
+
+    }
+
+    public interface IValidatePropertyValueManager<T> : IValidatePropertyValueManager, IPropertyValueManager<T>
+    {
 
     }
 

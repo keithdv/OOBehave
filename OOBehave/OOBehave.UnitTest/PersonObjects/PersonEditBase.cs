@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OOBehave.Rules;
+using OOBehave;
 
 namespace OOBehave.UnitTest.PersonObjects
 
 {
-    public abstract class PersonEditBase<T> : EditBase<T>, IPersonBase
+    public abstract class PersonEditBase<T> : EditBase, IPersonBase
         where T : PersonEditBase<T>
     {
 

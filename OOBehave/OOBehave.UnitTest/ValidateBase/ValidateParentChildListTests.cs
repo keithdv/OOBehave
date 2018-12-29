@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.ValidateBase
+namespace OOBehave.UnitTest.ValidateBaseTests
 {
 
     public interface IParentChildList : IValidateListBase<IParentChild>
@@ -18,11 +18,11 @@ namespace OOBehave.UnitTest.ValidateBase
         string FirstName { get; set; }
     }
 
-    public class ParentChildList : ValidateListBase<ParentChildList, IParentChild>, IParentChildList
+    public class ParentChildList : ValidateListBase<IParentChild>, IParentChildList
     {
         public ParentChildList(IValidateListBaseServices<ParentChildList, IParentChild> services) : base(services)
         {
-            RuleExecute.AddRule(nameof(FirstName), target =>
+            RuleExecute.AddRule<ParentChildList>(nameof(FirstName), target =>
             {
                 if (target.FirstName == "Error")
                 {

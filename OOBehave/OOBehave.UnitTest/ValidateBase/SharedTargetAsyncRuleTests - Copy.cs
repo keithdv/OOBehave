@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.ValidateBase
+namespace OOBehave.UnitTest.ValidateBaseTests
 {
     public class SharedTargetRule : Rules.SharedTargetAsyncRule
     {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.Base.Authorization
+namespace OOBehave.UnitTest.BaseTests.Authorization
 {
     public interface IAuthorizationGrantedRule : IAuthorizationRule
     {
@@ -72,7 +72,7 @@ namespace OOBehave.UnitTest.Base.Authorization
 
     public interface IBaseAuthorizationGrantedObject : IBase { }
 
-    public class BaseAuthorizationGrantedObject : Base<BaseAuthorizationGrantedObject>, IBaseAuthorizationGrantedObject
+    public class BaseAuthorizationGrantedObject : Base, IBaseAuthorizationGrantedObject
     {
 
         public BaseAuthorizationGrantedObject(IBaseServices<BaseAuthorizationGrantedObject> services) : base(services)

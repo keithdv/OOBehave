@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOBehave.UnitTest.Base.Authorization
+namespace OOBehave.UnitTest.BaseTests.Authorization
 {
 
     public interface IAuthorizationGrantedAsyncRule : IAuthorizationRule
@@ -80,7 +80,7 @@ namespace OOBehave.UnitTest.Base.Authorization
 
     public interface IBaseAuthorizationGrantedAsyncObject : IBase { }
 
-    public class BaseAuthorizationGrantedAsyncObject : Base<BaseAuthorizationGrantedAsyncObject>, IBaseAuthorizationGrantedAsyncObject
+    public class BaseAuthorizationGrantedAsyncObject : Base, IBaseAuthorizationGrantedAsyncObject
     {
 
         public BaseAuthorizationGrantedAsyncObject(IBaseServices<BaseAuthorizationGrantedAsyncObject> services) : base(services)

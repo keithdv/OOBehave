@@ -16,7 +16,7 @@ namespace OOBehave.Rules
         {
             if (target == null) { throw new ArgumentNullException(nameof(target)); }
 
-            Target = target as IPropertyAccess ?? throw new Exception($"To use {nameof(SharedTargetAsyncRule)} {target.GetType().FullName} must inherit from OOBehave.Base");
+            Target = target as IPropertyAccess ?? throw new Exception($"To use {nameof(SharedTargetAsyncRule)} {target.GetType().FullName} must inherit from OOBehave.Base or OOBehave.ListBase");
             var result = Execute(token);
             Target = null;
             return result;

@@ -8,22 +8,29 @@ using System.Text;
 
 namespace OOBehave
 {
+
+    public interface IValidateBaseServices : IBaseServices
+    {
+        IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+
+        IRuleExecute CreateRuleExecute(IValidateBase Target);
+
+    }
+
     /// <summary>
     /// Wrap the OOBehaveBase services into an interface so that 
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IValidateBaseServices<T> : IBaseServices<T>
-        where T : ValidateBase<T>
+    public interface IValidateBaseServices<T> : IValidateBaseServices, IBaseServices<T>
+        where T : ValidateBase
     {
-        IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
-        IRuleExecute<T> CreateRuleExecute(T target);
 
     }
 
     public class ValidateBaseServices<T> : BaseServices<T>, IValidateBaseServices<T>
-        where T : ValidateBase<T>
+        where T : ValidateBase
     {
 
         private IFactory Factory { get; }
@@ -34,16 +41,18 @@ namespace OOBehave
             this.Factory = factory;
         }
 
-        public IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
+        public IValidatePropertyValueManager ValidatePropertyValueManager { get; }
 
-        IPropertyValueManager<T> IBaseServices<T>.PropertyValueManager
+        IPropertyValueManager IBaseServices.PropertyValueManager
         {
             get { return ValidatePropertyValueManager; }
         }
 
-        public IRuleExecute<T> CreateRuleExecute(T target)
+        public IRuleExecute CreateRuleExecute(IValidateBase target)
         {
-            return Factory.CreateRuleExecute(target);
+            // This is the one catch not have generic base classes
+            // Classes receive IRuleExecute instead of IRuleExecut<T>
+            return Factory.CreateRuleExecute(target as T ?? throw new Exception($"Unexpected: Cannot case {target.GetType().FullName} to {typeof(T).FullName}"));
         }
 
     }

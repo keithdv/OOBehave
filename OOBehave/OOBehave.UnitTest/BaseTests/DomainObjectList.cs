@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OOBehave.UnitTest.Base
+namespace OOBehave.UnitTest.BaseTests
 {
 
     public interface IDomainObjectList : IListBase<IDomainObject>
@@ -12,7 +12,7 @@ namespace OOBehave.UnitTest.Base
         string LastName { get; set; }
 
     }
-    public class DomainObjectList : ListBase<DomainObjectList, IDomainObject>, IDomainObjectList
+    public class DomainObjectList : ListBase<IDomainObject>, IDomainObjectList
     {
 
         public DomainObjectList(IListBaseServices<DomainObjectList, IDomainObject> services) : base(services) { }

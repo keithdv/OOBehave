@@ -2,7 +2,7 @@
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public interface IEditObject : IEditBase<IBaseObject>
+    public interface IEditObject : IEditBase
     {
         string Name { get; set; }
         int IntCriteria { get; }

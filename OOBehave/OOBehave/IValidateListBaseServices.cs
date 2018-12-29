@@ -13,18 +13,29 @@ namespace OOBehave
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IValidateListBaseServices<L, T> : IListBaseServices<L, T>
-        where L : ValidateListBase<L, T>
+    public interface IValidateListBaseServices<T> : IListBaseServices<T>
         where T : IValidateBase
     {
-        IValidatePropertyValueManager<L> ValidatePropertyValueManager { get; }
+        IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        IRuleExecute CreateRuleExecute(IValidateBase target);
 
-        IRuleExecute<L> CreateRuleExecute(L target);
+    }
+
+    /// <summary>
+    /// Wrap the OOBehaveBase services into an interface so that 
+    /// the inheriting classes don't need to list all services
+    /// and services can be added
+    /// </summary>
+    public interface IValidateListBaseServices<L, T> : IValidateListBaseServices<T>, IListBaseServices<L, T>
+        where L : ValidateListBase<T>
+        where T : IValidateBase
+    {
+
 
     }
 
     public class ValidateListBaseServices<L, T> : ListBaseServices<L, T>, IValidateListBaseServices<L, T>
-        where L : ValidateListBase<L, T>
+        where L : ValidateListBase<T>
         where T : IValidateBase
     {
 
@@ -37,16 +48,18 @@ namespace OOBehave
             this.Factory = factory;
         }
 
-        public IValidatePropertyValueManager<L> ValidatePropertyValueManager { get; }
+        public IValidatePropertyValueManager ValidatePropertyValueManager { get; }
 
-        IPropertyValueManager<L> IListBaseServices<L, T>.PropertyValueManager
+        IPropertyValueManager IListBaseServices<T>.PropertyValueManager
         {
             get { return ValidatePropertyValueManager; }
         }
 
-        public IRuleExecute<L> CreateRuleExecute(L target)
+        public IRuleExecute CreateRuleExecute(IValidateBase target)
         {
-            return Factory.CreateRuleExecute(target);
+            // This is the one catch not have generic base classes
+            // Classes receive IRuleExecute instead of IRuleExecut<T>
+            return Factory.CreateRuleExecute(target as L ?? throw new Exception($"Unexpected: Cannot cast {target.GetType().FullName} to {typeof(T).FullName}"));
         }
 
     }

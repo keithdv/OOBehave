@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.UnitTest.EditBase
+namespace OOBehave.UnitTest.EditBaseTests
 {
 
     [TestClass]
