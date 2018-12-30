@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -101,6 +102,11 @@ namespace OOBehave
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
             PropertyValueManager.Set(registeredProperty, value);
+        }
+
+        public async Task RunSelfRules(CancellationToken token)
+        {
+            await RuleExecute.RunAllRules();
         }
     }
 }

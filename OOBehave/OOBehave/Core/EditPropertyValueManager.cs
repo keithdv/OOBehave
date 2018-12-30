@@ -36,10 +36,11 @@ namespace OOBehave.Core
     public class EditPropertyValue<T> : ValidatePropertyValue<T>, IEditPropertyValue<T>
     {
 
+        private bool initialValue = true;
         protected IValuesDiffer ValuesDiffer { get; }
         public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)
         {
-            this.ValuesDiffer = valuesDiffer;
+            this.ValuesDiffer = valuesDiffer ?? throw new ArgumentNullException(nameof(valuesDiffer));
             EditChild = value as IEditBase;
         }
 
@@ -50,11 +51,15 @@ namespace OOBehave.Core
             get => base.Value;
             set
             {
-                if (ValuesDiffer.Check(base.Value, value))
+                if (initialValue || ValuesDiffer.Check(base.Value, value))
                 {
                     base.Value = value;
                     EditChild = value as IEditBase;
-                    IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+                    if (!initialValue)
+                    {
+                        IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+                    }
+                    initialValue = false;
                 }
             }
         }

@@ -29,6 +29,7 @@ namespace OOBehave
 
     }
 
+    [DataContract]
     public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 

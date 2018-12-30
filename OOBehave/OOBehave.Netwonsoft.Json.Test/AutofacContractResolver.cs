@@ -24,7 +24,6 @@ namespace OOBehave.Netwonsoft.Json.Test
             {
                 JsonObjectContract contract = base.CreateObjectContract(_container.ConcreteType(objectType));
                 contract.DefaultCreator = () => _container.Resolve(objectType);
-
                 return contract;
             }
 

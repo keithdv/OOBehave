@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public interface IShortNameRule<T> : IRule<T> where T : IPersonBase { }
+    public interface IShortNameRule<T> : IRule<T> where T : IPersonBase { uint RunCount { get; } }
 
     public class ShortNameRule<T> : CascadeRule<T>, IShortNameRule<T>
         where T : IPersonBase
     {
+        public uint RunCount { get; private set; } = 0;
 
         public ShortNameRule() : base()
         {
@@ -20,7 +21,7 @@ namespace OOBehave.UnitTest.PersonObjects
 
         public override IRuleResult Execute(T target)
         {
-
+            RunCount++;
             // System.Diagnostics.Debug.WriteLine($"Run Rule {target.FirstName} {target.LastName}");
 
             if (target.FirstName?.StartsWith("Error") ?? false)

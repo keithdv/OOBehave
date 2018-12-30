@@ -7,14 +7,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
 
-    public interface IValidate : IPersonBase { }
+    public interface IValidate : IPersonBase { uint RuleRunCount { get; } }
 
     public class Validate : PersonValidateBase<Validate>, IValidate
     {
+        public IShortNameRule<Validate> ShortNameRule { get; }
+        public IFullNameRule<Validate> FullNameRule { get; }
 
         public Validate(IValidateBaseServices<Validate> services,
             IShortNameRule<Validate> shortNameRule,
@@ -23,6 +26,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             ) : base(services)
         {
             RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            ShortNameRule = shortNameRule;
+            FullNameRule = fullNameRule;
         }
 
         [Fetch]
@@ -31,6 +36,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         {
             base.FillFromDto(person);
         }
+
+        public uint RuleRunCount => ShortNameRule.RunCount + FullNameRule.RunCount;
 
     }
 
@@ -162,5 +169,11 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
         }
 
+        [TestMethod]
+        public async Task Validate_TargetRule_RunSelfRules()
+        {
+            await validate.RunSelfRules();
+            Assert.AreEqual(2, validate.RuleRunCount);
+        }
     }
 }

@@ -41,7 +41,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         public void JsonBaseTests_Deserialize()
         {
 
-            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
+            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
@@ -63,7 +63,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
 
-            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
+            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings

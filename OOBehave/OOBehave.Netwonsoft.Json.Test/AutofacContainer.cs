@@ -12,6 +12,7 @@ using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
 using OOBehave.Netwonsoft.Json.Test.BaseTests;
+using OOBehave.Netwonsoft.Json.Test.ValidateBaseTests;
 
 namespace OOBehave.Netwonsoft.Json.Test
 {
@@ -136,8 +137,10 @@ namespace OOBehave.Netwonsoft.Json.Test
 
                 // Newtonsoft.Json
                 builder.RegisterType<AutofacContractResolver>();
-                builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>));
+                builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>)); // TODO - If I register .AsSelf() fails; How does it succeed?
+                builder.RegisterGeneric(typeof(ValidatePropertyValue<>)).As(typeof(IValidatePropertyValue<>));
                 builder.RegisterType<BaseObject>().AsSelf();
+                builder.RegisterType<ValidateBaseObject>().AsSelf();
 
 
                 Container = builder.Build();

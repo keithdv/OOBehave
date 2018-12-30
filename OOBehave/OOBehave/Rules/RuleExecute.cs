@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace OOBehave.Rules
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
         FluentRule<T> AddRule<T>(string triggerProperty, Func<T, IRuleResult> func);
+        Task RunAllRules(CancellationToken token = new CancellationToken());
 
     }
 
@@ -34,12 +36,16 @@ namespace OOBehave.Rules
 
     }
 
+    [DataContract]
     public class RuleExecute<T> : IRuleExecute<T>
         where T : IValidateBase
     {
 
+        [DataMember]
         protected T Target { get; }
-        protected IDictionary<uint, IRuleResult> Results { get; } = new ConcurrentDictionary<uint, IRuleResult>();
+        [DataMember]
+        protected IDictionary<int, IRuleResult> Results { get; private set; } = new ConcurrentDictionary<int, IRuleResult>();
+        protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;
         public RuleExecute(T target)
         {
@@ -86,6 +92,23 @@ namespace OOBehave.Rules
             }
 
             CheckRulesQueue();
+        }
+
+        public async Task RunAllRules(CancellationToken token = new CancellationToken())
+        {
+            Results.Clear(); // Cover in case something unexpected has happened like a weird Serialization cover or maybe a Rule that exists on the client or not the server
+
+            var properties = Rules.OfType<ICascadeRule>().SelectMany(r => r.TriggerProperties).Distinct().ToList();
+
+            foreach (var p in properties)
+            {
+                propertyQueue.Enqueue(p);
+            }
+
+            CheckRulesQueue();
+
+            await WaitForRules;
+
         }
 
         public bool IsValid
@@ -149,7 +172,7 @@ namespace OOBehave.Rules
 
                     // System.Diagnostics.Debug.WriteLine($"Dequeue {propertyName}");
 
-                    var cascadeRuleTask = RunCascadeRulesRecursive(propertyName, token);
+                    var cascadeRuleTask = RunCascadeRules(propertyName, token);
 
                     if (!cascadeRuleTask.IsCompleted)
                     {
@@ -193,40 +216,76 @@ namespace OOBehave.Rules
 
 
 
-        private async Task RunCascadeRulesRecursive(string propertyName, CancellationToken token)
+        private async Task RunCascadeRules(string propertyName, CancellationToken token)
         {
+            if (TransferredResults)
+            {
+                var oldResults = Results.Where(x => x.Key < 0 && x.Value.TriggerProperties.Contains(propertyName)).ToList();
+                oldResults.ForEach(r => Results.Remove(r.Key));
+
+                if (!Results.Where(x => x.Key < 0).Any())
+                {
+                    TransferredResults = false;
+                }
+            }
+
             foreach (var r in Rules.OfType<ICascadeRule>().Where(r => r.TriggerProperties.Contains(propertyName)).ToList())
             {
-                IRuleResult result;
-
-                try
-                {
-                    if (r is ICascadeRule<T> rule)
-                    {
-                        result = await rule.Execute(Target, token);
-                    }
-                    else if (r is ICascadeRule<IBase> sharedRule)
-                    {
-                        result = await sharedRule.Execute(Target, token);
-                    }
-                    else
-                    {
-                        throw new InvalidRuleTypeException($"{r.GetType().FullName} cannot be executed for {typeof(T).FullName}");
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    result = RuleResult.TargetError(ex.Message);
-                }
+                await RunRule(r, token);
 
                 if (token.IsCancellationRequested)
                 {
                     break;
                 }
 
-                Results[r.UniqueIndex] = result;
+            }
+        }
 
+        private async Task RunRule(ICascadeRule r, CancellationToken token)
+        {
+            IRuleResult result = null;
+
+            try
+            {
+                if (r is ICascadeRule<T> rule)
+                {
+                    result = await rule.Execute(Target, token);
+                }
+                else if (r is ICascadeRule<IBase> sharedRule)
+                {
+                    result = await sharedRule.Execute(Target, token);
+                }
+                else
+                {
+                    throw new InvalidRuleTypeException($"{r.GetType().FullName} cannot be executed for {typeof(T).FullName}");
+                }
+
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+
+            }
+
+            catch (Exception ex)
+            {
+                // If there is an error mark all properties as failed
+                foreach (var p in r.TriggerProperties)
+                {
+                    result = RuleResult.PropertyError(p, ex.Message);
+                }
+            }
+
+
+            if (result.IsError)
+            {
+                result.TriggerProperties = r.TriggerProperties;
+                Results[(int)r.UniqueIndex] = result;
+            }
+            else if (Results.ContainsKey((int)r.UniqueIndex))
+            {
+                // Optimized approach for when/if this is serialized
+                Results.Remove((int)r.UniqueIndex);
             }
         }
 
@@ -262,8 +321,18 @@ namespace OOBehave.Rules
                     break;
                 }
 
-                Results[r.UniqueIndex] = result;
+                Results[(int)r.UniqueIndex] = result;
 
+            }
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            if (Results.Any())
+            {
+                Results = new ConcurrentDictionary<int, IRuleResult>(Results.Select(x => new KeyValuePair<int, IRuleResult>(x.Key * -1, x.Value)));
+                TransferredResults = true;
             }
         }
     }

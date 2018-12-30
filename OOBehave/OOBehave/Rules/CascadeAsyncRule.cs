@@ -10,7 +10,7 @@ namespace OOBehave.Rules
 
     public interface ICascadeRule : IRule
     {
-        IEnumerable<string> TriggerProperties { get; }
+        IReadOnlyList<string> TriggerProperties { get; }
 
     }
 
@@ -32,7 +32,7 @@ namespace OOBehave.Rules
             TriggerProperties.AddRange(triggerProperties);
         }
 
-        IEnumerable<string> ICascadeRule.TriggerProperties => TriggerProperties.AsEnumerable();
+        IReadOnlyList<string> ICascadeRule.TriggerProperties => TriggerProperties.AsReadOnly();
         protected List<string> TriggerProperties { get; } = new List<string>();
 
     }

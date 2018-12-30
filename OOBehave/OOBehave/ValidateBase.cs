@@ -6,7 +6,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -16,20 +18,19 @@ namespace OOBehave
         Task WaitForRules();
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
-
+        Task RunSelfRules(CancellationToken token = new CancellationToken());
     }
 
-
+    [DataContract]
     public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
+        [DataMember]
         protected IRuleExecute RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices services) : base(services)
         {
-            this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
-
             this.RuleExecute = services.CreateRuleExecute(this);
         }
 
@@ -59,6 +60,10 @@ namespace OOBehave
             PropertyHasChanged(propertyName);
         }
 
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Set(registeredProperty, value);
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -100,9 +105,10 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        public async Task RunSelfRules(CancellationToken token)
         {
-            PropertyValueManager.Set(registeredProperty, value);
+            await RuleExecute.RunAllRules();
         }
+
     }
 }
