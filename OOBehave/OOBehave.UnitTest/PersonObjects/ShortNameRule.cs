@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public interface IShortNameRule<T> : IRule<T> where T : IPersonBase { uint RunCount { get; } }
+    public interface IShortNameRule<T> : IRule<T> where T : IPersonBase { int RunCount { get; } }
 
     public class ShortNameRule<T> : Rule<T>, IShortNameRule<T>
         where T : IPersonBase
     {
-        public uint RunCount { get; private set; } = 0;
+        public int RunCount { get; private set; } = 0;
 
         public ShortNameRule() : base()
         {

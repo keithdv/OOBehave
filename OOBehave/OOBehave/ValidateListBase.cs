@@ -104,9 +104,14 @@ namespace OOBehave
             PropertyValueManager.Set(registeredProperty, value);
         }
 
-        public async Task RunSelfRules(CancellationToken token)
+        public Task RunSelfRules(CancellationToken token = new CancellationToken())
         {
-            await RuleExecute.RunAllRules();
+            return RuleExecute.RunAllRules(token);
+        }
+
+        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        {
+            return Task.WhenAll(RuleExecute.RunAllRules(token), Task.WhenAll(this.Select(t => t.RunAllRules(token))));
         }
     }
 }

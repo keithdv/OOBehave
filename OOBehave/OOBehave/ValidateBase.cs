@@ -18,6 +18,8 @@ namespace OOBehave
         Task WaitForRules();
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
+        Task RunAllRules(CancellationToken token = new CancellationToken());
+
         Task RunSelfRules(CancellationToken token = new CancellationToken());
     }
 
@@ -105,9 +107,14 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-        public async Task RunSelfRules(CancellationToken token)
+        public Task RunSelfRules(CancellationToken token = new CancellationToken())
         {
-            await RuleExecute.RunAllRules();
+            return RuleExecute.RunAllRules();
+        }
+
+        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        {
+            return Task.WhenAll(RuleExecute.RunAllRules(token), ValidatePropertyValueManager.RunAllRules(token));
         }
 
     }

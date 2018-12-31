@@ -23,7 +23,7 @@ namespace OOBehave
     /// REGISTERED IN DI CONTAINER
     /// </summary>
     public interface IEditBaseServices<T> : IEditBaseServices, IValidateBaseServices<T>
-        where T : EditBase
+        where T : IEditBase
     {
     }
 

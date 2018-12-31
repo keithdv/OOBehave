@@ -33,7 +33,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         {
             base.FillFromDto(person);
 
-            var childDto = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+            var childDto = personTable.FirstOrDefault(p => p.FatherId == Id);
 
             if (childDto != null)
             {

@@ -37,7 +37,7 @@ namespace OOBehave.Rules
 
         public AsyncRule(params string[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
 
-        public AsyncRule(IEnumerable<string> triggerProperties)
+        public AsyncRule(IEnumerable<string> triggerProperties) : this()
         {
             TriggerProperties.AddRange(triggerProperties);
         }

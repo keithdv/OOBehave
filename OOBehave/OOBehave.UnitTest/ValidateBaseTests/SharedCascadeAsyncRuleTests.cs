@@ -50,7 +50,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             var sn = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(ShortName));
 
             RuleExecute.AddRule(new ShortNameRule(sn, fn, ln));
-            
+
         }
 
     }

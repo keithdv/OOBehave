@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave.Core
@@ -11,7 +12,7 @@ namespace OOBehave.Core
     {
         bool IsValid { get; }
         bool IsBusy { get; }
-
+        Task RunAllRules(CancellationToken token);
         Task WaitForRules();
 
     }
@@ -25,6 +26,8 @@ namespace OOBehave.Core
     {
         bool IsValid { get; }
         bool IsBusy { get; }
+        Task RunAllRules(CancellationToken token);
+
         Task WaitForRules();
     }
 
@@ -57,6 +60,8 @@ namespace OOBehave.Core
         public bool IsBusy => (Child?.IsBusy ?? false);
 
         public Task WaitForRules() { return Child?.WaitForRules() ?? Task.CompletedTask; }
+        public Task RunAllRules(CancellationToken token) { return Child?.RunAllRules(token); }
+
     }
 
     public class ValidatePropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IValidatePropertyValue>
@@ -87,6 +92,12 @@ namespace OOBehave.Core
         public Task WaitForRules()
         {
             return Task.WhenAll(fieldData.Values.Select(x => x.WaitForRules()));
+        }
+
+        public Task RunAllRules(CancellationToken token)
+        {
+            var tasks = fieldData.Values.Select(x => x.RunAllRules(token)).ToList();
+            return Task.WhenAll(tasks.Where(t => t != null));
         }
 
     }
