@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,14 +37,14 @@ namespace OOBehave.Rules
 
     }
 
-    [DataContract]
+    [PortalDataContract]
     public class RuleExecute<T> : IRuleExecute<T>
         where T : IValidateBase
     {
 
-        [DataMember]
+        [PortalDataMember]
         protected T Target { get; }
-        [DataMember]
+        [PortalDataMember]
         protected IDictionary<int, IRuleResult> Results { get; private set; } = new ConcurrentDictionary<int, IRuleResult>();
         protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;

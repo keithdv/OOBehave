@@ -9,13 +9,13 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
 {
 
     [TestClass]
-    public class JsonBaseTests
+    public class FatClientBaseTests
     {
         IServiceScope scope;
         IBaseObject target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        AutofacContractResolver resolver;
+        FatClientContractResolver resolver;
 
         [TestInitialize]
         public void TestInitailize()
@@ -24,38 +24,54 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             target = scope.Resolve<IBaseObject>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<AutofacContractResolver>();
+            resolver = scope.Resolve<FatClientContractResolver>();
+        }
+
+        private string Serialize(object target)
+        {
+            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
+            {
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Formatting = Formatting.Indented
+            });
+        }
+
+        private T Deserialize<T>(string json)
+        {
+            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+            {
+                ContractResolver = resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All
+            });
         }
 
         [TestMethod]
-        public void JsonBaseTests_Serialize()
+        public void FatClientBaseTests_Serialize()
         {
 
-            var result = JsonConvert.SerializeObject(target);
+            var result = Serialize(target);
 
             Assert.IsTrue(result.Contains(Id.ToString()));
             Assert.IsTrue(result.Contains(Name));
         }
 
         [TestMethod]
-        public void JsonBaseTests_Deserialize()
+        public void FatClientBaseTests_Deserialize()
         {
 
-            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
+            var json = Serialize(target);
 
-            // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All
-            });
+            var newTarget = Deserialize<IBaseObject>(json);
 
             Assert.AreEqual(target.ID, newTarget.ID);
             Assert.AreEqual(target.Name, newTarget.Name);
         }
 
         [TestMethod]
-        public void JsonBaseTests_Deserialize_Child()
+        public void FatClientBaseTests_Deserialize_Child()
         {
 
             var child = target.Child = scope.Resolve<IBaseObject>();
@@ -63,14 +79,10 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
 
-            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
+            var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All
-            });
+            var newTarget = Deserialize<IBaseObject>(json);
 
 
             Assert.IsNotNull(newTarget.Child);
@@ -80,7 +92,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         }
 
         [TestMethod]
-        public void JsonBaseTests_Deserialize_Child_ParentRef()
+        public void FatClientBaseTests_Deserialize_Child_ParentRef()
         {
 
             var child = target.Child = scope.Resolve<IBaseObject>();
@@ -89,15 +101,10 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             child.Name = Guid.NewGuid().ToString();
             child.Parent = target;
 
-            var json = JsonConvert.SerializeObject(target, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All, PreserveReferencesHandling = PreserveReferencesHandling.All, Formatting = Formatting.Indented });
+            var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All
-            });
+            var newTarget = Deserialize<IBaseObject>(json);
 
 
             Assert.IsNotNull(newTarget.Child);

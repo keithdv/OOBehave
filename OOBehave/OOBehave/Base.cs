@@ -1,4 +1,5 @@
-﻿using OOBehave.AuthorizationRules;
+﻿using OOBehave.Attributes;
+using OOBehave.AuthorizationRules;
 using OOBehave.Core;
 using OOBehave.Portal;
 using System;
@@ -29,11 +30,11 @@ namespace OOBehave
 
     }
 
-    [DataContract]
+    [PortalDataContract]
     public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 
-        [DataMember]
+        [PortalDataMember]
         protected IPropertyValueManager PropertyValueManager { get; }
 
 

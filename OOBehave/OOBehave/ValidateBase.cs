@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.Attributes;
+using OOBehave.Core;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -23,12 +24,12 @@ namespace OOBehave
         Task RunSelfRules(CancellationToken token = new CancellationToken());
     }
 
-    [DataContract]
+    [PortalDataContract]
     public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
     {
         protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
-        [DataMember]
+        [PortalDataMember]
         protected IRuleExecute RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices services) : base(services)

@@ -41,6 +41,8 @@ namespace OOBehave.Core
 
         public virtual IValidateBase Child { get; protected set; }
 
+        protected ValidatePropertyValue() { } // For EditPropertyValue Deserialization
+
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
 

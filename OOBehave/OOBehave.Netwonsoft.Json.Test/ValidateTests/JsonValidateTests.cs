@@ -6,30 +6,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
+namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 {
 
     [TestClass]
-    public class JsonValidateBaseTests
+    public class JsonValidateTests
     {
         IServiceScope scope;
-        IValidateBaseObject target;
+        IValidateObject target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        AutofacContractResolver resolver;
+        FatClientContractResolver resolver;
 
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope().Resolve<IServiceScope>();
-            target = scope.Resolve<IValidateBaseObject>();
+            target = scope.Resolve<IValidateObject>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<AutofacContractResolver>();
+            resolver = scope.Resolve<FatClientContractResolver>();
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Serialize()
+        public void JsonValidateTests_Serialize()
         {
 
             var result = Serialize(target);
@@ -42,6 +42,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         {
             return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
             {
+                ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
                 Formatting = Formatting.Indented
@@ -59,20 +60,20 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize()
+        public void JsonValidateTests_Deserialize()
         {
 
             var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
             Assert.AreEqual(target.ID, newTarget.ID);
             Assert.AreEqual(target.Name, newTarget.Name);
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize_RuleExecute()
+        public void JsonValidateTests_Deserialize_RuleExecute()
         {
             target.Name = "Error";
             Assert.IsFalse(target.IsValid);
@@ -80,7 +81,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
             var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
             Assert.AreEqual(2, newTarget.RuleRunCount); // Ensure that RuleExecute was deserialized, not run
             Assert.AreEqual(1, newTarget.Rules.Count());
@@ -93,17 +94,17 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
 
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize_Child()
+        public void JsonValidateTests_Deserialize_Child()
         {
 
-            var child = target.Child = scope.Resolve<IValidateBaseObject>();
+            var child = target.Child = scope.Resolve<IValidateObject>();
 
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
 
             var json = Serialize(target);
 
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
             Assert.IsNotNull(newTarget.Child);
             Assert.AreSame(newTarget.Child.Parent, newTarget.Parent);
@@ -113,17 +114,17 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize_Child_RuleExecute()
+        public void JsonValidateTests_Deserialize_Child_RuleExecute()
         {
 
-            var child = target.Child = scope.Resolve<IValidateBaseObject>();
+            var child = target.Child = scope.Resolve<IValidateObject>();
 
             child.ID = Guid.NewGuid();
             child.Name = "Error";
             Assert.IsFalse(child.IsValid);
             var json = Serialize(target);
 
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
             Assert.IsFalse(newTarget.IsValid);
             Assert.IsTrue(newTarget.IsSelfValid);
@@ -136,11 +137,11 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize_ValidatePropertyValue_Child()
+        public void JsonValidateTests_Deserialize_ValidatePropertyValue_Child()
         {
             // Ensure ValidatePropertyValue.Child is a reference to the Child 
 
-            var child = target.Child = scope.Resolve<IValidateBaseObject>();
+            var child = target.Child = scope.Resolve<IValidateObject>();
 
             child.ID = Guid.NewGuid();
             child.Name = "Error";
@@ -148,7 +149,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
             Assert.IsFalse(child.IsValid);
 
             var json = Serialize(target);
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
             Assert.IsFalse(newTarget.IsValid);
 
@@ -158,10 +159,10 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         }
 
         [TestMethod]
-        public void JsonValidateBaseTests_Deserialize_Child_ParentRef()
+        public void JsonValidateTests_Deserialize_Child_ParentRef()
         {
 
-            var child = target.Child = scope.Resolve<IValidateBaseObject>();
+            var child = target.Child = scope.Resolve<IValidateObject>();
 
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
@@ -170,7 +171,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
             var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = Deserialize<IValidateBaseObject>(json);
+            var newTarget = Deserialize<IValidateObject>(json);
 
 
             Assert.IsNotNull(newTarget.Child);

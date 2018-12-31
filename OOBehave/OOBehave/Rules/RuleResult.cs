@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,22 +20,22 @@ namespace OOBehave.Rules
         IReadOnlyList<string> TriggerProperties { get; set; }
     }
 
-    [DataContract]
+    [PortalDataContract]
     public class RuleResult : IRuleResult
     {
-        [DataMember]
+        [PortalDataMember]
         protected Dictionary<string, string> PropertyErrorMessages { get; } = new Dictionary<string, string>();
 
         IReadOnlyDictionary<string, string> IRuleResult.PropertyErrorMessages => new ReadOnlyDictionary<string, string>(PropertyErrorMessages);
 
-        [DataMember]
+        [PortalDataMember]
         protected List<string> TargetErrorMessages { get; } = new List<string>();
 
         IEnumerable<string> IRuleResult.TargetErrorMessages => TargetErrorMessages.AsEnumerable();
 
         public bool IsError { get { return PropertyErrorMessages.Any() || TargetErrorMessages.Any(); } }
 
-        [DataMember]
+        [PortalDataMember]
         public IReadOnlyList<string> TriggerProperties { get; set; }
 
         public static RuleResult Empty()

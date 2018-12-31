@@ -12,7 +12,8 @@ using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
 using OOBehave.Netwonsoft.Json.Test.BaseTests;
-using OOBehave.Netwonsoft.Json.Test.ValidateBaseTests;
+using OOBehave.Netwonsoft.Json.Test.EditTests;
+using OOBehave.Netwonsoft.Json.Test.ValidateTests;
 
 namespace OOBehave.Netwonsoft.Json.Test
 {
@@ -110,8 +111,7 @@ namespace OOBehave.Netwonsoft.Json.Test
                 // Stored values for each Domain Object instance
                 // MUST BE per instance
                 builder.RegisterGeneric(typeof(PropertyValueManager<>))
-                    .As(typeof(IPropertyValueManager<>))
-                    .AsSelf();
+                    .As(typeof(IPropertyValueManager<>));
 
                 builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
                 builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
@@ -136,11 +136,16 @@ namespace OOBehave.Netwonsoft.Json.Test
                 builder.RegisterGeneric(typeof(EditListBaseServices<,>)).As(typeof(IEditListBaseServices<,>));
 
                 // Newtonsoft.Json
-                builder.RegisterType<AutofacContractResolver>();
-                builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>)); // TODO - If I register .AsSelf() fails; How does it succeed?
-                builder.RegisterGeneric(typeof(ValidatePropertyValue<>)).As(typeof(IValidatePropertyValue<>));
+                builder.RegisterType<FatClientContractResolver>();
+                builder.RegisterType<DependencyInjectionContractResolver>();
+
+                // Objects need to be registered AsSelf for deserialization
                 builder.RegisterType<BaseObject>().AsSelf();
-                builder.RegisterType<ValidateBaseObject>().AsSelf();
+                builder.RegisterType<ValidateObject>().AsSelf();
+                builder.RegisterType<EditObject>().AsSelf();
+
+
+                builder.RegisterGeneric(typeof(EditPropertyValue<>)).AsSelf();
 
 
                 Container = builder.Build();

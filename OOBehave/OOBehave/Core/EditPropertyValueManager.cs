@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,16 @@ namespace OOBehave.Core
 
         private bool initialValue = true;
         protected IValuesDiffer ValuesDiffer { get; }
+
+        /// <summary>
+        /// For Deserialization Only
+        /// </summary>
+        /// <param name="valuesDiffer"></param>
+        public EditPropertyValue(IValuesDiffer valuesDiffer)
+        {
+
+        }
+
         public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)
         {
             this.ValuesDiffer = valuesDiffer ?? throw new ArgumentNullException(nameof(valuesDiffer));
@@ -65,6 +76,8 @@ namespace OOBehave.Core
         }
 
         public bool IsModified => IsSelfModified || (EditChild?.IsModified ?? false);
+
+        [PortalDataMember]
         public bool IsSelfModified { get; private set; } = false;
 
         public void MarkSelfUnmodified()

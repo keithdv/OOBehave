@@ -4,24 +4,24 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
+namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 {
-    public interface IValidateBaseObject : IValidateBase
+    public interface IValidateObject : IValidateBase
     {
         Guid ID { get; set; }
         string Name { get; set; }
         int RuleRunCount { get; }
 
-        IValidateBaseObject Child { get; set; }
-        IValidateBaseObject Parent { get; set; }
+        IValidateObject Child { get; set; }
+        IValidateObject Parent { get; set; }
         IEnumerable<IRule> Rules { get; }
     }
 
-    public class ValidateBaseObject : ValidateBase, IValidateBaseObject
+    public class ValidateObject : ValidateBase, IValidateObject
     {
-        public ValidateBaseObject(IValidateBaseServices<ValidateBaseObject> services) : base(services)
+        public ValidateObject(IValidateBaseServices<ValidateObject> services) : base(services)
         {
-            RuleExecute.AddRule<ValidateBaseObject>(nameof(Name), t =>
+            RuleExecute.AddRule<ValidateObject>(nameof(Name), t =>
             {
                 t.RuleRunCount++;
                 if (t.Name == "Error") { return RuleResult.PropertyError(nameof(Name), "Error"); }
@@ -32,8 +32,8 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateBaseTests
         public int RuleRunCount { get => Getter<int>(); set => Setter(value); }
         public Guid ID { get => Getter<Guid>(); set => Setter(value); }
         public string Name { get => Getter<string>(); set => Setter(value); }
-        public IValidateBaseObject Child { get => Getter<IValidateBaseObject>(); set => Setter(value); }
-        public IValidateBaseObject Parent { get => Getter<IValidateBaseObject>(); set => Setter(value); }
+        public IValidateObject Child { get => Getter<IValidateObject>(); set => Setter(value); }
+        public IValidateObject Parent { get => Getter<IValidateObject>(); set => Setter(value); }
 
         public IEnumerable<IRule> Rules => RuleExecute.Rules;
     }
