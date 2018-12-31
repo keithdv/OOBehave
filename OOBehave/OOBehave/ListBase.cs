@@ -1,4 +1,5 @@
-﻿using OOBehave.AuthorizationRules;
+﻿using OOBehave.Attributes;
+using OOBehave.AuthorizationRules;
 using OOBehave.Core;
 using OOBehave.Portal;
 using System;
@@ -9,6 +10,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -25,11 +27,11 @@ namespace OOBehave
         new int Count { get; }
     }
 
-    public abstract partial class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess
+    public abstract class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess
         where T : IBase
     {
 
-        protected IPropertyValueManager PropertyValueManager { get; }
+        protected IPropertyValueManager PropertyValueManager { get; private set; } // Private setter for Deserialization
         protected IReceivePortalChild<T> ItemPortal { get; }
 
         public ListBase(IListBaseServices<T> services)

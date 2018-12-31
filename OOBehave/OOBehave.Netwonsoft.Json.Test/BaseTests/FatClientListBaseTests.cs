@@ -1,30 +1,38 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using OOBehave.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OOBehave.Netwonsoft.Json.Test.BaseTests
 {
 
     [TestClass]
-    public class FatClientBaseTests
+    public class FatClientListBaseTests
     {
         IServiceScope scope;
-        IBaseObject target;
+        IBaseObjectList target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
         FatClientContractResolver resolver;
+        IBaseObject child;
 
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope().Resolve<IServiceScope>();
-            target = scope.Resolve<IBaseObject>();
+            target = scope.Resolve<IBaseObjectList>();
             target.ID = Id;
             target.Name = Name;
             resolver = scope.Resolve<FatClientContractResolver>();
+
+            child = scope.Resolve<IBaseObject>();
+            child.ID = Guid.NewGuid();
+            child.Name = Guid.NewGuid().ToString();
+            target.Add(child);
         }
 
         private string Serialize(object target)
@@ -34,32 +42,36 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
                 ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
+                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
             });
         }
 
-        private IBaseObject Deserialize(string json)
+        private IBaseObjectList Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<IBaseObject>(json, new JsonSerializerSettings
+            return JsonConvert.DeserializeObject<IBaseObjectList>(json, new JsonSerializerSettings
             {
                 ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
             });
         }
 
         [TestMethod]
-        public void FatClientBaseTests_Serialize()
+        public void FatClientListBaseTests_Serialize()
         {
 
             var result = Serialize(target);
 
             Assert.IsTrue(result.Contains(Id.ToString()));
             Assert.IsTrue(result.Contains(Name));
+            Assert.IsTrue(result.Contains(child.ID.ToString()));
+            Assert.IsTrue(result.Contains(child.Name));
         }
 
         [TestMethod]
-        public void FatClientBaseTests_Deserialize()
+        public void FatClientListBaseTests_Deserialize()
         {
 
             var json = Serialize(target);
@@ -71,13 +83,8 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         }
 
         [TestMethod]
-        public void FatClientBaseTests_Deserialize_Child()
+        public void FatClientListBaseTests_Deserialize_Child()
         {
-
-            var child = target.Child = scope.Resolve<IBaseObject>();
-
-            child.ID = Guid.NewGuid();
-            child.Name = Guid.NewGuid().ToString();
 
             var json = Serialize(target);
 
@@ -85,33 +92,24 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             var newTarget = Deserialize(json);
 
 
-            Assert.IsNotNull(newTarget.Child);
-            Assert.AreEqual(child.ID, newTarget.Child.ID);
-            Assert.AreEqual(child.Name, newTarget.Child.Name);
+            Assert.IsNotNull(newTarget.SingleOrDefault());
+            Assert.AreEqual(child.ID, newTarget.Single().ID);
+            Assert.AreEqual(child.Name, newTarget.Single().Name);
 
         }
 
         [TestMethod]
-        public void FatClientBaseTests_Deserialize_Child_ParentRef()
+        public void FatClientListBaseTests_Deserialize_Modify()
         {
-
-            var child = target.Child = scope.Resolve<IBaseObject>();
-
-            child.ID = Guid.NewGuid();
-            child.Name = Guid.NewGuid().ToString();
-            child.Parent = target;
 
             var json = Serialize(target);
 
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = Deserialize(json);
 
-
-            Assert.IsNotNull(newTarget.Child);
-            Assert.AreEqual(child.ID, newTarget.Child.ID);
-            Assert.AreEqual(child.Name, newTarget.Child.Name);
-            Assert.AreSame(newTarget.Child.Parent, newTarget);
-             
+            var newId = Guid.NewGuid();
+            newTarget.ID = newId;
+            Assert.AreEqual(newId, newTarget.ID);
         }
 
     }

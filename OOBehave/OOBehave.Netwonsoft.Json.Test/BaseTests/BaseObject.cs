@@ -26,4 +26,22 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         public IBaseObject Parent { get => Getter<IBaseObject>(); set => Setter(value); }
 
     }
+
+    public interface IBaseObjectList : IListBase<IBaseObject>
+    {
+        Guid ID { get; set; }
+        string Name { get; set; }
+
+    }
+
+    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
+    {
+        public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> services) : base(services)
+        {
+        }
+
+        public Guid ID { get => Getter<Guid>(); set => Setter(value); }
+        public string Name { get => Getter<string>(); set => Setter(value); }
+
+    }
 }

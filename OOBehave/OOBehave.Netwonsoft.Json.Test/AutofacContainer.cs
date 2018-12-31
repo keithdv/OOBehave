@@ -14,6 +14,7 @@ using OOBehave.Rules;
 using OOBehave.Netwonsoft.Json.Test.BaseTests;
 using OOBehave.Netwonsoft.Json.Test.EditTests;
 using OOBehave.Netwonsoft.Json.Test.ValidateTests;
+using OOBehave.Newtonsoft.Json;
 
 namespace OOBehave.Netwonsoft.Json.Test
 {
@@ -110,9 +111,7 @@ namespace OOBehave.Netwonsoft.Json.Test
 
                 // Stored values for each Domain Object instance
                 // MUST BE per instance
-                builder.RegisterGeneric(typeof(PropertyValueManager<>))
-                    .As(typeof(IPropertyValueManager<>));
-
+                builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>)).AsSelf();
                 builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
                 builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
 
@@ -137,12 +136,14 @@ namespace OOBehave.Netwonsoft.Json.Test
 
                 // Newtonsoft.Json
                 builder.RegisterType<FatClientContractResolver>();
-                builder.RegisterType<DependencyInjectionContractResolver>();
+                builder.RegisterType<ListBaseCollectionConverter>();
 
                 // Objects need to be registered AsSelf for deserialization
                 builder.RegisterType<BaseObject>().AsSelf();
+                builder.RegisterType<BaseObjectList>().AsSelf();
                 builder.RegisterType<ValidateObject>().AsSelf();
                 builder.RegisterType<EditObject>().AsSelf();
+                builder.RegisterType<EditObjectList>().AsSelf();
 
 
                 builder.RegisterGeneric(typeof(EditPropertyValue<>)).AsSelf();

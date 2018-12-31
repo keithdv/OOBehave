@@ -11,10 +11,10 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
 {
 
     [TestClass]
-    public class FatClientEditTests
+    public class FatClientEditListTests
     {
         IServiceScope scope;
-        IEditObject target;
+        IEditObjectList target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
         FatClientContractResolver resolver;
@@ -23,7 +23,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope().Resolve<IServiceScope>();
-            target = scope.Resolve<IEditObject>();
+            target = scope.Resolve<IEditObjectList>();
             target.ID = Id;
             target.Name = Name;
             resolver = scope.Resolve<FatClientContractResolver>();
@@ -40,9 +40,9 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             });
         }
 
-        private IEditObject Deserialize(string json)
+        private IEditObjectList Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<IEditObject>(json, new JsonSerializerSettings
+            return JsonConvert.DeserializeObject<IEditObjectList>(json, new JsonSerializerSettings
             {
                 ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
@@ -51,7 +51,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_Serialize()
+        public void FatClientEditList_Serialize()
         {
 
             var result = Serialize(target);
@@ -61,7 +61,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_Deserialize()
+        public void FatClientEditList_Deserialize()
         {
 
             var json = Serialize(target);
@@ -72,49 +72,49 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             Assert.AreEqual(target.Name, newTarget.Name);
         }
 
-        [TestMethod]
-        public void FatClientEdit_Deserialize_Child()
-        {
+        //[TestMethod]
+        //public void FatClientEditList_Deserialize_Child()
+        //{
 
-            var child = target.Child = scope.Resolve<IEditObject>();
+        //    var child = target.Child = scope.Resolve<IEditObject>();
 
-            child.ID = Guid.NewGuid();
-            child.Name = Guid.NewGuid().ToString();
+        //    child.ID = Guid.NewGuid();
+        //    child.Name = Guid.NewGuid().ToString();
 
-            var json = Serialize(target);
+        //    var json = Serialize(target);
 
-            var newTarget = Deserialize(json);
+        //    var newTarget = Deserialize(json);
 
-            Assert.IsNotNull(newTarget.Child);
-            Assert.AreEqual(child.ID, newTarget.Child.ID);
-            Assert.AreEqual(child.Name, newTarget.Child.Name);
+        //    Assert.IsNotNull(newTarget.Child);
+        //    Assert.AreEqual(child.ID, newTarget.Child.ID);
+        //    Assert.AreEqual(child.Name, newTarget.Child.Name);
 
-        }
+        //}
 
-        [TestMethod]
-        public void FatClientEdit_Deserialize_Child_ParentRef()
-        {
+        //[TestMethod]
+        //public void FatClientEditList_Deserialize_Child_ParentRef()
+        //{
 
-            var child = target.Child = scope.Resolve<IEditObject>();
+        //    var child = target.Child = scope.Resolve<IEditObject>();
 
-            child.ID = Guid.NewGuid();
-            child.Name = Guid.NewGuid().ToString();
-            child.Parent = target;
+        //    child.ID = Guid.NewGuid();
+        //    child.Name = Guid.NewGuid().ToString();
+        //    child.Parent = target;
 
-            var json = Serialize(target);
+        //    var json = Serialize(target);
 
-            // ITaskRespository and ILogger constructor parameters are injected by Autofac 
-            var newTarget = Deserialize(json);
+        //    // ITaskRespository and ILogger constructor parameters are injected by Autofac 
+        //    var newTarget = Deserialize(json);
 
-            Assert.IsNotNull(newTarget.Child);
-            Assert.AreEqual(child.ID, newTarget.Child.ID);
-            Assert.AreEqual(child.Name, newTarget.Child.Name);
-            Assert.AreSame(newTarget.Child.Parent, newTarget);
+        //    Assert.IsNotNull(newTarget.Child);
+        //    Assert.AreEqual(child.ID, newTarget.Child.ID);
+        //    Assert.AreEqual(child.Name, newTarget.Child.Name);
+        //    Assert.AreSame(newTarget.Child.Parent, newTarget);
              
-        }
+        //}
 
         [TestMethod]
-        public void FatClientEdit_IsModified()
+        public void FatClientEditList_IsModified()
         {
 
             var json = Serialize(target);
@@ -127,7 +127,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_IsModified_False()
+        public void FatClientEditList_IsModified_False()
         {
 
             target.MarkUnmodified();
@@ -141,7 +141,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_IsNew()
+        public void FatClientEditList_IsNew()
         {
 
             target.MarkNew();
@@ -154,7 +154,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_IsNew_False()
+        public void FatClientEditList_IsNew_False()
         {
 
             target.MarkOld();
@@ -168,7 +168,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_IsChild()
+        public void FatClientEditList_IsChild()
         {
 
             target.MarkAsChild();
@@ -182,7 +182,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_IsChild_False()
+        public void FatClientEditList_IsChild_False()
         {
 
             var json = Serialize(target);
@@ -194,7 +194,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         }
 
         [TestMethod]
-        public void FatClientEdit_ModifiedProperties()
+        public void FatClientEditList_ModifiedProperties()
         {
 
             var orig = target.ModifiedProperties.ToList();
