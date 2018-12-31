@@ -7,7 +7,7 @@ namespace OOBehave.UnitTest.PersonObjects
 {
     public interface IShortNameAsyncRule<T> : IRule<T> where T : IPersonBase { }
 
-    public class ShortNameAsyncRule<T> : CascadeAsyncRule<T>, IShortNameAsyncRule<T>
+    public class ShortNameAsyncRule<T> : AsyncRule<T>, IShortNameAsyncRule<T>
         where T : IPersonBase
     {
 
@@ -22,7 +22,7 @@ namespace OOBehave.UnitTest.PersonObjects
 
             await Task.Delay(10, token);
 
-            // System.Diagnostics.Debug.WriteLine($"ShortNameCascadeAsyncRule {target.FirstName} {target.LastName}");
+            // System.Diagnostics.Debug.WriteLine($"ShortNameAsyncRule {target.FirstName} {target.LastName}");
 
             if (target.FirstName?.StartsWith("Error") ?? false)
             {

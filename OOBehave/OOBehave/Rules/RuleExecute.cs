@@ -52,13 +52,13 @@ namespace OOBehave.Rules
             this.Target = target;
         }
 
-        IEnumerable<IRule> IRuleExecute.Rules => Rules.AsReadOnly();
+        IEnumerable<IRule> IRuleExecute.Rules => Rules.Values;
 
-        private List<IRule> Rules { get; } = new List<IRule>();
+        private IDictionary<uint, IRule> Rules { get; } = new ConcurrentDictionary<uint, IRule>();
 
         IEnumerable<IRuleResult> IRuleExecute.Results => Results.Values;
 
-        private ConcurrentQueue<string> propertyQueue = new ConcurrentQueue<string>();
+        private ConcurrentQueue<uint> ruleQueue = new ConcurrentQueue<uint>();
 
 
         public void AddRules(params IRule[] rules)
@@ -73,22 +73,37 @@ namespace OOBehave.Rules
         public void AddRule(IRule rule)
         {
             // TODO - Only allow Rule Types to be added - not instances
-            Rules.Add(rule ?? throw new ArgumentNullException(nameof(rule)));
+            Rules.Add(rule.UniqueIndex, rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 
         public FluentRule<T2> AddRule<T2>(string triggerProperty, Func<T2, IRuleResult> func)
         {
             FluentRule<T2> rule = new FluentRule<T2>(func, triggerProperty); // TODO - DI
-            Rules.Add(rule);
+            Rules.Add(rule.UniqueIndex, rule);
             return rule;
         }
 
         public void CheckRulesForProperty(string propertyName)
         {
-            if (!propertyQueue.Contains(propertyName))
+
+            if (TransferredResults)
             {
-                // System.Diagnostics.Debug.WriteLine($"Enqueue {propertyName}");
-                propertyQueue.Enqueue(propertyName);
+                var oldResults = Results.Where(x => x.Key < 0 && x.Value.TriggerProperties.Contains(propertyName)).ToList();
+                oldResults.ForEach(r => Results.Remove(r.Key));
+
+                if (!Results.Where(x => x.Key < 0).Any())
+                {
+                    TransferredResults = false;
+                }
+            }
+
+            foreach (var index in Rules.Values.Where(r => r.TriggerProperties.Contains(propertyName)).Select(r => r.UniqueIndex))
+            {
+                if (!ruleQueue.Contains(index))
+                {
+                    // System.Diagnostics.Debug.WriteLine($"Enqueue {propertyName}");
+                    ruleQueue.Enqueue(index);
+                }
             }
 
             CheckRulesQueue();
@@ -98,11 +113,9 @@ namespace OOBehave.Rules
         {
             Results.Clear(); // Cover in case something unexpected has happened like a weird Serialization cover or maybe a Rule that exists on the client or not the server
 
-            var properties = Rules.OfType<ICascadeRule>().SelectMany(r => r.TriggerProperties).Distinct().ToList();
-
-            foreach (var p in properties)
+            foreach (var ruleIndex in Rules.Keys)
             {
-                propertyQueue.Enqueue(p);
+                ruleQueue.Enqueue(ruleIndex);
             }
 
             CheckRulesQueue();
@@ -145,9 +158,8 @@ namespace OOBehave.Rules
             void Stop()
             {
                 // We need to handle if properties changed by the user while rules were running
-                // Yes, this causes the infinite loop if they change a property in a TargetRule. Which they should not do.
 
-                if (propertyQueue.Any())
+                if (ruleQueue.Any())
                 {
                     CheckRulesQueue(true);
                 }
@@ -167,14 +179,14 @@ namespace OOBehave.Rules
                 Start();
                 var token = cancellationTokenSource.Token; // Local stack copy important
 
-                while (propertyQueue.TryDequeue(out var propertyName))
+                while (ruleQueue.TryDequeue(out var ruleIndex))
                 {
 
                     // System.Diagnostics.Debug.WriteLine($"Dequeue {propertyName}");
 
-                    var cascadeRuleTask = RunCascadeRules(propertyName, token);
+                    var ruleExecuteTask = RunRule(Rules[ruleIndex], token);
 
-                    if (!cascadeRuleTask.IsCompleted)
+                    if (!ruleExecuteTask.IsCompleted)
                     {
                         // Really important
                         // If there there is not an asyncronous fork all of the async methods will run synchronously
@@ -182,7 +194,7 @@ namespace OOBehave.Rules
                         // However, if there was an asyncronous fork we need to handle it's completion
                         // In WPF there's an executable so this will continue "hands off"
                         // In request response the WaitForRules needs to be awaited!
-                        cascadeRuleTask.ContinueWith(x =>
+                        ruleExecuteTask.ContinueWith(x =>
                         {
                             CheckRulesQueue(true);
                         });
@@ -191,67 +203,21 @@ namespace OOBehave.Rules
                     }
                 }
 
-                var targetRuleTask = RunTargetRulesSequential(token);
-
-                // Really important
-                // If there there is not an asyncronous fork all of the async methods will run synchronously
-                // Which is great! Because we are likely within a property change
-                // However, if there was an asyncronous fork we need to handle it's completion
-                // In WPF there's an executable so this will continue "hands off"
-                // In request response the WaitForRules needs to be awaited!
-                if (!targetRuleTask.IsCompleted)
-                {
-                    targetRuleTask.ContinueWith(x =>
-                    {
-                        Stop();
-                    });
-
-                }
-                else
-                {
-                    Stop();
-                }
+                Stop();
             }
         }
 
-
-
-        private async Task RunCascadeRules(string propertyName, CancellationToken token)
-        {
-            if (TransferredResults)
-            {
-                var oldResults = Results.Where(x => x.Key < 0 && x.Value.TriggerProperties.Contains(propertyName)).ToList();
-                oldResults.ForEach(r => Results.Remove(r.Key));
-
-                if (!Results.Where(x => x.Key < 0).Any())
-                {
-                    TransferredResults = false;
-                }
-            }
-
-            foreach (var r in Rules.OfType<ICascadeRule>().Where(r => r.TriggerProperties.Contains(propertyName)).ToList())
-            {
-                await RunRule(r, token);
-
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-            }
-        }
-
-        private async Task RunRule(ICascadeRule r, CancellationToken token)
+        private async Task RunRule(IRule r, CancellationToken token)
         {
             IRuleResult result = null;
 
             try
             {
-                if (r is ICascadeRule<T> rule)
+                if (r is IRule<T> rule)
                 {
                     result = await rule.Execute(Target, token);
                 }
-                else if (r is ICascadeRule<IBase> sharedRule)
+                else if (r is IRule<IBase> sharedRule)
                 {
                     result = await sharedRule.Execute(Target, token);
                 }
@@ -276,7 +242,6 @@ namespace OOBehave.Rules
                 }
             }
 
-
             if (result.IsError)
             {
                 result.TriggerProperties = r.TriggerProperties;
@@ -287,43 +252,7 @@ namespace OOBehave.Rules
                 // Optimized approach for when/if this is serialized
                 Results.Remove((int)r.UniqueIndex);
             }
-        }
 
-        private async Task RunTargetRulesSequential(CancellationToken token)
-        {
-            foreach (var r in Rules.OfType<ITargetRule>().ToList())
-            {
-                IRuleResult result;
-
-                try
-                {
-                    if (r is ITargetRule<T> rule)
-                    {
-                        result = await rule.Execute(Target, token);
-                    }
-                    else if (r is ITargetRule<IBase> baseRule)
-                    {
-                        result = await baseRule.Execute(Target, token);
-                    }
-                    else
-                    {
-                        throw new InvalidRuleTypeException($"{r.GetType().FullName} cannot be executed for {typeof(T).FullName}");
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    result = RuleResult.TargetError(ex.Message);
-                }
-
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                Results[(int)r.UniqueIndex] = result;
-
-            }
         }
 
         [OnDeserialized]

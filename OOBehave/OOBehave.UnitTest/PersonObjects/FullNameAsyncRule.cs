@@ -10,7 +10,7 @@ namespace OOBehave.UnitTest.PersonObjects
 
     public interface IFullNameAsyncRule<T> : IRule<T> where T : IPersonBase { }
 
-    public class FullNameAsyncRule<T> : CascadeAsyncRule<T>, IFullNameAsyncRule<T>
+    public class FullNameAsyncRule<T> : AsyncRule<T>, IFullNameAsyncRule<T>
         where T : IPersonBase
     {
 
@@ -25,7 +25,7 @@ namespace OOBehave.UnitTest.PersonObjects
         {
             await Task.Delay(10, token);
 
-            // System.Diagnostics.Debug.WriteLine($"FullNameCascadeAsyncRule {target.Title} {target.ShortName}");
+            // System.Diagnostics.Debug.WriteLine($"FullNameAsyncRule {target.Title} {target.ShortName}");
 
             target.FullName = $"{target.Title} {target.ShortName}";
 

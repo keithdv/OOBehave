@@ -21,10 +21,9 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     {
         public ParentChild(IValidateBaseServices<ParentChild> services,
             IShortNameAsyncRule<ParentChild> shortNameRule,
-            IFullNameAsyncRule<ParentChild> fullNameRule,
-            IPersonAsyncRule<ParentChild> personRule) : base(services)
+            IFullNameAsyncRule<ParentChild> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
         public IPersonBase Child

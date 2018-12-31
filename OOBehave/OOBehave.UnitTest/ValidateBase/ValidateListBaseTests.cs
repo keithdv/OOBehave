@@ -17,11 +17,10 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
         public ValidateList(IValidateListBaseServices<ValidateList, IValidate> services,
             IShortNameRule<ValidateList> shortNameRule,
-            IFullNameRule<ValidateList> fullNameRule,
-            IPersonRule<ValidateList> personRule
+            IFullNameRule<ValidateList> fullNameRule
             ) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
         public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
@@ -83,13 +82,12 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         //{
         //    Assert.IsTrue(Core.Factory.StaticFactory.RuleManager.RegisteredRules.ContainsKey(typeof(ValidateList)));
         //    Assert.AreEqual(3, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)].Count);
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateList>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)]).First(), typeof(ShortNameCascadeRule));
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateList>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)]).Take(2).Last(), typeof(FullNameCascadeRule));
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateList>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)]).Take(3).Last(), typeof(FirstNameTargetRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateList>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)]).First(), typeof(ShortNameRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateList>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateList)]).Take(2).Last(), typeof(FullNameRule));
         //}
 
         [TestMethod]
-        public void ValidateList_CascadeRule()
+        public void ValidateList_Rule()
         {
 
             ValidateList.FirstName = "John";
@@ -100,7 +98,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void ValidateList_CascadeRule_Recursive()
+        public void ValidateList_Rule_Recursive()
         {
 
             ValidateList.Title = "Mr.";
@@ -113,7 +111,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void ValidateList_CascadeRule_IsValid_True()
+        public void ValidateList_Rule_IsValid_True()
         {
             ValidateList.Title = "Mr.";
             ValidateList.FirstName = "John";
@@ -123,7 +121,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void ValidateList_CascadeRule_IsValid_False()
+        public void ValidateList_Rule_IsValid_False()
         {
             ValidateList.Title = "Mr.";
             ValidateList.FirstName = "Error";
@@ -134,7 +132,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void ValidateList_CascadeRule_IsValid_False_Fixed()
+        public void ValidateList_Rule_IsValid_False_Fixed()
         {
             ValidateList.Title = "Mr.";
             ValidateList.FirstName = "Error";
@@ -149,21 +147,6 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
         }
 
-        [TestMethod]
-        public void ValidateList_TargetRule_IsValid_False()
-        {
-
-            ValidateList.Title = "Mr.";
-            ValidateList.FirstName = "John";
-            ValidateList.LastName = "Smith";
-            Assert.IsTrue(ValidateList.IsValid);
-
-            ValidateList.ShortName = "";
-
-            Assert.IsFalse(ValidateList.IsValid);
-            Assert.AreEqual(1, ValidateList.BrokenRulePropertyMessages(nameof(ValidateList.ShortName)).Count());
-
-        }
 
     }
 }

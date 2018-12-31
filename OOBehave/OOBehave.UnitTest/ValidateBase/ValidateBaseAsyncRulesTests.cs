@@ -18,10 +18,9 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
         public ValidateAsyncRules(IValidateBaseServices<ValidateAsyncRules> services,
             IShortNameAsyncRule<ValidateAsyncRules> shortNameRule,
-            IFullNameAsyncRule<ValidateAsyncRules> fullNameRule,
-            IPersonAsyncRule<ValidateAsyncRules> personRule) : base(services)
+            IFullNameAsyncRule<ValidateAsyncRules> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
     }
@@ -85,14 +84,14 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         //{
         //    Assert.IsTrue(Core.Factory.StaticFactory.RuleManager.RegisteredRules.ContainsKey(typeof(ValidateAsyncRules)));
         //    Assert.AreEqual(3, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)].Count);
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).First(), typeof(ShortNameCascadeAsyncRule));
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Take(2).Last(), typeof(FullNameCascadeAsyncRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).First(), typeof(ShortNameAsyncRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Take(2).Last(), typeof(FullNameAsyncRule));
         //    Assert.IsInstanceOfType(((IRegisteredRuleList<ValidateAsyncRules>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(ValidateAsyncRules)]).Take(3).Last(), typeof(FirstNameTargetAsyncRule));
         //}
 
 
         [TestMethod]
-        public async Task ValidateAsyncRules_CascadeRule()
+        public async Task ValidateAsyncRules_Rule()
         {
 
             validate.FirstName = "John";
@@ -105,7 +104,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_CascadeRule_Recursive()
+        public async Task ValidateAsyncRules_Rule_Recursive()
         {
 
             validate.Title = "Mr.";
@@ -120,7 +119,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_CascadeRule_IsValid_True()
+        public async Task ValidateAsyncRules_Rule_IsValid_True()
         {
             validate.Title = "Mr.";
             validate.FirstName = "John";
@@ -132,7 +131,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_CascadeRule_IsValid_False()
+        public async Task ValidateAsyncRules_Rule_IsValid_False()
         {
             validate.Title = "Mr.";
             validate.FirstName = "Error";
@@ -145,7 +144,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public async Task ValidateAsyncRules_CascadeRule_IsValid_False_Fixed()
+        public async Task ValidateAsyncRules_Rule_IsValid_False_Fixed()
         {
             validate.Title = "Mr.";
             validate.FirstName = "Error";
@@ -161,27 +160,6 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
             Assert.IsTrue(validate.IsValid);
             Assert.AreEqual(0, validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Count());
-
-        }
-
-        [TestMethod]
-        public async Task ValidateAsyncRules_TargetRule_IsValid_False()
-        {
-
-            validate.Title = "Mr.";
-            validate.FirstName = "John";
-            validate.LastName = "Smith";
-
-            await validate.WaitForRules();
-
-            Assert.IsTrue(validate.IsValid);
-
-            validate.ShortName = "";
-
-            await validate.WaitForRules();
-
-            Assert.IsFalse(validate.IsValid);
-            Assert.AreEqual(1, validate.BrokenRulePropertyMessages(nameof(validate.ShortName)).Count());
 
         }
     }
