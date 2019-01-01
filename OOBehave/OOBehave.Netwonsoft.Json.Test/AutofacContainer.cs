@@ -40,7 +40,7 @@ namespace OOBehave.Netwonsoft.Json.Test
 
                     if (!t.IsGenericType)
                     {
-                        var reg = builder.RegisterType(t).As(i);
+                        var reg = builder.RegisterType(t).As(i).AsSelf(); // AsSelf for Deserialization
 
                         // If it is a RULE
                         // and has zero constructor parameters
@@ -59,7 +59,7 @@ namespace OOBehave.Netwonsoft.Json.Test
                         // and has zero constructor parameters
                         // assume no dependencies
                         // so it can be SingleInstance
-                        var reg = builder.RegisterGeneric(t).As(i);
+                        var reg = builder.RegisterGeneric(t).As(i); // AsSelf for Deserialization
                         if (typeof(IRule).IsAssignableFrom(t) && zeroConstructorParams)
                         {
                             reg.SingleInstance();
@@ -112,8 +112,8 @@ namespace OOBehave.Netwonsoft.Json.Test
                 // Stored values for each Domain Object instance
                 // MUST BE per instance
                 builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>)).AsSelf();
-                builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
-                builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
+                builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>)).AsSelf();
+                builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>)).AsSelf();
 
                 // Takes IServiceScope so these need to match it's lifetime
                 builder.RegisterGeneric(typeof(LocalReceivePortal<>))
@@ -139,11 +139,11 @@ namespace OOBehave.Netwonsoft.Json.Test
                 builder.RegisterType<ListBaseCollectionConverter>();
 
                 // Objects need to be registered AsSelf for deserialization
-                builder.RegisterType<BaseObject>().AsSelf();
-                builder.RegisterType<BaseObjectList>().AsSelf();
-                builder.RegisterType<ValidateObject>().AsSelf();
-                builder.RegisterType<EditObject>().AsSelf();
-                builder.RegisterType<EditObjectList>().AsSelf();
+                //builder.RegisterType<BaseObject>().AsSelf();
+                //builder.RegisterType<BaseObjectList>().AsSelf();
+                //builder.RegisterType<ValidateObject>().AsSelf();
+                //builder.RegisterType<EditObject>().AsSelf();
+                //builder.RegisterType<EditObjectList>().AsSelf();
 
 
                 builder.RegisterGeneric(typeof(EditPropertyValue<>)).AsSelf();

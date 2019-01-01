@@ -26,7 +26,7 @@ namespace OOBehave.Rules
     public abstract class AsyncRule<T> : IRule<T>
     {
 
-        private static uint indexer = 0;
+        private static uint indexer = 1;
 
         protected AsyncRule()
         {

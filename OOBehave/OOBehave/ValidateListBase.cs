@@ -25,15 +25,12 @@ namespace OOBehave
     public abstract class ValidateListBase<T> : ListBase<T>, IValidateListBase<T>, INotifyPropertyChanged, IPropertyAccess
         where T : IValidateBase
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
-        protected IRuleExecute RuleExecute { get; }
+        protected IRuleExecute RuleExecute { get; private set; }
 
         public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
         {
-            this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
-
-            // TODO - Why do I need to cast to L??
             this.RuleExecute = services.CreateRuleExecute(this);
         }
 

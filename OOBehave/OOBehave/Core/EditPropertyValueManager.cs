@@ -34,6 +34,7 @@ namespace OOBehave.Core
 
     }
 
+    [PortalDataContract]
     public class EditPropertyValue<T> : ValidatePropertyValue<T>, IEditPropertyValue<T>
     {
 
@@ -85,7 +86,6 @@ namespace OOBehave.Core
             IsSelfModified = false;
         }
     }
-
 
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
     {

@@ -37,4 +37,32 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
         public IEnumerable<IRule> Rules => RuleExecute.Rules;
     }
+
+    public interface IValidateObjectList : IValidateListBase<IValidateObject>
+    {
+        Guid ID { get; set; }
+        string Name { get; set; }
+        int RuleRunCount { get; }
+        IEnumerable<IRule> Rules { get; }
+    }
+
+    public class ValidateObjectList : ValidateListBase<IValidateObject>, IValidateObjectList
+    {
+        public ValidateObjectList(IValidateListBaseServices<ValidateObjectList, IValidateObject> services) : base(services)
+        {
+            RuleExecute.AddRule<ValidateObjectList>(nameof(Name), t =>
+            {
+                t.RuleRunCount++;
+                if (t.Name == "Error") { return RuleResult.PropertyError(nameof(Name), "Error"); }
+                return RuleResult.Empty();
+            });
+        }
+
+        public int RuleRunCount { get => Getter<int>(); set => Setter(value); }
+        public Guid ID { get => Getter<Guid>(); set => Setter(value); }
+        public string Name { get => Getter<string>(); set => Setter(value); }
+        public IEnumerable<IRule> Rules => RuleExecute.Rules;
+
+
+    }
 }

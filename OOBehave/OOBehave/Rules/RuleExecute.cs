@@ -42,7 +42,6 @@ namespace OOBehave.Rules
         where T : IValidateBase
     {
 
-        [PortalDataMember]
         protected T Target { get; }
         [PortalDataMember]
         protected IDictionary<int, IRuleResult> Results { get; private set; } = new ConcurrentDictionary<int, IRuleResult>();
@@ -262,6 +261,15 @@ namespace OOBehave.Rules
             if (Results.Any())
             {
                 Results = new ConcurrentDictionary<int, IRuleResult>(Results.Select(x => new KeyValuePair<int, IRuleResult>(x.Key * -1, x.Value)));
+                TransferredResults = true;
+            }
+        }
+
+        private void SetSerializedResults(ConcurrentDictionary<int, IRuleResult> transfferedResults)
+        {
+            if (transfferedResults.Any())
+            {
+                Results = new ConcurrentDictionary<int, IRuleResult>(transfferedResults.Select(x => new KeyValuePair<int, IRuleResult>(x.Key * -1, x.Value)));
                 TransferredResults = true;
             }
         }

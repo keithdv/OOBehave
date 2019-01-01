@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using OOBehave.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -34,6 +35,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
                 ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() },
                 Formatting = Formatting.Indented
             });
         }
@@ -44,7 +46,8 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             {
                 ContractResolver = resolver,
                 TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
             });
         }
 
