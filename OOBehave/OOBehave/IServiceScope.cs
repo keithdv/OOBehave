@@ -13,6 +13,7 @@ namespace OOBehave
 
         bool TryResolve(Type T, out object result);
 
+        Type ConcreteType(Type T);
         Type ConcreteType<T>();
 
         bool IsRegistered<T>();

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,21 +17,26 @@ namespace OOBehave.Rules
         IReadOnlyDictionary<string, string> PropertyErrorMessages { get; }
 
         IEnumerable<string> TargetErrorMessages { get; }
-
+        IReadOnlyList<string> TriggerProperties { get; set; }
     }
 
+    [PortalDataContract]
     public class RuleResult : IRuleResult
     {
-
+        [PortalDataMember]
         protected Dictionary<string, string> PropertyErrorMessages { get; } = new Dictionary<string, string>();
 
         IReadOnlyDictionary<string, string> IRuleResult.PropertyErrorMessages => new ReadOnlyDictionary<string, string>(PropertyErrorMessages);
 
+        [PortalDataMember]
         protected List<string> TargetErrorMessages { get; } = new List<string>();
 
         IEnumerable<string> IRuleResult.TargetErrorMessages => TargetErrorMessages.AsEnumerable();
 
         public bool IsError { get { return PropertyErrorMessages.Any() || TargetErrorMessages.Any(); } }
+
+        [PortalDataMember]
+        public IReadOnlyList<string> TriggerProperties { get; set; }
 
         public static RuleResult Empty()
         {
@@ -58,6 +65,12 @@ namespace OOBehave.Rules
         internal void AddTargetErrorMessage(string message)
         {
             TargetErrorMessages.Add(message);
+        }
+
+        [OnSerializing]
+        public void OnSerializing(StreamingContext context)
+        {
+            TriggerProperties = TriggerProperties.ToList();
         }
 
     }

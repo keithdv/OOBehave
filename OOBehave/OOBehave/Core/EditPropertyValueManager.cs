@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,14 +34,25 @@ namespace OOBehave.Core
 
     }
 
+    [PortalDataContract]
     public class EditPropertyValue<T> : ValidatePropertyValue<T>, IEditPropertyValue<T>
     {
 
+        private bool initialValue = true;
         protected IValuesDiffer ValuesDiffer { get; }
-        public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name)
+
+        /// <summary>
+        /// For Deserialization Only
+        /// </summary>
+        /// <param name="valuesDiffer"></param>
+        public EditPropertyValue(IValuesDiffer valuesDiffer)
         {
-            this.ValuesDiffer = valuesDiffer;
-            base.Value = value;
+
+        }
+
+        public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)
+        {
+            this.ValuesDiffer = valuesDiffer ?? throw new ArgumentNullException(nameof(valuesDiffer));
             EditChild = value as IEditBase;
         }
 
@@ -51,16 +63,22 @@ namespace OOBehave.Core
             get => base.Value;
             set
             {
-                if (ValuesDiffer.Check(base.Value, value))
+                if (initialValue || ValuesDiffer.Check(base.Value, value))
                 {
                     base.Value = value;
                     EditChild = value as IEditBase;
-                    IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+                    if (!initialValue)
+                    {
+                        IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+                    }
+                    initialValue = false;
                 }
             }
         }
 
         public bool IsModified => IsSelfModified || (EditChild?.IsModified ?? false);
+
+        [PortalDataMember]
         public bool IsSelfModified { get; private set; } = false;
 
         public void MarkSelfUnmodified()
@@ -68,7 +86,6 @@ namespace OOBehave.Core
             IsSelfModified = false;
         }
     }
-
 
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
     {

@@ -1,50 +1,33 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OOBehave.Portal;
 using OOBehave.Rules;
 using OOBehave.UnitTest.PersonObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
 
-    public interface IValidate : IPersonBase { }
-
-    public class Validate : PersonValidateBase<Validate>, IValidate
-    {
-
-        public Validate(IValidateBaseServices<Validate> services,
-            IShortNameRule<Validate> shortNameRule,
-            IFullNameRule<Validate> fullNameRule,
-            IPersonRule<Validate> personRule
-            ) : base(services)
-        {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
-        }
-
-        [Fetch]
-        [FetchChild]
-        private void Fetch(PersonDto person)
-        {
-            base.FillFromDto(person);
-        }
-
-    }
 
     [TestClass]
     public class ValidateBaseTests
     {
 
-
-        IValidate validate;
+        private ILifetimeScope scope;
+        private IValidateObject validate;
+        private IValidateObject child;
 
         [TestInitialize]
         public void TestInitailize()
         {
-            validate = AutofacContainer.GetLifetimeScope().Resolve<IValidate>();
+            scope = AutofacContainer.GetLifetimeScope();
+            var validateDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
+            validate = scope.Resolve<IValidateObject>();
+            child = scope.Resolve<IValidateObject>();
+            validate.Child = child;
         }
 
         [TestCleanup]
@@ -55,20 +38,20 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_Constructor()
+        public void ValidateBase_Constructor()
         {
 
         }
 
 
         [TestMethod]
-        public void Validate_Set()
+        public void ValidateBase_Set()
         {
             validate.FirstName = "Keith";
         }
 
         [TestMethod]
-        public void Validate_SetGet()
+        public void ValidateBase_SetGet()
         {
             var name = Guid.NewGuid().ToString();
             validate.ShortName = name;
@@ -76,17 +59,16 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         //[TestMethod]
-        //public void Validate_RulesCreated()
+        //public void ValidateBase_RulesCreated()
         //{
         //    Assert.IsTrue(Core.Factory.StaticFactory.RuleManager.RegisteredRules.ContainsKey(typeof(Validate)));
         //    Assert.AreEqual(3, Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)].Count);
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).First(), typeof(ShortNameCascadeRule));
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Take(2).Last(), typeof(FullNameCascadeRule));
-        //    Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Take(3).Last(), typeof(FirstNameTargetRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>) Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).First(), typeof(ShortNameRule));
+        //    Assert.IsInstanceOfType(((IRegisteredRuleList<Validate>)Core.Factory.StaticFactory.RuleManager.RegisteredRules[typeof(Validate)]).Take(2).Last(), typeof(FullNameRule));
         //}
 
         [TestMethod]
-        public void Validate_CascadeRule()
+        public void ValidateBase_Rule()
         {
 
             validate.FirstName = "John";
@@ -97,7 +79,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_CascadeRule_Recursive()
+        public void ValidateBase_Rule_Recursive()
         {
 
             validate.Title = "Mr.";
@@ -110,7 +92,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_CascadeRule_IsValid_True()
+        public void ValidateBase_Rule_IsValid_True()
         {
             validate.Title = "Mr.";
             validate.FirstName = "John";
@@ -120,7 +102,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_CascadeRule_IsValid_False()
+        public void ValidateBase_Rule_IsValid_False()
         {
             validate.Title = "Mr.";
             validate.FirstName = "Error";
@@ -131,7 +113,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_CascadeRule_IsValid_False_Fixed()
+        public void ValidateBase_Rule_IsValid_False_Fixed()
         {
             validate.Title = "Mr.";
             validate.FirstName = "Error";
@@ -147,19 +129,42 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void Validate_TargetRule_IsValid_False()
+        public async Task ValidateBase_RunSelfRules()
         {
+            var ruleCount = validate.RuleRunCount;
+            await validate.RunSelfRules();
+            Assert.AreEqual(ruleCount + 2, validate.RuleRunCount);
+        }
 
-            validate.Title = "Mr.";
-            validate.FirstName = "John";
-            validate.LastName = "Smith";
-            Assert.IsTrue(validate.IsValid);
+        [TestMethod]
+        public async Task ValidateBase_RunAllRules()
+        {
+            var ruleCount = validate.RuleRunCount;
+            await validate.RunAllRules();
+            Assert.AreEqual(ruleCount + 4, validate.RuleRunCount);
+        }
 
-            validate.ShortName = "";
 
+        [TestMethod]
+        public void ValidateBase_validateInvalid()
+        {
+            validate.FirstName = "Error";
+            Assert.IsFalse(validate.IsBusy);
             Assert.IsFalse(validate.IsValid);
-            Assert.AreEqual(1, validate.BrokenRulePropertyMessages(nameof(validate.ShortName)).Count());
+            Assert.IsFalse(validate.IsSelfValid);
+            Assert.IsTrue(child.IsValid);
+            Assert.IsTrue(child.IsSelfValid);
+        }
 
+        [TestMethod]
+        public void ValidateBase_ChildInvalid()
+        {
+            child.FirstName = "Error";
+            Assert.IsFalse(validate.IsBusy);
+            Assert.IsFalse(validate.IsValid);
+            Assert.IsTrue(validate.IsSelfValid);
+            Assert.IsFalse(child.IsValid);
+            Assert.IsFalse(child.IsSelfValid);
         }
 
     }

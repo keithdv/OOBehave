@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -24,15 +25,12 @@ namespace OOBehave
     public abstract class ValidateListBase<T> : ListBase<T>, IValidateListBase<T>, INotifyPropertyChanged, IPropertyAccess
         where T : IValidateBase
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
-        protected IRuleExecute RuleExecute { get; }
+        protected IRuleExecute RuleExecute { get; private set; }
 
         public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
         {
-            this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
-
-            // TODO - Why do I need to cast to L??
             this.RuleExecute = services.CreateRuleExecute(this);
         }
 
@@ -101,6 +99,16 @@ namespace OOBehave
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
             PropertyValueManager.Set(registeredProperty, value);
+        }
+
+        public Task RunSelfRules(CancellationToken token = new CancellationToken())
+        {
+            return RuleExecute.RunAllRules(token);
+        }
+
+        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        {
+            return Task.WhenAll(RuleExecute.RunAllRules(token), Task.WhenAll(this.Select(t => t.RunAllRules(token))));
         }
     }
 }

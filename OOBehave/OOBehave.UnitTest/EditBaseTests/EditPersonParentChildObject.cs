@@ -20,10 +20,9 @@ namespace OOBehave.UnitTest.EditBaseTests
     {
         public EditPersonParentChild(IEditBaseServices<EditPersonParentChild> services,
             IShortNameAsyncRule<EditPersonParentChild> shortNameRule,
-            IFullNameAsyncRule<EditPersonParentChild> fullNameRule,
-            IPersonAsyncRule<EditPersonParentChild> personRule) : base(services)
+            IFullNameAsyncRule<EditPersonParentChild> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
         public IEditPersonParentChild Child { get => Getter<IEditPersonParentChild>(); private set => Setter(value); }
@@ -34,7 +33,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         {
             base.FillFromDto(person);
 
-            var childDto = personTable.FirstOrDefault(p => p.FatherId == PersonId);
+            var childDto = personTable.FirstOrDefault(p => p.FatherId == Id);
 
             if (childDto != null)
             {

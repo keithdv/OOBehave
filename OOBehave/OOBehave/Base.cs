@@ -1,4 +1,5 @@
-﻿using OOBehave.AuthorizationRules;
+﻿using OOBehave.Attributes;
+using OOBehave.AuthorizationRules;
 using OOBehave.Core;
 using OOBehave.Portal;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -28,10 +30,11 @@ namespace OOBehave
 
     }
 
-
+    [PortalDataContract]
     public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
     {
 
+        [PortalDataMember]
         protected IPropertyValueManager PropertyValueManager { get; }
 
 
@@ -96,6 +99,24 @@ namespace OOBehave
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
             PropertyValueManager.Load(registeredProperty, value);
+        }
+
+        [OnSerializing]
+        private void OnSerializing(StreamingContext context)
+        {
+
+        }
+
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+
         }
     }
 

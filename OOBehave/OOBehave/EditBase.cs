@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.Attributes;
+using OOBehave.Core;
 using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,11 @@ namespace OOBehave
         public bool IsModified => EditPropertyValueManager.IsModified;
         public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
+        [PortalDataMember]
         public bool IsNew { get; protected set; }
         public bool IsDeleted => throw new NotImplementedException();
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
+        [PortalDataMember]
         public bool IsChild { get; protected set; }
 
         protected virtual void MarkAsChild()

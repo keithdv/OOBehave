@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.PersonObjects
 {
-    public interface IShortNameAsyncRule<T> : IRule<T> where T : IPersonBase { }
+    public interface IShortNameAsyncRule<T> : IRule<T> where T : IPersonBase { int RunCount { get; } }
 
-    public class ShortNameAsyncRule<T> : CascadeAsyncRule<T>, IShortNameAsyncRule<T>
+    public class ShortNameAsyncRule<T> : AsyncRule<T>, IShortNameAsyncRule<T>
         where T : IPersonBase
     {
 
@@ -17,12 +17,15 @@ namespace OOBehave.UnitTest.PersonObjects
             TriggerProperties.Add(nameof(IPersonBase.LastName));
         }
 
+        public int RunCount { get; private set; }
+
         public override async Task<IRuleResult> Execute(T target, CancellationToken token)
         {
+            RunCount++;
 
             await Task.Delay(10, token);
 
-            // System.Diagnostics.Debug.WriteLine($"ShortNameCascadeAsyncRule {target.FirstName} {target.LastName}");
+            // System.Diagnostics.Debug.WriteLine($"ShortNameAsyncRule {target.FirstName} {target.LastName}");
 
             if (target.FirstName?.StartsWith("Error") ?? false)
             {

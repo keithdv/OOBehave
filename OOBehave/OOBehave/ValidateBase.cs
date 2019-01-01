@@ -1,4 +1,5 @@
-﻿using OOBehave.Core;
+﻿using OOBehave.Attributes;
+using OOBehave.Core;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave
@@ -16,20 +19,21 @@ namespace OOBehave
         Task WaitForRules();
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
+        Task RunAllRules(CancellationToken token = new CancellationToken());
 
+        Task RunSelfRules(CancellationToken token = new CancellationToken());
     }
 
-
+    [PortalDataContract]
     public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
+        [PortalDataMember]
         protected IRuleExecute RuleExecute { get; }
 
         public ValidateBase(IValidateBaseServices services) : base(services)
         {
-            this.ValidatePropertyValueManager = services.ValidatePropertyValueManager;
-
             this.RuleExecute = services.CreateRuleExecute(this);
         }
 
@@ -59,6 +63,10 @@ namespace OOBehave
             PropertyHasChanged(propertyName);
         }
 
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Set(registeredProperty, value);
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -100,9 +108,15 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        public Task RunSelfRules(CancellationToken token = new CancellationToken())
         {
-            PropertyValueManager.Set(registeredProperty, value);
+            return RuleExecute.RunAllRules();
         }
+
+        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        {
+            return Task.WhenAll(RuleExecute.RunAllRules(token), ValidatePropertyValueManager.RunAllRules(token));
+        }
+
     }
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
-    public class ShortNameRule : Rules.SharedCascadeAsyncRule
+    public class ShortNameRule : Rules.SharedAsyncRule
     {
         private readonly IRegisteredProperty<string> shortName;
         private readonly IRegisteredProperty<string> firstName;
@@ -37,12 +37,12 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
     }
 
-    public interface ISharedCascadeAsyncRuleObject : IPersonBase { }
+    public interface ISharedAsyncRuleObject : IPersonBase { }
 
-    public class SharedCascadeAsyncRuleObject : PersonValidateBase<SharedCascadeAsyncRuleObject>, ISharedCascadeAsyncRuleObject
+    public class SharedAsyncRuleObject : PersonValidateBase<SharedAsyncRuleObject>, ISharedAsyncRuleObject
     {
 
-        public SharedCascadeAsyncRuleObject(IValidateBaseServices<SharedCascadeAsyncRuleObject> services) : base(services)
+        public SharedAsyncRuleObject(IValidateBaseServices<SharedAsyncRuleObject> services) : base(services)
         {
 
             var fn = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(FirstName));
@@ -50,23 +50,23 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             var sn = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(ShortName));
 
             RuleExecute.AddRule(new ShortNameRule(sn, fn, ln));
-            
+
         }
 
     }
 
     [TestClass]
-    public class SharedCascadeAsyncRuleTests
+    public class SharedAsyncRuleTests
     {
 
         private ILifetimeScope scope;
-        private ISharedCascadeAsyncRuleObject target;
+        private ISharedAsyncRuleObject target;
 
         [TestInitialize]
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            target = scope.Resolve<IReceivePortal<ISharedCascadeAsyncRuleObject>>().Create().Result;
+            target = scope.Resolve<IReceivePortal<ISharedAsyncRuleObject>>().Create().Result;
 
         }
 
@@ -78,7 +78,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public async Task SharedCascadeAsyncRuleTests_ShortName()
+        public async Task SharedAsyncRuleTests_ShortName()
         {
             target.FirstName = "John";
             target.LastName = "Smith";

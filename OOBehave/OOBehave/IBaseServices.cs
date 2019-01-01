@@ -22,7 +22,7 @@ namespace OOBehave
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IBaseServices<T> : IBaseServices where T : Base
+    public interface IBaseServices<T> : IBaseServices where T : IBase
     {
 
     }

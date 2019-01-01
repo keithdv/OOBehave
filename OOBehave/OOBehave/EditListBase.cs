@@ -23,11 +23,11 @@ namespace OOBehave
         where T : IEditBase
     {
 
-        protected IEditPropertyValueManager EditPropertyValueManager { get; }
+        protected IEditPropertyValueManager EditPropertyValueManager => (IEditPropertyValueManager)base.PropertyValueManager;
 
         public EditListBase(IEditListBaseServices<T> services) : base(services)
         {
-            EditPropertyValueManager = services.EditPropertyValueManager;
+            
         }
 
         public bool IsModified => EditPropertyValueManager.IsModified || this.Any(c => c.IsModified);
@@ -77,6 +77,8 @@ namespace OOBehave
         {
             MarkOld();
         }
+
+
     }
 
 

@@ -23,7 +23,7 @@ namespace OOBehave
     /// and services can be added
     /// </summary>
     public interface IValidateBaseServices<T> : IValidateBaseServices, IBaseServices<T>
-        where T : ValidateBase
+        where T : IValidateBase
     {
 
 

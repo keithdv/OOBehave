@@ -1,7 +1,9 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace OOBehave.Core
@@ -41,15 +43,16 @@ namespace OOBehave.Core
         T Value { get; set; }
     }
 
+    [PortalDataContract]
     public class PropertyValue<T> : IPropertyValue<T>, IPropertyValue
     {
-        public string Name { get; }
+        [PortalDataMember]
+        public string Name { get; protected set; } // Setter for Deserialization of Edit
+
+        [PortalDataMember]
         public virtual T Value { get; set; }
 
-        public PropertyValue(string name)
-        {
-            this.Name = name;
-        }
+        protected PropertyValue() { } // For EditPropertyValue Deserialization
 
         public PropertyValue(string name, T value)
         {
@@ -71,12 +74,15 @@ namespace OOBehave.Core
         }
     }
 
+    [PortalDataContract]
     public abstract class PropertyValueManagerBase<T, P> : IPropertyValueManager<T>
         where P : IPropertyValue
     {
 
         protected IFactory Factory { get; }
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
+
+        [PortalDataMember]
         protected IDictionary<uint, P> fieldData = new ConcurrentDictionary<uint, P>();
 
         public PropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory)

@@ -8,17 +8,17 @@ namespace OOBehave.Rules
 {
 
 
-    public abstract class SharedCascadeAsyncRule : CascadeAsyncRule<IBase>
+    public abstract class SharedAsyncRule : AsyncRule<IBase>
     {
-        public SharedCascadeAsyncRule() : base() { }
-        public SharedCascadeAsyncRule(IEnumerable<IRegisteredProperty> triggerProperties) : base(triggerProperties.Select(x=>x.Name)) { }
-        public SharedCascadeAsyncRule(params IRegisteredProperty[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
+        public SharedAsyncRule() : base() { }
+        public SharedAsyncRule(IEnumerable<IRegisteredProperty> triggerProperties) : base(triggerProperties.Select(x=>x.Name)) { }
+        public SharedAsyncRule(params IRegisteredProperty[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
 
         public sealed override Task<IRuleResult> Execute(IBase target, CancellationToken token)
         {
             if (target == null) { throw new ArgumentNullException(nameof(target)); }
 
-            Target = target as IPropertyAccess ?? throw new Exception($"To use {nameof(SharedCascadeAsyncRule)} {target.GetType().FullName} must inherit from OOBehave.Base");
+            Target = target as IPropertyAccess ?? throw new Exception($"To use {nameof(SharedAsyncRule)} {target.GetType().FullName} must inherit from OOBehave.Base");
             var result = Execute(token);
             Target = null;
             return result;
@@ -44,12 +44,12 @@ namespace OOBehave.Rules
 
     }
 
-    public abstract class SharedCascadeRule : SharedCascadeAsyncRule
+    public abstract class SharedRule : SharedAsyncRule
     {
 
-        public SharedCascadeRule() : base() { }
-        public SharedCascadeRule(IEnumerable<IRegisteredProperty> triggerProperties) : base(triggerProperties) { }
-        public SharedCascadeRule(params IRegisteredProperty[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
+        public SharedRule() : base() { }
+        public SharedRule(IEnumerable<IRegisteredProperty> triggerProperties) : base(triggerProperties) { }
+        public SharedRule(params IRegisteredProperty[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
 
         protected sealed override Task<IRuleResult> Execute(CancellationToken token)
         {

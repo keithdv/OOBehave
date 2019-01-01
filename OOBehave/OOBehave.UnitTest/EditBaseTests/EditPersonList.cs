@@ -17,14 +17,13 @@ namespace OOBehave.UnitTest.EditBaseTests
     {
         public EditPersonList(IEditListBaseServices<EditPersonList, IEditPerson> services,
             IShortNameAsyncRule<EditPersonList> shortNameRule,
-            IFullNameAsyncRule<EditPersonList> fullNameRule,
-            IPersonAsyncRule<EditPersonList> personRule) : base(services)
+            IFullNameAsyncRule<EditPersonList> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule, personRule);
+            RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
 
-        public Guid PersonId { get { return Getter<Guid>(); } }
+        public Guid Id { get { return Getter<Guid>(); } }
 
         public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
 
@@ -38,10 +37,21 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         public uint? Age { get => Getter<uint>(); set => Setter(value); }
 
+        public void FillFromDto(PersonDto dto)
+        {
+            LoadProperty(nameof(Id), dto.PersonId);
+
+            // These will not mark IsModified to true
+            // as long as within ObjectPortal operation
+            FirstName = dto.FirstName;
+            LastName = dto.LastName;
+            Title = dto.Title;
+        }
+
         [Fetch]
         private async Task FillFromDto(PersonDto dto, IReadOnlyList<PersonDto> personTable)
         {
-            LoadProperty(nameof(PersonId), dto.PersonId);
+            LoadProperty(nameof(Id), dto.PersonId);
 
             // These will not mark IsModified to true
             // as long as within ObjectPortal operation
@@ -49,7 +59,7 @@ namespace OOBehave.UnitTest.EditBaseTests
             LastName = dto.LastName;
             Title = dto.Title;
 
-            var children = personTable.Where(p => p.FatherId == PersonId);
+            var children = personTable.Where(p => p.FatherId == Id);
 
             foreach (var child in children)
             {
