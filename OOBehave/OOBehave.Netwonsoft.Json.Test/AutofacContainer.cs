@@ -115,6 +115,8 @@ namespace OOBehave.Netwonsoft.Json.Test
                 builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>)).AsSelf();
                 builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>)).AsSelf();
 
+                builder.RegisterGeneric(typeof(EditPropertyValue<>)).AsSelf();
+
                 // Takes IServiceScope so these need to match it's lifetime
                 builder.RegisterGeneric(typeof(LocalReceivePortal<>))
                     .As(typeof(IReceivePortal<>))
@@ -138,16 +140,17 @@ namespace OOBehave.Netwonsoft.Json.Test
                 builder.RegisterType<FatClientContractResolver>();
                 builder.RegisterType<ListBaseCollectionConverter>();
 
-                // Objects need to be registered AsSelf for deserialization
-                //builder.RegisterType<BaseObject>().AsSelf();
-                //builder.RegisterType<BaseObjectList>().AsSelf();
-                //builder.RegisterType<ValidateObject>().AsSelf();
-                //builder.RegisterType<EditObject>().AsSelf();
-                //builder.RegisterType<EditObjectList>().AsSelf();
+                builder.RegisterType<DisposableDependencyList>();
+                builder.RegisterType<DisposableDependency>().As<IDisposableDependency>().InstancePerLifetimeScope();
 
+                builder.Register<MethodObject.CommandMethod>(cc =>
+                {
+                    var dd = cc.Resolve<Func<IDisposableDependency>>();
+                    return i => MethodObject.CommendMethod_(i, dd());
+                });
 
-                builder.RegisterGeneric(typeof(EditPropertyValue<>)).AsSelf();
-
+                builder.RegisterGeneric(typeof(RemoteMethod<,,>)).As(typeof(IRemoteMethod<,,>)).AsSelf();
+                builder.RegisterType<MethodObject>();
 
                 Container = builder.Build();
             }
