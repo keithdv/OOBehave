@@ -16,7 +16,6 @@ namespace OOBehave.Rules
 
         IReadOnlyDictionary<string, string> PropertyErrorMessages { get; }
 
-        IEnumerable<string> TargetErrorMessages { get; }
         IReadOnlyList<string> TriggerProperties { get; set; }
     }
 
@@ -28,12 +27,7 @@ namespace OOBehave.Rules
 
         IReadOnlyDictionary<string, string> IRuleResult.PropertyErrorMessages => new ReadOnlyDictionary<string, string>(PropertyErrorMessages);
 
-        [PortalDataMember]
-        protected List<string> TargetErrorMessages { get; } = new List<string>();
-
-        IEnumerable<string> IRuleResult.TargetErrorMessages => TargetErrorMessages.AsEnumerable();
-
-        public bool IsError { get { return PropertyErrorMessages.Any() || TargetErrorMessages.Any(); } }
+        public bool IsError { get { return PropertyErrorMessages.Any(); } }
 
         [PortalDataMember]
         public IReadOnlyList<string> TriggerProperties { get; set; }
@@ -50,26 +44,15 @@ namespace OOBehave.Rules
             return result;
         }
 
-        public static RuleResult TargetError(string message)
-        {
-            var result = new RuleResult();
-            result.TargetErrorMessages.Add(message);
-            return result;
-        }
-
         internal void AddPropertyErrorMessage(string propertyName, string message)
         {
             PropertyErrorMessages.Add(propertyName, message);
         }
 
-        internal void AddTargetErrorMessage(string message)
-        {
-            TargetErrorMessages.Add(message);
-        }
-
         [OnSerializing]
         public void OnSerializing(StreamingContext context)
         {
+            // Readonly list cannot be serialized
             TriggerProperties = TriggerProperties.ToList();
         }
 
@@ -80,12 +63,6 @@ namespace OOBehave.Rules
         public static RuleResult AddPropertyError(this RuleResult rr, string propertyName, string message)
         {
             rr.AddPropertyErrorMessage(propertyName, message);
-            return rr;
-        }
-
-        public static RuleResult AddTargetError(this RuleResult rr, string message)
-        {
-            rr.AddTargetErrorMessage(message);
             return rr;
         }
 

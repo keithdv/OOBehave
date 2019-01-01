@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>0.1.0-Beta</Version>
+    <Authors>Keith Voels</Authors>
+    <Description>Behavioral OO modeling and collaboration business framework.</Description>
+    <Copyright>2019</Copyright>
+    <PackageTags>CSLA</PackageTags>
+    <PackageProjectUrl>oobehave.net</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/keithdv/OOBehave/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
 </Project>
