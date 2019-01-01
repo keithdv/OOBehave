@@ -11,6 +11,7 @@
     <PackageTags>CSLA</PackageTags>
     <PackageProjectUrl>oobehave.net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/keithdv/OOBehave/blob/master/LICENSE</PackageLicenseUrl>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
 </Project>

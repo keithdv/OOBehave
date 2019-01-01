@@ -12,6 +12,7 @@ using System.Threading;
 using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
+using OOBehave.UnitTest.Portal;
 
 namespace OOBehave.UnitTest
 {
@@ -123,6 +124,8 @@ namespace OOBehave.UnitTest
                     .As(typeof(ISendReceivePortalChild<>))
                     .InstancePerLifetimeScope();
 
+                builder.RegisterGeneric(typeof(LocalMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
+
                 // Simple wrapper - Always InstancePerDependency
                 builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
                 builder.RegisterGeneric(typeof(ListBaseServices<,>)).As(typeof(IListBaseServices<,>));
@@ -130,6 +133,8 @@ namespace OOBehave.UnitTest
                 builder.RegisterGeneric(typeof(ValidateListBaseServices<,>)).As(typeof(IValidateListBaseServices<,>));
                 builder.RegisterGeneric(typeof(EditBaseServices<>)).As(typeof(IEditBaseServices<>));
                 builder.RegisterGeneric(typeof(EditListBaseServices<,>)).As(typeof(IEditListBaseServices<,>));
+
+
 
                 // Unit Test Library
                 builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedRule>().As<BaseTests.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
@@ -139,6 +144,11 @@ namespace OOBehave.UnitTest
                 builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
                 builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
 
+                builder.Register<MethodObject.CommandMethod>(cc =>
+                {
+                    var dd = cc.Resolve<Func<Objects.IDisposableDependency>>();
+                    return i => MethodObject.CommandMethod_(i, dd());
+                });
 
                 builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>
                 {
