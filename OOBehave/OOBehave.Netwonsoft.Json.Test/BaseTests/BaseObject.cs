@@ -11,7 +11,6 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         string Name { get; set; }
 
         IBaseObject Child { get; set; }
-        IBaseObject Parent { get; set; }
     }
 
     public class BaseObject : Base, IBaseObject
@@ -23,7 +22,6 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         public Guid ID { get => Getter<Guid>(); set => Setter(value); }
         public string Name { get => Getter<string>(); set => Setter(value); }
         public IBaseObject Child { get => Getter<IBaseObject>(); set => Setter(value); }
-        public IBaseObject Parent { get => Getter<IBaseObject>(); set => Setter(value); }
 
     }
 

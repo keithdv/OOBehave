@@ -121,6 +121,14 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         }
 
+        [TestMethod]
+        public void EditListBaseTest_IsDeleted()
+        {
+            list.Delete();
+            Assert.IsTrue(list.IsDeleted);
+            Assert.IsTrue(list.IsModified);
+            Assert.IsTrue(list.IsSelfModified);
+        }
     }
 }
 

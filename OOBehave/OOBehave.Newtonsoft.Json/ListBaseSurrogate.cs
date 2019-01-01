@@ -33,7 +33,7 @@ namespace OOBehave.Newtonsoft.Json
 
         public bool IsNew { get; set; }
         public bool IsChild { get; set; }
-
+        public bool IsDeleted { get; set; }
     }
 
     public class ListBaseCollectionConverter : JsonConverter
@@ -87,6 +87,7 @@ namespace OOBehave.Newtonsoft.Json
             {
                 editType.InvokeMember(nameof(IEditBase.IsNew), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.FlattenHierarchy, null, list, new object[] { surrogate.IsNew });
                 editType.InvokeMember(nameof(IEditBase.IsChild), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.FlattenHierarchy, null, list, new object[] { surrogate.IsChild });
+                editType.InvokeMember(nameof(IEditBase.IsDeleted), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.FlattenHierarchy, null, list, new object[] { surrogate.IsDeleted });
             }
 
             return list;
@@ -159,6 +160,7 @@ namespace OOBehave.Newtonsoft.Json
             {
                 surrogate.IsNew = edit.IsNew;
                 surrogate.IsChild = edit.IsChild;
+                surrogate.IsDeleted = edit.IsDeleted;
             }
              
 

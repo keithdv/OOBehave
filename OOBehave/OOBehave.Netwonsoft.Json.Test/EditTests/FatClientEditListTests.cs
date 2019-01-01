@@ -212,6 +212,23 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             CollectionAssert.AreEquivalent(orig, result);
 
         }
+
+        [TestMethod]
+        public void FatClientEditList_IsDeleted()
+        {
+            target.Delete();
+
+            var json = Serialize(target);
+
+            var newTarget = Deserialize(json);
+
+            Assert.IsTrue(target.IsDeleted);
+            Assert.IsTrue(target.IsModified);
+            Assert.IsTrue(target.IsSelfModified);
+            Assert.IsTrue(newTarget.IsDeleted);
+            Assert.IsTrue(newTarget.IsModified);
+            Assert.IsTrue(newTarget.IsSelfModified);
+        }
     }
 }
 

@@ -55,6 +55,26 @@ namespace OOBehave.Portal
 
     }
 
+
+    public sealed class InsertAttribute : PortalOperationAttributeAttribute
+    {
+
+        public InsertAttribute() : base(PortalOperation.Insert)
+        {
+        }
+
+    }
+
+    public sealed class InsertChildAttribute : PortalOperationAttributeAttribute
+    {
+
+        public InsertChildAttribute() : base(PortalOperation.InsertChild)
+        {
+        }
+
+    }
+
+
     public sealed class UpdateAttribute : PortalOperationAttributeAttribute
     {
 
@@ -63,6 +83,9 @@ namespace OOBehave.Portal
         }
 
     }
+
+
+
 
     public sealed class UpdateChildAttribute : PortalOperationAttributeAttribute
     {

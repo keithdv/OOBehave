@@ -8,7 +8,6 @@ namespace OOBehave.Attributes
     [System.AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public sealed class PortalDataContractAttribute : Attribute
     {
-        readonly string positionalString;
 
         // This is a positional argument
         public PortalDataContractAttribute()

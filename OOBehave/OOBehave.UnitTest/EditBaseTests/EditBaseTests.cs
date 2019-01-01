@@ -92,6 +92,14 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         }
 
+        [TestMethod]
+        public void EditBaseTest_IsDeleted()
+        {
+            editPerson.Delete();
+            Assert.IsTrue(editPerson.IsDeleted);
+            Assert.IsTrue(editPerson.IsModified);
+            Assert.IsTrue(editPerson.IsSelfModified);
+        }
     }
 }
 

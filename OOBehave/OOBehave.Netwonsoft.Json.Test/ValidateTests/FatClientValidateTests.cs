@@ -184,7 +184,6 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
-            child.Parent = target;
 
             var json = Serialize(target);
 

@@ -11,7 +11,6 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         string Name { get; set; }
 
         IEditObject Child { get; set; }
-        IEditObject Parent { get; set; }
     }
 
     public class EditObject : EditBase, IEditObject
@@ -23,8 +22,6 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         public Guid ID { get => Getter<Guid>(); set => Setter(value); }
         public string Name { get => Getter<string>(); set => Setter(value); }
         public IEditObject Child { get => Getter<IEditObject>(); set => Setter(value); }
-        public IEditObject Parent { get => Getter<IEditObject>(); set => Setter(value); }
-
     }
 
     public interface IEditObjectList : IEditListBase<IEditObject>

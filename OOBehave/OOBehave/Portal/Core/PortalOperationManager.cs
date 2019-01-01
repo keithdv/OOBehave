@@ -248,10 +248,9 @@ namespace OOBehave.Portal.Core
                         break;
                     case PortalOperation.DeleteChild:
                         break;
+                    case PortalOperation.Insert:
+                    case PortalOperation.InsertChild:
                     case PortalOperation.Update:
-                        editTarget.MarkUnmodified();
-                        editTarget.MarkOld();
-                        break;
                     case PortalOperation.UpdateChild:
                         editTarget.MarkUnmodified();
                         editTarget.MarkOld();

@@ -28,12 +28,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Create(int criteria)
         {
             IntCriteria = criteria;
+            CreateCalled = true;
         }
 
         [Create]
         private void Create(Guid criteria)
         {
             GuidCriteria = criteria;
+            CreateCalled = true;
         }
 
 
@@ -42,6 +44,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            CreateCalled = true;
         }
 
         public bool CreateChildCalled { get; set; } = false;
@@ -56,12 +59,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void CreateChild(int criteria)
         {
             IntCriteria = criteria;
+            CreateChildCalled = true;
         }
 
         [CreateChild]
         private void CreateChild(Guid criteria)
         {
             GuidCriteria = criteria;
+            CreateChildCalled = true;
         }
 
         [CreateChild]
@@ -69,6 +74,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            CreateChildCalled = true;
         }
 
         public bool FetchCalled { get; set; } = false;
@@ -83,12 +89,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Fetch(int criteria)
         {
             IntCriteria = criteria;
+            FetchCalled = true;
         }
 
         [Fetch]
         private void Fetch(Guid criteria)
         {
             GuidCriteria = criteria;
+            FetchCalled = true;
         }
 
 
@@ -97,6 +105,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            FetchCalled = true;
         }
 
         public bool FetchChildCalled { get; set; } = false;
@@ -111,12 +120,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void FetchChild(int criteria)
         {
             IntCriteria = criteria;
+            FetchChildCalled = true;
         }
 
         [FetchChild]
         private void FetchChild(Guid criteria)
         {
             GuidCriteria = criteria;
+            FetchChildCalled = true;
         }
 
         [FetchChild]
@@ -124,6 +135,70 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            FetchChildCalled = true;
+        }
+
+        public bool InsertCalled { get; set; } = false;
+
+        [Insert]
+        private void Insert()
+        {
+            InsertCalled = true;
+        }
+
+
+        [Insert]
+        private void Insert(int criteria)
+        {
+            InsertCalled = true;
+            IntCriteria = criteria;
+        }
+
+
+        [Insert]
+        private void Insert(Guid criteria)
+        {
+            InsertCalled = true;
+            GuidCriteria = criteria;
+        }
+
+        [Insert]
+        private void Insert(Guid criteria, IDisposableDependency dependency)
+        {
+            Assert.IsNotNull(dependency);
+            InsertCalled = true;
+            GuidCriteria = criteria;
+        }
+
+        public bool InsertChildCalled { get; set; } = false;
+
+        [InsertChild]
+        private void InsertChild()
+        {
+            InsertChildCalled = true;
+        }
+
+        [InsertChild]
+        private void InsertChild(int criteria)
+        {
+            IntCriteria = criteria;
+            InsertChildCalled = true;
+        }
+
+
+        [InsertChild]
+        private void InsertChild(Guid criteria)
+        {
+            GuidCriteria = criteria;
+            InsertChildCalled = true;
+        }
+
+        [InsertChild]
+        private void InsertChild(Guid criteria, IDisposableDependency dependency)
+        {
+            Assert.IsNotNull(dependency);
+            GuidCriteria = criteria;
+            InsertChildCalled = true;
         }
 
         public bool UpdateCalled { get; set; } = false;
@@ -139,6 +214,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Update(int criteria)
         {
             IntCriteria = criteria;
+            UpdateCalled = true;
         }
 
 
@@ -146,6 +222,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Update(Guid criteria)
         {
             GuidCriteria = criteria;
+            UpdateCalled = true;
         }
 
         [Update]
@@ -153,6 +230,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            UpdateCalled = true;
         }
 
         public bool UpdateChildCalled { get; set; } = false;
@@ -167,6 +245,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void UpdateChild(int criteria)
         {
             IntCriteria = criteria;
+            UpdateChildCalled = true;
         }
 
 
@@ -174,6 +253,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void UpdateChild(Guid criteria)
         {
             GuidCriteria = criteria;
+            UpdateChildCalled = true;
         }
 
         [UpdateChild]
@@ -181,12 +261,13 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            UpdateChildCalled = true;
         }
 
         public bool DeleteCalled { get; set; } = false;
 
         [Delete]
-        private void Delete()
+        private void Delete_()
         {
             DeleteCalled = true;
         }
@@ -195,12 +276,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Delete(int criteria)
         {
             IntCriteria = criteria;
+            DeleteCalled = true;
         }
 
         [Delete]
         private void Delete(Guid criteria)
         {
             GuidCriteria = criteria;
+            DeleteCalled = true;
         }
 
         [Delete]
@@ -208,6 +291,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            DeleteCalled = true;
         }
 
         public bool DeleteChildCalled { get; set; } = false;
@@ -222,12 +306,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void DeleteChild(int criteria)
         {
             IntCriteria = criteria;
+            DeleteChildCalled = true;
         }
 
         [DeleteChild]
         private void DeleteChild(Guid criteria)
         {
             GuidCriteria = criteria;
+            DeleteChildCalled = true;
         }
 
         [DeleteChild]
@@ -235,6 +321,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
+            DeleteChildCalled = true;
         }
     }
 }

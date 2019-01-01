@@ -43,6 +43,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             var crit = Guid.NewGuid();
             editObject = await portal.CreateChild(crit);
+            Assert.IsTrue(editObject.CreateChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
         }
 
@@ -51,6 +52,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.CreateChild(crit);
+            Assert.IsTrue(editObject.CreateChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
 
@@ -71,6 +73,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             var crit = Guid.NewGuid();
             editObject = await portal.FetchChild(crit);
+            Assert.IsTrue(editObject.FetchChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
         }
 
@@ -79,6 +82,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.FetchChild(crit);
+            Assert.IsTrue(editObject.FetchChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
 
@@ -98,6 +102,7 @@ namespace OOBehave.UnitTest.ObjectPortal
             var crit = Guid.NewGuid();
             editObject = await portal.CreateChild();
             await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
         }
 
@@ -107,15 +112,46 @@ namespace OOBehave.UnitTest.ObjectPortal
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.CreateChild();
             await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
 
 
         [TestMethod]
+        public async Task SendReceivePortalChild_InsertChild()
+        {
+            editObject = await portal.CreateChild();
+            await portal.UpdateChild(editObject);
+            Assert.IsTrue(editObject.InsertChildCalled);
+            Assert.IsFalse(editObject.IsNew);
+            Assert.IsTrue(editObject.IsChild);
+        }
+
+        [TestMethod]
+        public async Task SendReceivePortalChild_InsertChildGuidCriteriaCalled()
+        {
+            var crit = Guid.NewGuid();
+            editObject = await portal.CreateChild();
+            await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.InsertChildCalled);
+            Assert.AreEqual(crit, editObject.GuidCriteria);
+        }
+
+        [TestMethod]
+        public async Task SendReceivePortalChild_InsertChildIntCriteriaCalled()
+        {
+            int crit = DateTime.Now.Millisecond;
+            editObject = await portal.CreateChild();
+            await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.InsertChildCalled);
+            Assert.AreEqual(crit, editObject.IntCriteria);
+        }
+        [TestMethod]
         public async Task SendReceivePortalChild_DeleteChild()
         {
             editObject = await portal.CreateChild();
-            await portal.DeleteChild(editObject);
+            editObject.Delete();
+            await portal.UpdateChild(editObject);
             Assert.IsTrue(editObject.DeleteChildCalled);
         }
 
@@ -124,7 +160,9 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             var crit = Guid.NewGuid();
             editObject = await portal.CreateChild();
-            await portal.DeleteChild(editObject, crit);
+            editObject.Delete();
+            await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.DeleteChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
         }
 
@@ -133,7 +171,9 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.CreateChild();
-            await portal.DeleteChild(editObject, crit);
+            editObject.Delete();
+            await portal.UpdateChild(editObject, crit);
+            Assert.IsTrue(editObject.DeleteChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
     }

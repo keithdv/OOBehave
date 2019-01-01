@@ -22,20 +22,17 @@ namespace OOBehave.Portal
         Task<T> FetchChild(object criteria);
     }
 
-    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IPortalEditTarget
+    public interface ISendReceivePortal<T> : IReceivePortal<T> where T : IPortalEditTarget, IEditMetaProperties
     {
         Task Update(T target, object criteria);
         Task Update(T target);
-        Task Delete(T target, object criteria);
-        Task Delete(T target);
     }
 
-    public interface ISendReceivePortalChild<T> : IReceivePortalChild<T> where T : IPortalEditTarget
+    public interface ISendReceivePortalChild<T> : IReceivePortalChild<T> where T : IPortalEditTarget, IEditMetaProperties
     {
         Task UpdateChild(T child, object criteria);
         Task UpdateChild(T child);
-        Task DeleteChild(T child, object criteria);
-        Task DeleteChild(T child);
+
     }
 
 }

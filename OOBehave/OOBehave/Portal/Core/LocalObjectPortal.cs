@@ -101,7 +101,7 @@ namespace OOBehave.Portal.Core
 
 
     public class LocalSendReceivePortal<T> : LocalReceivePortal<T>, ISendReceivePortal<T>, ISendReceivePortalChild<T>
-        where T : IPortalEditTarget
+        where T : IPortalEditTarget, IEditMetaProperties
     {
 
         public LocalSendReceivePortal(IServiceScope scope)
@@ -109,16 +109,43 @@ namespace OOBehave.Portal.Core
         {
         }
 
-        public async Task Update(T child)
+        public async Task Update(T target)
         {
-            await CallOperationMethod(child, PortalOperation.Update);
+            if (target.IsDeleted)
+            {
+                if (!target.IsNew)
+                {
+                    await CallOperationMethod(target, PortalOperation.Delete);
+                }
+            }
+            else if (target.IsNew)
+            {
+                await CallOperationMethod(target, PortalOperation.Insert);
+            }
+            else
+            {
+                await CallOperationMethod(target, PortalOperation.Update);
+            }
         }
 
-        public async Task Update(T child, object criteria)
+        public async Task Update(T target, object criteria)
         {
-            await CallOperationMethod(child, criteria, PortalOperation.Update);
+            if (target.IsDeleted)
+            {
+                if (!target.IsNew)
+                {
+                    await CallOperationMethod(target, criteria, PortalOperation.Delete);
+                }
+            }
+            else if (target.IsNew)
+            {
+                await CallOperationMethod(target, criteria, PortalOperation.Insert);
+            }
+            else
+            {
+                await CallOperationMethod(target, criteria, PortalOperation.Update);
+            }
         }
-
 
         public async Task UpdateChild(T child)
         {
@@ -128,27 +155,6 @@ namespace OOBehave.Portal.Core
         public async Task UpdateChild(T child, object criteria)
         {
             await CallOperationMethod(child, criteria, PortalOperation.UpdateChild);
-        }
-
-        public async Task Delete(T child)
-        {
-            await CallOperationMethod(child, PortalOperation.Delete);
-        }
-
-        public async Task Delete(T child, object criteria)
-        {
-            await CallOperationMethod(child, criteria, PortalOperation.Delete);
-        }
-
-
-        public async Task DeleteChild(T child)
-        {
-            await CallOperationMethod(child, PortalOperation.DeleteChild);
-        }
-
-        public async Task DeleteChild(T child, object criteria)
-        {
-            await CallOperationMethod(child, criteria, PortalOperation.DeleteChild);
         }
 
     }

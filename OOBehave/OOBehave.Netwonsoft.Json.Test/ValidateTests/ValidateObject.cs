@@ -13,7 +13,6 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         int RuleRunCount { get; }
 
         IValidateObject Child { get; set; }
-        IValidateObject Parent { get; set; }
         IEnumerable<IRule> Rules { get; }
     }
 
@@ -33,7 +32,6 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         public Guid ID { get => Getter<Guid>(); set => Setter(value); }
         public string Name { get => Getter<string>(); set => Setter(value); }
         public IValidateObject Child { get => Getter<IValidateObject>(); set => Setter(value); }
-        public IValidateObject Parent { get => Getter<IValidateObject>(); set => Setter(value); }
 
         public IEnumerable<IRule> Rules => RuleExecute.Rules;
     }

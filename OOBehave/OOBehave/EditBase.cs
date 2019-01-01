@@ -12,6 +12,8 @@ namespace OOBehave
     {
         IEnumerable<string> ModifiedProperties { get; }
         bool IsChild { get; }
+
+        void Delete();
     }
 
     public abstract class EditBase : ValidateBase, IOOBehaveObject, IEditBase
@@ -25,12 +27,13 @@ namespace OOBehave
         }
 
 
-        public bool IsModified => EditPropertyValueManager.IsModified;
-        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
+        public bool IsModified => EditPropertyValueManager.IsModified || IsDeleted;
+        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         [PortalDataMember]
         public bool IsNew { get; protected set; }
-        public bool IsDeleted => throw new NotImplementedException();
+        [PortalDataMember]
+        public bool IsDeleted { get; protected set; }
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
         [PortalDataMember]
         public bool IsChild { get; protected set; }
@@ -74,6 +77,18 @@ namespace OOBehave
         {
             MarkOld();
         }
+
+        protected virtual void MarkDeleted()
+        {
+            IsDeleted = true;
+        }
+
+        public void Delete()
+        {
+            MarkDeleted();
+        }
+
+
     }
 
 

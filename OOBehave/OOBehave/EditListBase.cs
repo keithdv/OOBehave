@@ -30,14 +30,14 @@ namespace OOBehave
             
         }
 
-        public bool IsModified => EditPropertyValueManager.IsModified || this.Any(c => c.IsModified);
-        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified;
+        public bool IsModified => EditPropertyValueManager.IsModified || this.Any(c => c.IsModified) || IsDeleted;
+        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }
-        public bool IsDeleted => throw new NotImplementedException();
+        public bool IsDeleted { get; protected set; }
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
         public bool IsChild { get; protected set; }
-
+        protected List<T> DeletedItems { get; } = new List<T>();
 
 
         protected virtual void MarkAsChild()
@@ -80,6 +80,15 @@ namespace OOBehave
             MarkOld();
         }
 
+        protected virtual void MarkDeleted()
+        {
+            IsDeleted = true;
+        }
+
+        public void Delete()
+        {
+            MarkDeleted();
+        }
 
     }
 
