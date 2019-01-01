@@ -12,7 +12,7 @@ namespace OOBehave.Core
     {
         bool IsValid { get; }
         bool IsBusy { get; }
-        Task RunAllRules(CancellationToken token);
+        Task CheckAllRules(CancellationToken token);
         Task WaitForRules();
 
     }
@@ -26,7 +26,7 @@ namespace OOBehave.Core
     {
         bool IsValid { get; }
         bool IsBusy { get; }
-        Task RunAllRules(CancellationToken token);
+        Task CheckAllRules(CancellationToken token);
 
         Task WaitForRules();
     }
@@ -62,11 +62,12 @@ namespace OOBehave.Core
         public bool IsBusy => (Child?.IsBusy ?? false);
 
         public Task WaitForRules() { return Child?.WaitForRules() ?? Task.CompletedTask; }
-        public Task RunAllRules(CancellationToken token) { return Child?.RunAllRules(token); }
+        public Task CheckAllRules(CancellationToken token) { return Child?.CheckAllRules(token); }
 
     }
 
     public class ValidatePropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IValidatePropertyValue>
+        where T : IBase
     {
         public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
         {
@@ -80,6 +81,7 @@ namespace OOBehave.Core
     }
 
     public abstract class ValidatePropertyValueManagerBase<T, P> : PropertyValueManagerBase<T, P>, IValidatePropertyValueManager<T>
+        where T : IBase
         where P : IValidatePropertyValue
     {
         public ValidatePropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
@@ -96,9 +98,9 @@ namespace OOBehave.Core
             return Task.WhenAll(fieldData.Values.Select(x => x.WaitForRules()));
         }
 
-        public Task RunAllRules(CancellationToken token)
+        public Task CheckAllRules(CancellationToken token)
         {
-            var tasks = fieldData.Values.Select(x => x.RunAllRules(token)).ToList();
+            var tasks = fieldData.Values.Select(x => x.CheckAllRules(token)).ToList();
             return Task.WhenAll(tasks.Where(t => t != null));
         }
 

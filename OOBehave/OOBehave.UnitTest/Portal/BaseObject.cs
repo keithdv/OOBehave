@@ -14,6 +14,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         public Guid GuidCriteria { get; set; } = Guid.Empty;
         public int IntCriteria { get; set; } = -1;
+        public (int, string) TupleCriteria { get; set; }
 
         public bool CreateCalled { get; set; } = false;
 
@@ -27,6 +28,12 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void Create(int criteria)
         {
             IntCriteria = criteria;
+        }
+
+        [Create]
+        private void CreateTuple((int, string) tuple)
+        {
+            TupleCriteria = tuple;
         }
 
 

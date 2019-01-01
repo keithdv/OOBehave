@@ -27,7 +27,7 @@ namespace OOBehave
         new int Count { get; }
     }
 
-    public abstract class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess
+    public abstract class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess, ISetParent
         where T : IBase
     {
 
@@ -38,6 +38,13 @@ namespace OOBehave
         {
             PropertyValueManager = services.PropertyValueManager;
             ItemPortal = services.ReceivePortal;
+        }
+
+        public IBase Parent { get; protected set; }
+
+        void ISetParent.SetParent(IBase parent)
+        {
+            Parent = parent;
         }
 
         protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")

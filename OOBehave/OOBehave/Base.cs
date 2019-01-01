@@ -28,20 +28,28 @@ namespace OOBehave
         /// </summary>
         bool IsStopped { get; }
 
+        IBase Parent { get; }
+
     }
 
     [PortalDataContract]
-    public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess
+    public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess, ISetParent
     {
 
         [PortalDataMember]
         protected IPropertyValueManager PropertyValueManager { get; }
 
-
-
         public Base(IBaseServices services)
         {
             PropertyValueManager = services.PropertyValueManager;
+            ((ISetTarget)PropertyValueManager).SetTarget(this);
+        }
+
+        public IBase Parent { get; protected set; }
+
+        void ISetParent.SetParent(IBase parent)
+        {
+            Parent = parent;
         }
 
         protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")

@@ -5,17 +5,17 @@ using System.Text;
 namespace OOBehave.UnitTest.BaseTests
 {
 
-    public interface IDomainObjectList : IListBase<IDomainObject>
+    public interface IBaseObjectList : IListBase<IBaseObject>
     {
         Guid Id { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
 
     }
-    public class DomainObjectList : ListBase<IDomainObject>, IDomainObjectList
+    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
     {
 
-        public DomainObjectList(IListBaseServices<DomainObjectList, IDomainObject> services) : base(services) { }
+        public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> services) : base(services) { }
 
         public Guid Id
         {

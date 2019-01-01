@@ -1,4 +1,5 @@
 ﻿using OOBehave.Attributes;
+using OOBehave.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace OOBehave.Rules
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
         FluentRule<T> AddRule<T>(string triggerProperty, Func<T, IRuleResult> func);
-        Task RunAllRules(CancellationToken token = new CancellationToken());
+        Task CheckAllRules(CancellationToken token = new CancellationToken());
 
     }
 
@@ -38,19 +39,16 @@ namespace OOBehave.Rules
     }
 
     [PortalDataContract]
-    public class RuleExecute<T> : IRuleExecute<T>
+    public class RuleExecute<T> : IRuleExecute<T>, ISetTarget
         where T : IValidateBase
     {
 
-        protected T Target { get; }
+        protected T Target { get; set; }
         [PortalDataMember]
         protected IDictionary<int, IRuleResult> Results { get; private set; } = new ConcurrentDictionary<int, IRuleResult>();
         protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;
-        public RuleExecute(T target)
-        {
-            this.Target = target;
-        }
+        public RuleExecute() { }
 
         IEnumerable<IRule> IRuleExecute.Rules => Rules.Values;
 
@@ -109,7 +107,7 @@ namespace OOBehave.Rules
             CheckRulesQueue();
         }
 
-        public async Task RunAllRules(CancellationToken token = new CancellationToken())
+        public async Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
             Results.Clear(); // Cover in case something unexpected has happened like a weird Serialization cover or maybe a Rule that exists on the client or not the server
 
@@ -137,6 +135,9 @@ namespace OOBehave.Rules
 
         public void CheckRulesQueue(bool isRecursiveCall = false)
         {
+
+            if (Target == null) { throw new TargetIsNullException(); }
+
             // DISCUSS : Runes the rules sequentially - even Async Rules
             // Make async rules changing properties a non-issue
 
@@ -255,6 +256,18 @@ namespace OOBehave.Rules
 
         }
 
+        void ISetTarget.SetTarget(IBase target)
+        {
+            if (target is T tt)
+            {
+                Target = tt;
+            }
+            else
+            {
+                throw new InvalidTargetTypeException(target.GetType().FullName);
+            }
+        }
+
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
@@ -297,6 +310,30 @@ namespace OOBehave.Rules
         protected InvalidRuleTypeException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class InvalidTargetTypeException : Exception
+    {
+        public InvalidTargetTypeException() { }
+        public InvalidTargetTypeException(string message) : base(message) { }
+        public InvalidTargetTypeException(string message, Exception inner) : base(message, inner) { }
+        protected InvalidTargetTypeException(
+          SerializationInfo info,
+          StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class TargetIsNullException : Exception
+    {
+        public TargetIsNullException() { }
+        public TargetIsNullException(string message) : base(message) { }
+        public TargetIsNullException(string message, Exception inner) : base(message, inner) { }
+        protected TargetIsNullException(
+          SerializationInfo info,
+          StreamingContext context) : base(info, context) { }
     }
 }
 

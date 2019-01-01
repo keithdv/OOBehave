@@ -9,12 +9,14 @@ namespace OOBehave.UnitTest.BaseTests
     [TestClass]
     public class BaseTests
     {
-        private IDomainObject single;
+        private ILifetimeScope scope;
+        private IBaseObject single;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            single = AutofacContainer.GetLifetimeScope().Resolve<IDomainObject>();
+            scope = AutofacContainer.GetLifetimeScope();
+            single = scope.Resolve<IBaseObject>();
         }
         [TestMethod]
         public void Base_Construct()
@@ -56,6 +58,12 @@ namespace OOBehave.UnitTest.BaseTests
             single.LoadPropertyTest(B);
         }
 
-
+        [TestMethod]
+        public void Base_Set_Parent()
+        {
+            var child = scope.Resolve<IBaseObject>();
+            single.Child = child;
+            Assert.AreSame(single, child.Parent);
+        }
     }
 }

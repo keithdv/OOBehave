@@ -38,6 +38,8 @@ namespace OOBehave
         public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
         public bool IsChild { get; protected set; }
 
+
+
         protected virtual void MarkAsChild()
         {
             IsChild = true;

@@ -62,6 +62,7 @@ namespace OOBehave.Core
     }
 
     public class PropertyValueManager<T> : PropertyValueManagerBase<T, IPropertyValue>
+        where T : IBase
     {
         public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
         {
@@ -75,9 +76,11 @@ namespace OOBehave.Core
     }
 
     [PortalDataContract]
-    public abstract class PropertyValueManagerBase<T, P> : IPropertyValueManager<T>
+    public abstract class PropertyValueManagerBase<T, P> : IPropertyValueManager<T>, ISetTarget
+        where T : IBase
         where P : IPropertyValue
     {
+        protected T Target { get; set; }
 
         protected IFactory Factory { get; }
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
@@ -98,7 +101,10 @@ namespace OOBehave.Core
             return registeredPropertyManager.RegisterProperty<PV>(name);
         }
 
-
+        void ISetTarget.SetTarget(IBase target)
+        {
+            this.Target = (T)(target ?? throw new ArgumentNullException(nameof(target)));
+        }
 
         public virtual void Set<PV>(string name, PV newValue)
         {
@@ -117,6 +123,7 @@ namespace OOBehave.Core
             IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(PV).FullName}");
             fd.Value = newValue;
 
+            SetParent(newValue);
         }
 
         public virtual void Load<PV>(string name, PV newValue)
@@ -133,6 +140,7 @@ namespace OOBehave.Core
 
             fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty.Name, newValue);
 
+            SetParent(newValue);
         }
 
         public PV Read<PV>(string name)
@@ -152,6 +160,14 @@ namespace OOBehave.Core
             return fd.Value;
         }
 
+        protected void SetParent<PV>(PV newValue)
+        {
+            if (newValue is ISetParent x)
+            {
+                if (Target == null) { throw new ArgumentNullException(nameof(Target)); }
+                x.SetParent(Target);
+            }
+        }
 
 
     }

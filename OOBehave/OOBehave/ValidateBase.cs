@@ -19,9 +19,9 @@ namespace OOBehave
         Task WaitForRules();
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
-        Task RunAllRules(CancellationToken token = new CancellationToken());
+        Task CheckAllRules(CancellationToken token = new CancellationToken());
 
-        Task RunSelfRules(CancellationToken token = new CancellationToken());
+        Task CheckAllSelfRules(CancellationToken token = new CancellationToken());
     }
 
     [PortalDataContract]
@@ -34,7 +34,8 @@ namespace OOBehave
 
         public ValidateBase(IValidateBaseServices services) : base(services)
         {
-            this.RuleExecute = services.CreateRuleExecute(this);
+            this.RuleExecute = services.RuleExecute;
+            ((ISetTarget)this.RuleExecute).SetTarget(this);
         }
 
         public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid;
@@ -107,14 +108,14 @@ namespace OOBehave
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
 
-        public Task RunSelfRules(CancellationToken token = new CancellationToken())
+        public Task CheckAllSelfRules(CancellationToken token = new CancellationToken())
         {
-            return RuleExecute.RunAllRules();
+            return RuleExecute.CheckAllRules();
         }
 
-        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
-            return Task.WhenAll(RuleExecute.RunAllRules(token), ValidatePropertyValueManager.RunAllRules(token));
+            return Task.WhenAll(RuleExecute.CheckAllRules(token), ValidatePropertyValueManager.CheckAllRules(token));
         }
 
     }

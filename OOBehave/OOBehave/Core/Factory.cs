@@ -28,11 +28,6 @@ namespace OOBehave.Core
             return new RegisteredProperty<T>(name, NextIndex());
         }
 
-        public IRuleExecute<T> CreateRuleExecute<T>(T target) where T : IValidateBase
-        {
-            return new RuleExecute<T>(target);
-        }
-
         public IPropertyValue CreatePropertyValue<P>(string name, P value)
         {
             return new PropertyValue<P>(name, value);

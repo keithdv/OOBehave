@@ -13,7 +13,7 @@ namespace OOBehave
     {
         IValidatePropertyValueManager ValidatePropertyValueManager { get; }
 
-        IRuleExecute CreateRuleExecute(IValidateBase Target);
+        IRuleExecute RuleExecute { get; }
 
     }
 
@@ -33,26 +33,20 @@ namespace OOBehave
         where T : ValidateBase
     {
 
-        private IFactory Factory { get; }
-        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager,
-            IFactory factory) : base(registeredPropertyValueManager, registeredPropertyManager)
+        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleExecute<T> ruleExecute)
+            : base(registeredPropertyValueManager, registeredPropertyManager)
         {
             this.ValidatePropertyValueManager = registeredPropertyValueManager;
-            this.Factory = factory;
+            RuleExecute = ruleExecute;
+
         }
 
         public IValidatePropertyValueManager ValidatePropertyValueManager { get; }
+        public IRuleExecute RuleExecute { get; }
 
         IPropertyValueManager IBaseServices.PropertyValueManager
         {
             get { return ValidatePropertyValueManager; }
-        }
-
-        public IRuleExecute CreateRuleExecute(IValidateBase target)
-        {
-            // This is the one catch not have generic base classes
-            // Classes receive IRuleExecute instead of IRuleExecut<T>
-            return Factory.CreateRuleExecute(target as T ?? throw new Exception($"Unexpected: Cannot case {target.GetType().FullName} to {typeof(T).FullName}"));
         }
 
     }

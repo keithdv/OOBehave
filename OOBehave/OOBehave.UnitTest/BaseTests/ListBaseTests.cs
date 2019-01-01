@@ -11,12 +11,12 @@ namespace OOBehave.UnitTest.BaseTests
     [TestClass]
     public class ListBaseTests
     {
-        private IDomainObjectList list;
+        private IBaseObjectList list;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            list = AutofacContainer.GetLifetimeScope().Resolve<IDomainObjectList>();
+            list = AutofacContainer.GetLifetimeScope().Resolve<IBaseObjectList>();
         }
         [TestMethod]
         public void ListBase_Construct()

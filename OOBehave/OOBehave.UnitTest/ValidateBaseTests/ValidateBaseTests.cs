@@ -132,7 +132,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public async Task ValidateBase_RunSelfRules()
         {
             var ruleCount = validate.RuleRunCount;
-            await validate.RunSelfRules();
+            await validate.CheckAllSelfRules();
             Assert.AreEqual(ruleCount + 2, validate.RuleRunCount);
         }
 
@@ -140,7 +140,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public async Task ValidateBase_RunAllRules()
         {
             var ruleCount = validate.RuleRunCount;
-            await validate.RunAllRules();
+            await validate.CheckAllRules();
             Assert.AreEqual(ruleCount + 4, validate.RuleRunCount);
         }
 
@@ -167,5 +167,10 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.IsFalse(child.IsSelfValid);
         }
 
+        [TestMethod]
+        public void ValidateBase_Parent()
+        {
+            Assert.AreSame(validate, child.Parent);
+        }
     }
 }

@@ -31,7 +31,8 @@ namespace OOBehave
 
         public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
         {
-            this.RuleExecute = services.CreateRuleExecute(this);
+            this.RuleExecute = services.RuleExecute;
+            ((ISetTarget)this.RuleExecute).SetTarget(this);
         }
 
         public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
@@ -100,14 +101,14 @@ namespace OOBehave
             PropertyValueManager.Set(registeredProperty, value);
         }
 
-        public Task RunSelfRules(CancellationToken token = new CancellationToken())
+        public Task CheckAllSelfRules(CancellationToken token = new CancellationToken())
         {
-            return RuleExecute.RunAllRules(token);
+            return RuleExecute.CheckAllRules(token);
         }
 
-        public Task RunAllRules(CancellationToken token = new CancellationToken())
+        public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
-            return Task.WhenAll(RuleExecute.RunAllRules(token), Task.WhenAll(this.Select(t => t.RunAllRules(token))));
+            return Task.WhenAll(RuleExecute.CheckAllRules(token), Task.WhenAll(this.Select(t => t.CheckAllRules(token))));
         }
     }
 }

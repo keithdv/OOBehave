@@ -53,6 +53,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
+        public async Task ReceivePortal_CreateTupleCriteriaCalled()
+        {
+            var crit = (10, "String");
+            domainObject = await portal.Create(crit);
+            Assert.AreEqual(crit, domainObject.TupleCriteria);
+        }
+
+        [TestMethod]
         public async Task ReceivePortal_Fetch()
         {
             domainObject = await portal.Fetch();

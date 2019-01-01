@@ -28,11 +28,11 @@ namespace OOBehave.Netwonsoft.Json.Test
 
 
             var types = ThisAssembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract).ToList();
-            var interfaces = ThisAssembly.GetTypes().Where(t => t.IsInterface).ToDictionary(x => x.Name);
+            var interfaces = ThisAssembly.GetTypes().Where(t => t.IsInterface).ToDictionary(x => x.FullName);
 
             foreach (var t in types)
             {
-                if (interfaces.TryGetValue($"I{t.Name}", out var i))
+                if (interfaces.TryGetValue($"{t.Namespace}.I{t.Name}", out var i))
                 {
                     var singleConstructor = t.GetConstructors().SingleOrDefault();
                     var zeroConstructorParams = singleConstructor != null && !singleConstructor.GetParameters().Any();
@@ -108,6 +108,7 @@ namespace OOBehave.Netwonsoft.Json.Test
 
                 // Should not be singleinstance because AuthorizationRules can have constructor dependencies
                 builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
+                builder.RegisterGeneric(typeof(RuleExecute<>)).As(typeof(IRuleExecute<>)).AsSelf();
 
                 // Stored values for each Domain Object instance
                 // MUST BE per instance

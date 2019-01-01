@@ -31,9 +31,11 @@ namespace OOBehave
     {
 
         public IEditPropertyValueManager EditPropertyValueManager { get; }
+
         public EditListBaseServices(IEditPropertyValueManager<L> registeredPropertyManager,
                                         IReceivePortalChild<T> receivePortalChild,
-                                        IFactory factory) : base(registeredPropertyManager, receivePortalChild, factory)
+                                        IRuleExecute<L> ruleExecute) 
+            : base(registeredPropertyManager, receivePortalChild, ruleExecute)
         {
             EditPropertyValueManager = registeredPropertyManager;
         }

@@ -88,6 +88,7 @@ namespace OOBehave.Core
     }
 
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
+        where T : IBase
     {
         public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
         {

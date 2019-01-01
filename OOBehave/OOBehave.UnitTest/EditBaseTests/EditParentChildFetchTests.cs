@@ -92,6 +92,13 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         }
 
+
+        [TestMethod]
+        public void EditParentChildFetchTest_IsParent()
+        {
+            Assert.AreSame(parent, child.Parent);
+            Assert.AreSame(child, grandChild.Parent);
+        }
     }
 }
 
