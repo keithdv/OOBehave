@@ -1,2 +1,2 @@
-# [[https://github.com/keithdv/OOBehave/blob/master/OOBehave/Logo.png?raw=true]] OOBehave
+# ![Logo](/OOBehave/Logo.png) OOBehave
 Behavioral object model framework
