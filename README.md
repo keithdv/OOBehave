@@ -1,2 +1,2 @@
-# ![Logo](/OOBehave/Logo.png =100x100) OOBehave
+# <img src="drawing.jpg" alt="drawing" width="200" height="200"/> OOBehave
 Behavioral object model framework
