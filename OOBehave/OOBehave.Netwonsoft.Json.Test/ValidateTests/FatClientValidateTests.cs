@@ -125,7 +125,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             var newTarget = Deserialize(json);
 
             Assert.IsNotNull(newTarget.Child);
-            Assert.AreSame(newTarget.Child.Parent, newTarget.Parent);
+            Assert.AreSame(newTarget.Child.Parent, newTarget);
             Assert.AreEqual(child.ID, newTarget.Child.ID);
             Assert.AreEqual(child.Name, newTarget.Child.Name);
 

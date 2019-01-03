@@ -45,6 +45,7 @@ namespace OOBehave
             ((ISetTarget)PropertyValueManager).SetTarget(this);
         }
 
+        [PortalDataMember]
         public IBase Parent { get; protected set; }
 
         void ISetParent.SetParent(IBase parent)

@@ -57,7 +57,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
 
         }
 
-
+        [Ignore("Need to write a web converter")]
         [TestMethod]
         public void WebClientTests_Serialize_Child()
         {

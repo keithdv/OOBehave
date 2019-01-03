@@ -149,12 +149,40 @@ namespace OOBehave.Portal.Core
 
         public async Task UpdateChild(T child)
         {
-            await CallOperationMethod(child, PortalOperation.UpdateChild);
+            if (child.IsDeleted)
+            {
+                if (!child.IsNew)
+                {
+                    await CallOperationMethod(child, PortalOperation.DeleteChild);
+                }
+            }
+            else if (child.IsNew)
+            {
+                await CallOperationMethod(child, PortalOperation.InsertChild);
+            }
+            else
+            {
+                await CallOperationMethod(child, PortalOperation.UpdateChild);
+            }
         }
 
         public async Task UpdateChild(T child, object criteria)
         {
-            await CallOperationMethod(child, criteria, PortalOperation.UpdateChild);
+            if (child.IsDeleted)
+            {
+                if (!child.IsNew)
+                {
+                    await CallOperationMethod(child, criteria, PortalOperation.DeleteChild);
+                }
+            }
+            else if (child.IsNew)
+            {
+                await CallOperationMethod(child, criteria, PortalOperation.InsertChild);
+            }
+            else
+            {
+                await CallOperationMethod(child, criteria, PortalOperation.UpdateChild);
+            }
         }
 
     }

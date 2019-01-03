@@ -89,7 +89,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task SendReceivePortalChild_UpdateChild()
         {
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
+            editObject.Name = "abc";
             await portal.UpdateChild(editObject);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.IsFalse(editObject.IsNew);
@@ -100,7 +101,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         public async Task SendReceivePortalChild_UpdateChildGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
+            editObject.Name = "abc";
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
@@ -110,7 +112,8 @@ namespace OOBehave.UnitTest.ObjectPortal
         public async Task SendReceivePortalChild_UpdateChildIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
+            editObject.Name = "abc";
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
@@ -146,20 +149,33 @@ namespace OOBehave.UnitTest.ObjectPortal
             Assert.IsTrue(editObject.InsertChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);
         }
+
+
         [TestMethod]
         public async Task SendReceivePortalChild_DeleteChild()
         {
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
             editObject.Delete();
             await portal.UpdateChild(editObject);
             Assert.IsTrue(editObject.DeleteChildCalled);
         }
 
         [TestMethod]
+        public async Task SendReceivePortalChild_DeleteChild_Create()
+        {
+            // Want it to do nothing
+            editObject = await portal.CreateChild();
+            editObject.Delete();
+            await portal.UpdateChild(editObject);
+            Assert.IsFalse(editObject.DeleteChildCalled);
+        }
+
+
+        [TestMethod]
         public async Task SendReceivePortalChild_DeleteChildGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
             editObject.Delete();
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.DeleteChildCalled);
@@ -170,7 +186,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         public async Task SendReceivePortalChild_DeleteChildIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.CreateChild();
+            editObject = await portal.FetchChild();
             editObject.Delete();
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.DeleteChildCalled);
