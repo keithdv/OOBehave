@@ -27,7 +27,9 @@ namespace OOBehave
     [PortalDataContract]
     public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
+
+        [PortalDataMember]
+        protected new IValidatePropertyValueManager PropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
         [PortalDataMember]
         protected IRuleExecute RuleExecute { get; }
@@ -38,13 +40,13 @@ namespace OOBehave
             ((ISetTarget)this.RuleExecute).SetTarget(this);
         }
 
-        public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid;
+        public bool IsValid => RuleExecute.IsValid && PropertyValueManager.IsValid;
 
         public bool IsSelfValid => RuleExecute.IsValid;
 
         public bool IsSelfBusy => RuleExecute.IsBusy;
 
-        public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy;
+        public bool IsBusy => RuleExecute.IsBusy || PropertyValueManager.IsBusy;
 
         protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
@@ -84,7 +86,7 @@ namespace OOBehave
 
         public virtual Task WaitForRules()
         {
-            return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, ValidatePropertyValueManager.WaitForRules() });
+            return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, PropertyValueManager.WaitForRules() });
         }
 
         public override async Task<IDisposable> StopAllActions()
@@ -115,7 +117,7 @@ namespace OOBehave
 
         public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
-            return Task.WhenAll(RuleExecute.CheckAllRules(token), ValidatePropertyValueManager.CheckAllRules(token));
+            return Task.WhenAll(RuleExecute.CheckAllRules(token), PropertyValueManager.CheckAllRules(token));
         }
 
     }

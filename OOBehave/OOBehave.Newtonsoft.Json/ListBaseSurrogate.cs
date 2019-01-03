@@ -141,7 +141,7 @@ namespace OOBehave.Newtonsoft.Json
             var list = (IList)Activator.CreateInstance(listType, value);
 
             // Get PropertyValueManager property
-            var pvmProp = value.GetType().GetProperty("PropertyValueManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+            var pvmProp = GetListBase(value.GetType()).GetProperty("PropertyValueManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             var pvm = (IPropertyValueManager)pvmProp.GetValue(value);
             var surrogate = new ListBaseSurrogate(value.GetType(), list, pvm);
 

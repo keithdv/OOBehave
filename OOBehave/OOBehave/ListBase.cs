@@ -32,6 +32,7 @@ namespace OOBehave
     {
 
         protected IPropertyValueManager PropertyValueManager { get; private set; } // Private setter for Deserialization
+
         protected IReceivePortalChild<T> ItemPortal { get; }
 
         public ListBase(IListBaseServices<T> services)

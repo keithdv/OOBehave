@@ -47,7 +47,7 @@ namespace OOBehave.Core
         /// <param name="valuesDiffer"></param>
         public EditPropertyValue(IValuesDiffer valuesDiffer)
         {
-
+            ValuesDiffer = valuesDiffer;
         }
 
         public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)

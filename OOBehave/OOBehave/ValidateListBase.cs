@@ -27,6 +27,10 @@ namespace OOBehave
     {
         protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use ValidatePropertyManager", true)]
+        new IPropertyValueManager PropertyValueManager => base.PropertyValueManager;
+
         protected IRuleExecute RuleExecute { get; private set; }
 
         public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
@@ -54,7 +58,7 @@ namespace OOBehave
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            PropertyValueManager.Set(propertyName, value);
+            ValidatePropertyValueManager.Set(propertyName, value);
             PropertyHasChanged(propertyName);
         }
 
@@ -98,7 +102,7 @@ namespace OOBehave
 
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Set(registeredProperty, value);
+            ValidatePropertyValueManager.Set(registeredProperty, value);
         }
 
         public Task CheckAllSelfRules(CancellationToken token = new CancellationToken())

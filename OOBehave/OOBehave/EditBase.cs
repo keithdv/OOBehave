@@ -18,23 +18,21 @@ namespace OOBehave
 
     public abstract class EditBase : ValidateBase, IOOBehaveObject, IEditBase
     {
-
-        protected IEditPropertyValueManager EditPropertyValueManager { get; }
+        [PortalDataMember]
+        protected new IEditPropertyValueManager PropertyValueManager => (IEditPropertyValueManager) base.PropertyValueManager;
 
         public EditBase(IEditBaseServices services) : base(services)
         {
-            EditPropertyValueManager = services.EditPropertyValueManager;
         }
 
-
-        public bool IsModified => EditPropertyValueManager.IsModified || IsDeleted;
-        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified || IsDeleted;
+        public bool IsModified => PropertyValueManager.IsModified || IsDeleted;
+        public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         [PortalDataMember]
         public bool IsNew { get; protected set; }
         [PortalDataMember]
         public bool IsDeleted { get; protected set; }
-        public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
+        public IEnumerable<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
         [PortalDataMember]
         public bool IsChild { get; protected set; }
 
@@ -50,7 +48,7 @@ namespace OOBehave
 
         protected virtual void MarkUnmodified()
         {
-            EditPropertyValueManager.MarkSelfUnmodified();
+            PropertyValueManager.MarkSelfUnmodified();
         }
 
         void IPortalEditTarget.MarkUnmodified()

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OOBehave
 {
@@ -23,21 +24,23 @@ namespace OOBehave
         where T : IEditBase
     {
 
-        protected IEditPropertyValueManager EditPropertyValueManager => (IEditPropertyValueManager)base.PropertyValueManager;
+        protected new IEditPropertyValueManager PropertyValueManager => (IEditPropertyValueManager)base.PropertyValueManager;
+
+        protected new ISendReceivePortalChild<T> ItemPortal { get; }
 
         public EditListBase(IEditListBaseServices<T> services) : base(services)
         {
-            
+            this.ItemPortal = services.SendReceivePortalChild;
         }
 
-        public bool IsModified => EditPropertyValueManager.IsModified || this.Any(c => c.IsModified) || IsDeleted;
-        public bool IsSelfModified => EditPropertyValueManager.IsSelfModified || IsDeleted;
+        public bool IsModified => PropertyValueManager.IsModified || this.Any(c => c.IsModified) || IsDeleted;
+        public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }
         public bool IsDeleted { get; protected set; }
-        public IEnumerable<string> ModifiedProperties => EditPropertyValueManager.ModifiedProperties;
+        public IEnumerable<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
         public bool IsChild { get; protected set; }
-        protected List<T> DeletedItems { get; } = new List<T>();
+        protected List<T> DeletedList { get; } = new List<T>();
 
 
         protected virtual void MarkAsChild()
@@ -52,7 +55,7 @@ namespace OOBehave
 
         protected virtual void MarkUnmodified()
         {
-            EditPropertyValueManager.MarkSelfUnmodified();
+            PropertyValueManager.MarkSelfUnmodified();
         }
 
         void IPortalEditTarget.MarkUnmodified()
@@ -90,6 +93,31 @@ namespace OOBehave
             MarkDeleted();
         }
 
+        protected async Task UpdateList()
+        {
+            foreach (var d in DeletedList)
+            {
+                await ItemPortal.UpdateChild(d);
+            }
+
+            foreach (var i in this.Where(i => i.IsModified).ToList())
+            {
+                await ItemPortal.UpdateChild(i);
+            }
+        }
+
+        protected async Task UpdateList(object criteria)
+        {
+            foreach (var d in DeletedList)
+            {
+                await ItemPortal.UpdateChild(d, criteria);
+            }
+
+            foreach (var i in this.Where(i => i.IsModified).ToList())
+            {
+                await ItemPortal.UpdateChild(i, criteria);
+            }
+        }
     }
 
 

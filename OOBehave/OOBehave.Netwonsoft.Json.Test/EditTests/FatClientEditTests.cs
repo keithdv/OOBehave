@@ -73,6 +73,21 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
 
         }
 
+
+        [TestMethod]
+        public void FatClientEdit_Deserialize_Modify()
+        {
+
+            var json = Serialize(target);
+
+            var newTarget = Deserialize(json);
+
+            var id = Guid.NewGuid();
+            newTarget.ID = id;
+            Assert.AreEqual(id, newTarget.ID);
+
+        }
+
         [TestMethod]
         public void FatClientEdit_Deserialize_Child()
         {

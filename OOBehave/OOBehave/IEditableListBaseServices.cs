@@ -12,6 +12,7 @@ namespace OOBehave
     where T : IEditBase
     {
         IEditPropertyValueManager EditPropertyValueManager { get; }
+        ISendReceivePortalChild<T> SendReceivePortalChild { get; }
     }
 
     /// <summary>
@@ -23,6 +24,7 @@ namespace OOBehave
         where L : EditListBase<T>
         where T : IEditBase
     {
+        ISendReceivePortalChild<T> SendReceivePortalChild { get; }
     }
 
     public class EditListBaseServices<L, T> : ValidateListBaseServices<L, T>, IEditListBaseServices<L, T>
@@ -31,13 +33,15 @@ namespace OOBehave
     {
 
         public IEditPropertyValueManager EditPropertyValueManager { get; }
+        public ISendReceivePortalChild<T> SendReceivePortalChild { get; }
 
         public EditListBaseServices(IEditPropertyValueManager<L> registeredPropertyManager,
-                                        IReceivePortalChild<T> receivePortalChild,
-                                        IRuleExecute<L> ruleExecute) 
-            : base(registeredPropertyManager, receivePortalChild, ruleExecute)
+                                        ISendReceivePortalChild<T> sendReceivePortalChild,
+                                        IRuleExecute<L> ruleExecute)
+            : base(registeredPropertyManager, sendReceivePortalChild, ruleExecute)
         {
             EditPropertyValueManager = registeredPropertyManager;
+            SendReceivePortalChild = sendReceivePortalChild;
         }
     }
 }
