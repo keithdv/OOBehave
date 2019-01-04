@@ -14,6 +14,7 @@ namespace OOBehave.UnitTest.PersonObjects
         {
         }
 
+        private IRegisteredProperty<Guid> IdProperty => GetRegisteredProperty<Guid>(nameof(Id));
         public Guid Id { get { return Getter<Guid>(); } }
 
         public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
@@ -29,7 +30,7 @@ namespace OOBehave.UnitTest.PersonObjects
         public uint? Age { get => Getter<uint>(); set => Setter(value); }
         public void FillFromDto(PersonDto dto)
         {
-            LoadProperty(nameof(Id), dto.PersonId);
+            LoadProperty(IdProperty, dto.PersonId);
 
             // These will not mark IsModified to true
             // as long as within ObjectPortal operation

@@ -49,7 +49,11 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     }
 
 
-    public interface IValidateAsyncObjectList : IValidateListBase<IValidateAsyncObject>, IPersonBase { int RuleRunCount { get; } }
+    public interface IValidateAsyncObjectList : IValidateListBase<IValidateAsyncObject>, IPersonBase
+    {
+        int RuleRunCount { get; }
+        void Add(IValidateAsyncObject o);
+    }
 
     public class ValidateAsyncObjectList : PersonValidateListBase<ValidateAsyncObjectList, IValidateAsyncObject>, IValidateAsyncObjectList
     {

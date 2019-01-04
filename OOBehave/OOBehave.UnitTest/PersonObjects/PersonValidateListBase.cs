@@ -15,6 +15,7 @@ namespace OOBehave.UnitTest.PersonObjects
         {
         }
 
+        private IRegisteredProperty<Guid> IdProperty => GetRegisteredProperty<Guid>(nameof(Id));
         public Guid Id { get { return Getter<Guid>(); } }
 
         public string FirstName
@@ -54,7 +55,7 @@ namespace OOBehave.UnitTest.PersonObjects
 
         public void FillFromDto(PersonDto dto)
         {
-            LoadProperty(nameof(Id), dto.PersonId);
+            LoadProperty(IdProperty, dto.PersonId);
             FirstName = dto.FirstName;
             LastName = dto.LastName;
             Title = dto.Title;

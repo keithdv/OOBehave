@@ -15,12 +15,12 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
-    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable, ICollection, IList
+    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable
     {
 
     }
 
-    public interface IListBase<T> : IListBase, ICollection<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    public interface IListBase<T> : IListBase, IReadOnlyCollection<T>, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
     {
         Task<T> CreateAdd();
         Task<T> CreateAdd(object criteria);
@@ -48,24 +48,29 @@ namespace OOBehave
             Parent = parent;
         }
 
+        protected IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
+        {
+            return PropertyValueManager.GetRegisteredProperty<PV>(name);
+        }
+
         protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            return ReadProperty<P>(propertyName);
+            return ReadProperty<P>(GetRegisteredProperty<P>(propertyName));
         }
 
         protected virtual void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            LoadProperty(propertyName, value);
+            LoadProperty(GetRegisteredProperty<P>(propertyName), value);
         }
 
-        protected virtual P ReadProperty<P>(string propertyName)
+        protected virtual P ReadProperty<P>(IRegisteredProperty<P> property)
         {
-            return PropertyValueManager.Read<P>(propertyName);
+            return PropertyValueManager.Read<P>(property);
         }
 
-        protected virtual void LoadProperty<P>(string propertyName, P value)
+        protected virtual void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Load(propertyName, value);
+            PropertyValueManager.Load(registeredProperty, value);
         }
 
         public bool IsStopped { get; protected set; }

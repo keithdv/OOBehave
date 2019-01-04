@@ -56,13 +56,13 @@ namespace OOBehave
             }
             else
             {
-                LoadProperty(propertyName, value);
+                LoadProperty(GetRegisteredProperty<P>(propertyName), value);
             }
         }
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            PropertyValueManager.Set(propertyName, value);
+            PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value);
             PropertyHasChanged(propertyName);
         }
 

@@ -53,24 +53,29 @@ namespace OOBehave
             Parent = parent;
         }
 
+        protected IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
+        {
+            return PropertyValueManager.GetRegisteredProperty<PV>(name);
+        }
+
         protected virtual P Getter<P>([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            return ReadProperty<P>(propertyName);
+            return ReadProperty<P>(GetRegisteredProperty<P>(propertyName));
         }
 
         protected virtual void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            LoadProperty(propertyName, value);
+            LoadProperty(GetRegisteredProperty<P>(propertyName), value);
         }
 
-        protected virtual P ReadProperty<P>(string propertyName)
+        protected virtual P ReadProperty<P>(IRegisteredProperty<P> property)
         {
-            return PropertyValueManager.Read<P>(propertyName);
+            return PropertyValueManager.Read<P>(property);
         }
 
-        protected virtual void LoadProperty<P>(string propertyName, P value)
+        protected virtual void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Load(propertyName, value);
+            PropertyValueManager.Load(registeredProperty, value);
         }
 
         public bool IsStopped { get; protected set; }

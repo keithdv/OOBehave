@@ -1,6 +1,7 @@
 ﻿using OOBehave.Core;
 using OOBehave.Portal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,12 +10,12 @@ using System.Threading.Tasks;
 namespace OOBehave
 {
 
-    public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget
+    public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget, ICollection, IList
     {
 
     }
 
-    public interface IEditListBase<T> : IEditListBase, IValidateListBase<T>
+    public interface IEditListBase<T> : IEditListBase, IValidateListBase<T>, ICollection<T>, IList<T>
         where T : IEditBase
     {
 

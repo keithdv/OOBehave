@@ -45,9 +45,9 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public SharedAsyncRuleObject(IValidateBaseServices<SharedAsyncRuleObject> services) : base(services)
         {
 
-            var fn = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(FirstName));
-            var ln = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(LastName));
-            var sn = services.RegisteredPropertyManager.RegisterProperty<string>(nameof(ShortName));
+            var fn = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(FirstName));
+            var ln = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(LastName));
+            var sn = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(ShortName));
 
             RuleExecute.AddRule(new ShortNameRule(sn, fn, ln));
 

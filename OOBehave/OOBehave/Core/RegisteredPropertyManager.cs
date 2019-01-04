@@ -21,7 +21,7 @@ namespace OOBehave.Core
 #endif
         }
 
-        public IRegisteredProperty<P> RegisterProperty<P>(string name)
+        public IRegisteredProperty<P> GetOrRegisterProperty<P>(string name)
         {
 
             if (!RegisteredProperties.TryGetValue(name, out var prop))

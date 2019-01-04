@@ -23,6 +23,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         }
 
 
+        private IRegisteredProperty<Guid> IdProperty => GetRegisteredProperty<Guid>(nameof(Id));
         public Guid Id { get { return Getter<Guid>(); } }
 
         public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
@@ -39,7 +40,7 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         public void FillFromDto(PersonDto dto)
         {
-            LoadProperty(nameof(Id), dto.PersonId);
+            LoadProperty(IdProperty, dto.PersonId);
 
             // These will not mark IsModified to true
             // as long as within ObjectPortal operation
@@ -51,7 +52,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         [Fetch]
         private async Task FillFromDto(PersonDto dto, IReadOnlyList<PersonDto> personTable)
         {
-            LoadProperty(nameof(Id), dto.PersonId);
+            LoadProperty(IdProperty, dto.PersonId);
 
             // These will not mark IsModified to true
             // as long as within ObjectPortal operation

@@ -64,7 +64,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             var surrogate = serializer.Deserialize<ListBaseSurrogate>(reader);
 
-            var list = (IListBase)Scope.Resolve(surrogate.ListType);
+            var list = (IList)Scope.Resolve(surrogate.ListType);
 
             foreach (var i in surrogate.Collection)
             {

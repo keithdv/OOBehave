@@ -25,11 +25,7 @@ namespace OOBehave
     public abstract class ValidateListBase<T> : ListBase<T>, IValidateListBase<T>, INotifyPropertyChanged, IPropertyAccess
         where T : IValidateBase
     {
-        protected IValidatePropertyValueManager ValidatePropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ValidatePropertyManager", true)]
-        new IPropertyValueManager PropertyValueManager => base.PropertyValueManager;
+        protected new IValidatePropertyValueManager PropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
 
         protected IRuleExecute RuleExecute { get; private set; }
 
@@ -39,9 +35,9 @@ namespace OOBehave
             ((ISetTarget)this.RuleExecute).SetTarget(this);
         }
 
-        public bool IsValid => RuleExecute.IsValid && ValidatePropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
+        public bool IsValid => RuleExecute.IsValid && PropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
         public bool IsSelfValid => RuleExecute.IsValid;
-        public bool IsBusy => RuleExecute.IsBusy || ValidatePropertyValueManager.IsBusy || this.Any(c => c.IsBusy);
+        public bool IsBusy => RuleExecute.IsBusy || PropertyValueManager.IsBusy || this.Any(c => c.IsBusy);
         public bool IsSelfBusy => RuleExecute.IsBusy;
 
         protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -52,13 +48,13 @@ namespace OOBehave
             }
             else
             {
-                LoadProperty(propertyName, value);
+                LoadProperty(GetRegisteredProperty<P>(propertyName), value);
             }
         }
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            ValidatePropertyValueManager.Set(propertyName, value);
+            PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value);
             PropertyHasChanged(propertyName);
         }
 
@@ -76,7 +72,7 @@ namespace OOBehave
 
         public virtual Task WaitForRules()
         {
-            return Task.WhenAll(new Task[3] { RuleExecute.WaitForRules, ValidatePropertyValueManager.WaitForRules(), Task.WhenAll(this.Where(x => x.IsBusy).Select(x => x.WaitForRules())) });
+            return Task.WhenAll(new Task[3] { RuleExecute.WaitForRules, PropertyValueManager.WaitForRules(), Task.WhenAll(this.Where(x => x.IsBusy).Select(x => x.WaitForRules())) });
         }
 
         public override async Task<IDisposable> StopAllActions()
@@ -102,7 +98,7 @@ namespace OOBehave
 
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            ValidatePropertyValueManager.Set(registeredProperty, value);
+            PropertyValueManager.Set(registeredProperty, value);
         }
 
         public Task CheckAllSelfRules(CancellationToken token = new CancellationToken())

@@ -14,11 +14,9 @@ namespace OOBehave.Core
     /// </summary>
     public interface IPropertyValueManager
     {
-        void Set<P>(string name, P newValue);
+        IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name);
         void Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
-        void Load<P>(string name, P newValue);
         void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
-        P Read<P>(string name);
         P Read<P>(IRegisteredProperty<P> registeredProperty);
     }
 
@@ -96,9 +94,9 @@ namespace OOBehave.Core
 
         protected abstract P CreatePropertyValue<PV>(string name, PV value);
 
-        protected IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
+        public IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
         {
-            return registeredPropertyManager.RegisterProperty<PV>(name);
+            return registeredPropertyManager.GetOrRegisterProperty<PV>(name);
         }
 
         void ISetTarget.SetTarget(IBase target)

@@ -48,6 +48,7 @@ namespace OOBehave.UnitTest.BaseTests
             set { Setter(value); }
         }
 
+        private IRegisteredProperty<IA> TestPropertyTypeProperty => GetRegisteredProperty<IA>(nameof(TestPropertyType));
         public IA TestPropertyType
         {
             get { return Getter<IA>(); }
@@ -64,7 +65,7 @@ namespace OOBehave.UnitTest.BaseTests
             /// Example - If the types are different you need to explicitly define the type
             /// of the Property
             /// The <IA> in this case
-            LoadProperty<IA>(nameof(TestPropertyType), propertyValue);
+            LoadProperty<IA>(TestPropertyTypeProperty, propertyValue);
 
         }
     }

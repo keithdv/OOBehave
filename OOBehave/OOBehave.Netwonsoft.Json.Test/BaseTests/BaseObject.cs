@@ -29,6 +29,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
     {
         Guid ID { get; set; }
         string Name { get; set; }
+        void Add(IBaseObject obj);
 
     }
 

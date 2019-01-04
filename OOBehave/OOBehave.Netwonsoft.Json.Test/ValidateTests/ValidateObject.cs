@@ -42,6 +42,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         string Name { get; set; }
         int RuleRunCount { get; }
         IEnumerable<IRule> Rules { get; }
+        void Add(IValidateObject obj);
     }
 
     public class ValidateObjectList : ValidateListBase<IValidateObject>, IValidateObjectList
