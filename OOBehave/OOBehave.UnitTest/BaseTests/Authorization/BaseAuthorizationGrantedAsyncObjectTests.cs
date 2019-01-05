@@ -80,7 +80,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
 
     public interface IBaseAuthorizationGrantedAsyncObject : IBase { }
 
-    public class BaseAuthorizationGrantedAsyncObject : Base, IBaseAuthorizationGrantedAsyncObject
+    public class BaseAuthorizationGrantedAsyncObject : Base<BaseAuthorizationGrantedAsyncObject>, IBaseAuthorizationGrantedAsyncObject
     {
 
         public BaseAuthorizationGrantedAsyncObject(IBaseServices<BaseAuthorizationGrantedAsyncObject> services) : base(services)

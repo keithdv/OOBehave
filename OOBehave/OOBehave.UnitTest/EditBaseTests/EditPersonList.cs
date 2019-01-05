@@ -13,7 +13,7 @@ namespace OOBehave.UnitTest.EditBaseTests
     {
     }
 
-    public class EditPersonList : EditListBase<IEditPerson>, IEditPersonList
+    public class EditPersonList : EditListBase<EditPersonList, IEditPerson>, IEditPersonList
     {
         public EditPersonList(IEditListBaseServices<EditPersonList, IEditPerson> services,
             IShortNameAsyncRule<EditPersonList> shortNameRule,

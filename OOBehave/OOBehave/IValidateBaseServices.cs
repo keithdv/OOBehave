@@ -8,29 +8,23 @@ using System.Text;
 
 namespace OOBehave
 {
-
-    public interface IValidateBaseServices : IBaseServices
-    {
-        IValidatePropertyValueManager ValidatePropertyValueManager { get; }
-
-        IRuleExecute RuleExecute { get; }
-
-    }
-
     /// <summary>
     /// Wrap the OOBehaveBase services into an interface so that 
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IValidateBaseServices<T> : IValidateBaseServices, IBaseServices<T>
-        where T : IValidateBase
+    public interface IValidateBaseServices<T> : IBaseServices<T>
+        where T : ValidateBase<T>
     {
+        IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
+        IRuleExecute<T> RuleExecute { get; }
 
     }
 
+
     public class ValidateBaseServices<T> : BaseServices<T>, IValidateBaseServices<T>
-        where T : ValidateBase
+        where T : ValidateBase<T>
     {
 
         public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleExecute<T> ruleExecute)
@@ -41,10 +35,10 @@ namespace OOBehave
 
         }
 
-        public IValidatePropertyValueManager ValidatePropertyValueManager { get; }
-        public IRuleExecute RuleExecute { get; }
+        public IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
+        public IRuleExecute<T> RuleExecute { get; }
 
-        IPropertyValueManager IBaseServices.PropertyValueManager
+        IPropertyValueManager<T> IBaseServices<T>.PropertyValueManager
         {
             get { return ValidatePropertyValueManager; }
         }

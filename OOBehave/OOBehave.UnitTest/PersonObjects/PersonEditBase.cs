@@ -6,7 +6,7 @@ using OOBehave;
 namespace OOBehave.UnitTest.PersonObjects
 
 {
-    public abstract class PersonEditBase<T> : EditBase, IPersonBase
+    public abstract class PersonEditBase<T> : EditBase<T>, IPersonBase
         where T : PersonEditBase<T>
     {
 

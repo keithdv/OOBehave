@@ -24,7 +24,6 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            var validateDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
             validate = scope.Resolve<IValidateObject>();
             child = scope.Resolve<IValidateObject>();
             validate.Child = child;
@@ -171,6 +170,27 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public void ValidateBase_Parent()
         {
             Assert.AreSame(validate, child.Parent);
+        }
+
+        [TestMethod]
+        public void ValidateBase_MarkInvalid()
+        {
+            string message;
+            validate.TestMarkInvalid(message = Guid.NewGuid().ToString());
+            Assert.IsFalse(validate.IsValid);
+            Assert.IsFalse(validate.IsSelfValid);
+            Assert.AreEqual(1, validate.BrokenRuleMessages.Count());
+            Assert.AreEqual(message, validate.BrokenRuleMessages.Single());
+        }
+
+        [TestMethod]
+        public void ValidateBase_MarkInvalid_Dont_Run_Rules()
+        {
+            var rrc = validate.RuleRunCount;
+            string message;
+            validate.TestMarkInvalid(message = Guid.NewGuid().ToString());
+            validate.FirstName = Guid.NewGuid().ToString();
+            Assert.AreEqual(rrc, validate.RuleRunCount);
         }
     }
 }

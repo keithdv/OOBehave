@@ -16,12 +16,13 @@ namespace OOBehave
         void Delete();
     }
 
-    public abstract class EditBase : ValidateBase, IOOBehaveObject, IEditBase
+    public abstract class EditBase<T> : ValidateBase<T>, IOOBehaveObject, IEditBase
+        where T : EditBase<T>
     {
         [PortalDataMember]
-        protected new IEditPropertyValueManager PropertyValueManager => (IEditPropertyValueManager) base.PropertyValueManager;
+        protected new IEditPropertyValueManager<T> PropertyValueManager => (IEditPropertyValueManager<T>)base.PropertyValueManager;
 
-        public EditBase(IEditBaseServices services) : base(services)
+        public EditBase(IEditBaseServices<T> services) : base(services)
         {
         }
 

@@ -72,7 +72,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
 
     public interface IBaseAuthorizationGrantedObject : IBase { }
 
-    public class BaseAuthorizationGrantedObject : Base, IBaseAuthorizationGrantedObject
+    public class BaseAuthorizationGrantedObject : Base<BaseAuthorizationGrantedObject>, IBaseAuthorizationGrantedObject
     {
 
         public BaseAuthorizationGrantedObject(IBaseServices<BaseAuthorizationGrantedObject> services) : base(services)

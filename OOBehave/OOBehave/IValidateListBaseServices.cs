@@ -13,44 +13,34 @@ namespace OOBehave
     /// the inheriting classes don't need to list all services
     /// and services can be added
     /// </summary>
-    public interface IValidateListBaseServices<T> : IListBaseServices<T>
-        where T : IValidateBase
+    public interface IValidateListBaseServices<T, I> : IListBaseServices<T, I>
+        where T : ValidateListBase<T, I>
+        where I : IValidateBase
     {
-        IValidatePropertyValueManager ValidatePropertyValueManager { get; }
-        IRuleExecute RuleExecute { get; }
+        IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
+        IRuleExecute<T> RuleExecute { get; }
 
     }
 
-    /// <summary>
-    /// Wrap the OOBehaveBase services into an interface so that 
-    /// the inheriting classes don't need to list all services
-    /// and services can be added
-    /// </summary>
-    public interface IValidateListBaseServices<L, T> : IValidateListBaseServices<T>, IListBaseServices<L, T>
-        where L : ValidateListBase<T>
-        where T : IValidateBase
+
+
+    public class ValidateListBaseServices<T, I> : ListBaseServices<T, I>, IValidateListBaseServices<T, I>
+        where T : ValidateListBase<T, I>
+        where I : IValidateBase
     {
 
-
-    }
-
-    public class ValidateListBaseServices<L, T> : ListBaseServices<L, T>, IValidateListBaseServices<L, T>
-        where L : ValidateListBase<T>
-        where T : IValidateBase
-    {
-
-        public ValidateListBaseServices(IValidatePropertyValueManager<L> registeredPropertyManager,
-            IReceivePortalChild<T> portal,
-            IRuleExecute<L> ruleExecute) : base(registeredPropertyManager, portal)
+        public ValidateListBaseServices(IValidatePropertyValueManager<T> registeredPropertyManager,
+            IReceivePortalChild<I> portal,
+            IRuleExecute<T> ruleExecute) : base(registeredPropertyManager, portal)
         {
             this.ValidatePropertyValueManager = registeredPropertyManager;
             RuleExecute = ruleExecute;
         }
 
-        public IValidatePropertyValueManager ValidatePropertyValueManager { get; }
-        public IRuleExecute RuleExecute { get; }
+        public IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
+        public IRuleExecute<T> RuleExecute { get; }
 
-        IPropertyValueManager IListBaseServices<T>.PropertyValueManager
+        IPropertyValueManager<T> IListBaseServices<T, I>.PropertyValueManager
         {
             get { return ValidatePropertyValueManager; }
         }

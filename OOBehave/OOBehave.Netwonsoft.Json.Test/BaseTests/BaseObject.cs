@@ -13,7 +13,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         IBaseObject Child { get; set; }
     }
 
-    public class BaseObject : Base, IBaseObject
+    public class BaseObject : Base<BaseObject>, IBaseObject
     {
         public BaseObject(IBaseServices<BaseObject> services) : base(services)
         {
@@ -33,7 +33,7 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
 
     }
 
-    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
+    public class BaseObjectList : ListBase<BaseObjectList, IBaseObject>, IBaseObjectList
     {
         public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> services) : base(services)
         {

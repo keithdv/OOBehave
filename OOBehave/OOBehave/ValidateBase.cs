@@ -20,21 +20,21 @@ namespace OOBehave
         IEnumerable<string> BrokenRuleMessages { get; }
         IEnumerable<string> BrokenRulePropertyMessages(string propertyName);
         Task CheckAllRules(CancellationToken token = new CancellationToken());
-
         Task CheckAllSelfRules(CancellationToken token = new CancellationToken());
     }
 
     [PortalDataContract]
-    public abstract class ValidateBase : Base, IValidateBase, INotifyPropertyChanged, IPropertyAccess
+    public abstract class ValidateBase<T> : Base<T>, IValidateBase, INotifyPropertyChanged, IPropertyAccess
+        where T : ValidateBase<T>
     {
 
         [PortalDataMember]
-        protected new IValidatePropertyValueManager PropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
+        protected new IValidatePropertyValueManager<T> PropertyValueManager => (IValidatePropertyValueManager<T>)base.PropertyValueManager;
 
         [PortalDataMember]
-        protected IRuleExecute RuleExecute { get; }
+        protected IRuleExecute<T> RuleExecute { get; }
 
-        public ValidateBase(IValidateBaseServices services) : base(services)
+        public ValidateBase(IValidateBaseServices<T> services) : base(services)
         {
             this.RuleExecute = services.RuleExecute;
             ((ISetTarget)this.RuleExecute).SetTarget(this);
@@ -89,6 +89,15 @@ namespace OOBehave
             return Task.WhenAll(new Task[2] { RuleExecute.WaitForRules, PropertyValueManager.WaitForRules() });
         }
 
+        /// <summary>
+        /// Permantatly mark invalid
+        /// Note: not associated with any specific property
+        /// </summary>
+        /// <param name="message"></param>
+        protected virtual void MarkInvalid(string message)
+        {
+            RuleExecute.MarkInvalid(message);
+        }
         public override async Task<IDisposable> StopAllActions()
         {
             var result = await base.StopAllActions();

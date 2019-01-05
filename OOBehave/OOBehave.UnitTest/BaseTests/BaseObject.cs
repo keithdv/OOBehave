@@ -19,7 +19,7 @@ namespace OOBehave.UnitTest.BaseTests
         void LoadPropertyTest(B propertyValue);
         IBaseObject Child { get; set; }
     }
-    public class BaseObject : Base, IBaseObject
+    public class BaseObject : Base<BaseObject>, IBaseObject
     {
 
         public BaseObject(IBaseServices<BaseObject> services) : base(services) { }

@@ -12,7 +12,7 @@ namespace OOBehave.UnitTest.BaseTests
         string LastName { get; set; }
 
     }
-    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
+    public class BaseObjectList : ListBase<BaseObjectList, IBaseObject>, IBaseObjectList
     {
 
         public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> services) : base(services) { }

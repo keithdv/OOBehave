@@ -5,7 +5,7 @@ using System;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class BaseObject : Base, IBaseObject
+    public class BaseObject : Base<BaseObject>, IBaseObject
     {
 
         public BaseObject(IBaseServices<BaseObject> baseServices) : base(baseServices)

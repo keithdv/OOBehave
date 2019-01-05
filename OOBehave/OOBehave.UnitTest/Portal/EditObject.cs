@@ -5,7 +5,7 @@ using System;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class EditObject : EditBase, IEditObject
+    public class EditObject : EditBase<EditObject>, IEditObject
     {
 
         public EditObject(IEditBaseServices<EditObject> baseServices) : base(baseServices)

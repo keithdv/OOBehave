@@ -10,26 +10,27 @@ using System.Threading.Tasks;
 namespace OOBehave
 {
 
-    public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget, ICollection, IList
+    public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget
     {
 
     }
 
-    public interface IEditListBase<T> : IEditListBase, IValidateListBase<T>, ICollection<T>, IList<T>
-        where T : IEditBase
+    public interface IEditListBase<I> : IEditListBase, IValidateListBase<I>
+        where I : IEditBase
     {
 
     }
 
-    public abstract class EditListBase<T> : ValidateListBase<T>, IOOBehaveObject, IEditListBase<T>
-        where T : IEditBase
+    public abstract class EditListBase<T, I> : ValidateListBase<T, I>, IOOBehaveObject, IEditListBase<I>
+        where T : EditListBase<T, I>
+        where I : IEditBase
     {
 
-        protected new IEditPropertyValueManager PropertyValueManager => (IEditPropertyValueManager)base.PropertyValueManager;
+        protected new IEditPropertyValueManager<T> PropertyValueManager => (IEditPropertyValueManager<T>)base.PropertyValueManager;
 
-        protected new ISendReceivePortalChild<T> ItemPortal { get; }
+        protected new ISendReceivePortalChild<I> ItemPortal { get; }
 
-        public EditListBase(IEditListBaseServices<T> services) : base(services)
+        public EditListBase(IEditListBaseServices<T, I> services) : base(services)
         {
             this.ItemPortal = services.SendReceivePortalChild;
         }
@@ -41,7 +42,7 @@ namespace OOBehave
         public bool IsDeleted { get; protected set; }
         public IEnumerable<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
         public bool IsChild { get; protected set; }
-        protected List<T> DeletedList { get; } = new List<T>();
+        protected List<I> DeletedList { get; } = new List<I>();
 
 
         protected virtual void MarkAsChild()

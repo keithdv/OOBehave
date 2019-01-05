@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class BaseObjectList : ListBase<IBaseObject>, IBaseObjectList
+    public class BaseObjectList : ListBase<BaseObjectList, IBaseObject>, IBaseObjectList
     {
 
         public BaseObjectList(IListBaseServices<BaseObjectList, IBaseObject> baseServices) : base(baseServices)

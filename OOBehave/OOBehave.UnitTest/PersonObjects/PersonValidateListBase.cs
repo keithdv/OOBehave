@@ -6,7 +6,7 @@ using OOBehave.Rules;
 namespace OOBehave.UnitTest.PersonObjects
 
 {
-    public abstract class PersonValidateListBase<L, T> : ValidateListBase<T>, IPersonBase
+    public abstract class PersonValidateListBase<L, T> : ValidateListBase<L, T>, IPersonBase
         where L : PersonValidateListBase<L, T>
         where T : IPersonBase
     {

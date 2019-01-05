@@ -64,7 +64,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             var surrogate = serializer.Deserialize<ListBaseSurrogate>(reader);
 
-            var list = (IList)Scope.Resolve(surrogate.ListType);
+            var list = (IListBase)Scope.Resolve(surrogate.ListType);
 
             foreach (var i in surrogate.Collection)
             {
@@ -97,7 +97,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             do
             {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ListBase<>))
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ListBase<,>))
                 {
                     return type;
                 }
@@ -110,7 +110,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             do
             {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValidateListBase<>))
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValidateListBase<,>))
                 {
                     return type;
                 }
@@ -123,7 +123,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             do
             {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(EditListBase<>))
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(EditListBase<,>))
                 {
                     return type;
                 }
@@ -136,7 +136,7 @@ namespace OOBehave.Newtonsoft.Json
                                        JsonSerializer serializer)
         {
 
-            var itemType = GetListBase(value.GetType()).GetGenericArguments()[0];
+            var itemType = GetListBase(value.GetType()).GetGenericArguments()[1];
             var listType = typeof(List<>).MakeGenericType(itemType);
             var list = (IList)Activator.CreateInstance(listType, value);
 

@@ -17,19 +17,20 @@ namespace OOBehave
 
     }
 
-    public interface IValidateListBase<T> : IValidateListBase, IListBase<T>
+    public interface IValidateListBase<I> : IValidateListBase, IListBase<I>
     {
 
     }
 
-    public abstract class ValidateListBase<T> : ListBase<T>, IValidateListBase<T>, INotifyPropertyChanged, IPropertyAccess
-        where T : IValidateBase
+    public abstract class ValidateListBase<T, I> : ListBase<T, I>, IValidateListBase<I>, INotifyPropertyChanged, IPropertyAccess
+        where T : ValidateListBase<T, I>
+        where I : IValidateBase
     {
-        protected new IValidatePropertyValueManager PropertyValueManager => (IValidatePropertyValueManager)base.PropertyValueManager;
+        protected new IValidatePropertyValueManager<T> PropertyValueManager => (IValidatePropertyValueManager<T>)base.PropertyValueManager;
 
-        protected IRuleExecute RuleExecute { get; private set; }
+        protected IRuleExecute<T> RuleExecute { get; private set; }
 
-        public ValidateListBase(IValidateListBaseServices<T> services) : base(services)
+        public ValidateListBase(IValidateListBaseServices<T, I> services) : base(services)
         {
             this.RuleExecute = services.RuleExecute;
             ((ISetTarget)this.RuleExecute).SetTarget(this);
@@ -74,6 +75,17 @@ namespace OOBehave
         {
             return Task.WhenAll(new Task[3] { RuleExecute.WaitForRules, PropertyValueManager.WaitForRules(), Task.WhenAll(this.Where(x => x.IsBusy).Select(x => x.WaitForRules())) });
         }
+
+        /// <summary>
+        /// Permantatly mark invalid
+        /// Note: not associated with any specific property
+        /// </summary>
+        /// <param name="message"></param>
+        protected virtual void MarkInvalid(string message)
+        {
+            RuleExecute.MarkInvalid(message);
+        }
+
 
         public override async Task<IDisposable> StopAllActions()
         {

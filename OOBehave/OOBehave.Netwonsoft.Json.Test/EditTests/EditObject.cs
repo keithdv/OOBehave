@@ -13,7 +13,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         IEditObject Child { get; set; }
     }
 
-    public class EditObject : EditBase, IEditObject
+    public class EditObject : EditBase<EditObject>, IEditObject
     {
         public EditObject(IEditBaseServices<EditObject> services) : base(services)
         {
@@ -30,7 +30,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         string Name { get; set; }
     }
 
-    public class EditObjectList : EditListBase<IEditObject>, IEditObjectList
+    public class EditObjectList : EditListBase<EditObjectList, IEditObject>, IEditObjectList
     {
         public EditObjectList(IEditListBaseServices<EditObjectList, IEditObject> services) : base(services)
         {

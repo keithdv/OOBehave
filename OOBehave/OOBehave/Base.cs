@@ -33,13 +33,14 @@ namespace OOBehave
     }
 
     [PortalDataContract]
-    public abstract class Base : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess, ISetParent
+    public abstract class Base<T> : IOOBehaveObject, IBase, IPortalTarget, IPropertyAccess, ISetParent
+        where T : Base<T>
     {
 
         [PortalDataMember]
-        protected IPropertyValueManager PropertyValueManager { get; }
+        protected IPropertyValueManager<T> PropertyValueManager { get; }
 
-        public Base(IBaseServices services)
+        public Base(IBaseServices<T> services)
         {
             PropertyValueManager = services.PropertyValueManager;
             ((ISetTarget)PropertyValueManager).SetTarget(this);
@@ -115,23 +116,6 @@ namespace OOBehave
             PropertyValueManager.Load(registeredProperty, value);
         }
 
-        [OnSerializing]
-        private void OnSerializing(StreamingContext context)
-        {
-
-        }
-
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext context)
-        {
-
-        }
-
-        [OnDeserialized]
-        private void OnDeserialized(StreamingContext context)
-        {
-
-        }
     }
 
 }

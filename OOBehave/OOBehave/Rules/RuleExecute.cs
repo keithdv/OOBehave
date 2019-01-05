@@ -25,9 +25,16 @@ namespace OOBehave.Rules
         bool IsValid { get; }
 
         bool IsBusy { get; }
+        IRuleResult OverrideResult { get; }
+
+        /// <summary>
+        /// Set OverrideResult and permenantly mark as invalid
+        /// </summary>
+        /// <param name="message"></param>
+        void MarkInvalid(string message);
+
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
-        FluentRule<T> AddRule<T>(string triggerProperty, Func<T, IRuleResult> func);
         Task CheckAllRules(CancellationToken token = new CancellationToken());
 
     }
@@ -35,6 +42,7 @@ namespace OOBehave.Rules
     public interface IRuleExecute<T> : IRuleExecute
         where T : IValidateBase
     {
+        FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func);
 
     }
 
@@ -54,9 +62,10 @@ namespace OOBehave.Rules
 
         private IDictionary<uint, IRule> Rules { get; } = new ConcurrentDictionary<uint, IRule>();
 
-        IEnumerable<IRuleResult> IRuleExecute.Results => Results.Values;
+        IEnumerable<IRuleResult> IRuleExecute.Results => OverrideResult == null ? Results.Values : new IRuleResult[1] { OverrideResult };
 
         private ConcurrentQueue<uint> ruleQueue = new ConcurrentQueue<uint>();
+
 
 
         public void AddRules(params IRule[] rules)
@@ -74,9 +83,9 @@ namespace OOBehave.Rules
             Rules.Add(rule.UniqueIndex, rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 
-        public FluentRule<T2> AddRule<T2>(string triggerProperty, Func<T2, IRuleResult> func)
+        public FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func)
         {
-            FluentRule<T2> rule = new FluentRule<T2>(func, triggerProperty); // TODO - DI
+            FluentRule<T> rule = new FluentRule<T>(func, triggerProperty); // TODO - DI
             Rules.Add(rule.UniqueIndex, rule);
             return rule;
         }
@@ -124,7 +133,20 @@ namespace OOBehave.Rules
 
         public bool IsValid
         {
-            get { return !Results.Values.Where(r => r.IsError).Any(); }
+            get { return OverrideResult == null && !Results.Values.Where(r => r.IsError).Any(); }
+        }
+
+        public IRuleResult OverrideResult { get; protected set; }
+
+        public void MarkInvalid(string message)
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            Results.Clear();
+            OverrideResult = RuleResult.PropertyError(typeof(T).FullName, message);
         }
 
         public Task WaitForRules { get; private set; } = Task.CompletedTask;
@@ -175,7 +197,7 @@ namespace OOBehave.Rules
                 }
             }
 
-            if (!isRunningRules || isRecursiveCall)
+            if (OverrideResult == null && !isRunningRules || isRecursiveCall)
             {
                 Start();
                 var token = cancellationTokenSource.Token; // Local stack copy important

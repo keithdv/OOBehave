@@ -150,5 +150,25 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.IsTrue(List.IsSelfValid);
         }
 
+        [TestMethod]
+        public void ValidateListBase_MarkInvalid()
+        {
+            string message;
+            List.TestMarkInvalid(message = Guid.NewGuid().ToString());
+            Assert.IsFalse(List.IsValid);
+            Assert.IsFalse(List.IsSelfValid);
+            Assert.AreEqual(1, List.BrokenRuleMessages.Count());
+            Assert.AreEqual(message, List.BrokenRuleMessages.Single());
+        }
+
+        [TestMethod]
+        public void ValidateListBase_MarkInvalid_Dont_Run_Rules()
+        {
+            var rrc = List.RuleRunCount;
+            string message;
+            List.TestMarkInvalid(message = Guid.NewGuid().ToString());
+            List.FirstName = Guid.NewGuid().ToString();
+            Assert.AreEqual(rrc, List.RuleRunCount);
+        }
     }
 }

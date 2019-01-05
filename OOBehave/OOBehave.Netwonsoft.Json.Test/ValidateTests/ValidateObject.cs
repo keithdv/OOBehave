@@ -16,11 +16,11 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         IEnumerable<IRule> Rules { get; }
     }
 
-    public class ValidateObject : ValidateBase, IValidateObject
+    public class ValidateObject : ValidateBase<ValidateObject>, IValidateObject
     {
         public ValidateObject(IValidateBaseServices<ValidateObject> services) : base(services)
         {
-            RuleExecute.AddRule<ValidateObject>(nameof(Name), t =>
+            RuleExecute.AddRule(nameof(Name), t =>
             {
                 t.RuleRunCount++;
                 if (t.Name == "Error") { return RuleResult.PropertyError(nameof(Name), "Error"); }
@@ -45,11 +45,11 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         void Add(IValidateObject obj);
     }
 
-    public class ValidateObjectList : ValidateListBase<IValidateObject>, IValidateObjectList
+    public class ValidateObjectList : ValidateListBase<ValidateObjectList, IValidateObject>, IValidateObjectList
     {
         public ValidateObjectList(IValidateListBaseServices<ValidateObjectList, IValidateObject> services) : base(services)
         {
-            RuleExecute.AddRule<ValidateObjectList>(nameof(Name), t =>
+            RuleExecute.AddRule(nameof(Name), t =>
             {
                 t.RuleRunCount++;
                 if (t.Name == "Error") { return RuleResult.PropertyError(nameof(Name), "Error"); }

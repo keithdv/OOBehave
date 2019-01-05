@@ -15,27 +15,41 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
-    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable
+
+    public interface IReadOnlyListBase : IBase, IOOBehaveObject
     {
 
     }
 
-    public interface IListBase<T> : IListBase, IReadOnlyCollection<T>, IReadOnlyList<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    public interface IReadOnlyListBase<I> : IReadOnlyListBase, IReadOnlyCollection<I>, IReadOnlyList<I>
+        where I : IBase
     {
-        Task<T> CreateAdd();
-        Task<T> CreateAdd(object criteria);
         new int Count { get; }
     }
 
-    public abstract class ListBase<T> : ObservableCollection<T>, IOOBehaveObject, IListBase<T>, IPortalTarget, IPropertyAccess, ISetParent
-        where T : IBase
+
+    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable, ICollection, IList
     {
 
-        protected IPropertyValueManager PropertyValueManager { get; private set; } // Private setter for Deserialization
+    }
 
-        protected IReceivePortalChild<T> ItemPortal { get; }
+    public interface IListBase<I> : IListBase, IReadOnlyCollection<I>, IReadOnlyList<I>, INotifyCollectionChanged, INotifyPropertyChanged, ICollection<I>, IList<I>
+    {
+        Task<I> CreateAdd();
+        Task<I> CreateAdd(object criteria);
+        new int Count { get; }
+    }
 
-        public ListBase(IListBaseServices<T> services)
+    public abstract class ListBase<T, I> : ObservableCollection<I>, IOOBehaveObject, IListBase<I>, IReadOnlyListBase<I>, IPortalTarget, IPropertyAccess, ISetParent
+        where T : ListBase<T, I>
+        where I : IBase
+    {
+
+        protected IPropertyValueManager<T> PropertyValueManager { get; private set; } // Private setter for Deserialization
+
+        protected IReceivePortalChild<I> ItemPortal { get; }
+
+        public ListBase(IListBaseServices<T, I> services)
         {
             PropertyValueManager = services.PropertyValueManager;
             ItemPortal = services.ReceivePortal;
@@ -100,14 +114,14 @@ namespace OOBehave
             StartAllActions();
         }
 
-        public async Task<T> CreateAdd()
+        public async Task<I> CreateAdd()
         {
             var item = await ItemPortal.CreateChild();
             base.Add(item);
             return item;
         }
 
-        public async Task<T> CreateAdd(object criteria)
+        public async Task<I> CreateAdd(object criteria)
         {
             var item = await ItemPortal.CreateChild(criteria);
             base.Add(item);

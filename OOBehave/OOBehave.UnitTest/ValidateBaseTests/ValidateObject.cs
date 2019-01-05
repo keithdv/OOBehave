@@ -11,6 +11,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     {
         IValidateObject Child { get; set; }
         int RuleRunCount { get; }
+
+        void TestMarkInvalid(string message);
     }
 
     public class ValidateObject : PersonValidateBase<ValidateObject>, IValidateObject
@@ -46,6 +48,10 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
         public int RuleRunCount => ShortNameRule.RunCount + FullNameRule.RunCount;
 
+        public void TestMarkInvalid(string message)
+        {
+            MarkInvalid(message);
+        }
     }
 
 
@@ -53,6 +59,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     {
         int RuleRunCount { get; }
         void Add(IValidateObject obj);
+        void TestMarkInvalid(string message);
+
     }
 
     public class ValidateObjectList : PersonValidateListBase<ValidateObjectList, IValidateObject>, IValidateObjectList
@@ -71,6 +79,10 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public int RuleRunCount => ShortNameRule.RunCount + FullNameRule.RunCount + this.Select(v => v.RuleRunCount).Sum();
         public IShortNameRule<ValidateObjectList> ShortNameRule { get; }
         public IFullNameRule<ValidateObjectList> FullNameRule { get; }
+        public void TestMarkInvalid(string message)
+        {
+            MarkInvalid(message);
+        }
     }
 
 }
