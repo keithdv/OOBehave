@@ -55,8 +55,10 @@ namespace OOBehave
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value);
-            PropertyHasChanged(propertyName);
+            if (PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value))
+            {
+                PropertyHasChanged(propertyName);
+            }
         }
 
 
@@ -107,6 +109,7 @@ namespace OOBehave
         {
             return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
         }
+
 
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {

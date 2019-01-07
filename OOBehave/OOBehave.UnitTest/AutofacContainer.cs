@@ -13,153 +13,78 @@ using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
 using OOBehave.UnitTest.Portal;
+using OOBehave.Autofac;
+using System.Reflection;
 
 namespace OOBehave.UnitTest
 {
-
-    public class UnitTestModule : Module
-    {
-
-        protected override void Load(ContainerBuilder builder)
-        {
-            base.Load(builder);
-
-
-            var types = ThisAssembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract).ToList();
-            var interfaces = ThisAssembly.GetTypes().Where(t => t.IsInterface).ToDictionary(x => x.FullName);
-
-            foreach (var t in types)
-            {
-                if (interfaces.TryGetValue($"{t.Namespace}.I{t.Name}", out var i))
-                {
-                    var singleConstructor = t.GetConstructors().SingleOrDefault();
-                    var zeroConstructorParams = singleConstructor != null && !singleConstructor.GetParameters().Any();
-
-
-                    if (!t.IsGenericType)
-                    {
-                        var reg = builder.RegisterType(t).As(i);
-
-                        // If it is a RULE
-                        // and has zero constructor parameters
-                        // assume no dependencies
-                        // so it can be SingleInstance
-                        if (typeof(IRule).IsAssignableFrom(t) && zeroConstructorParams)
-                        {
-                            reg.SingleInstance();
-                        }
-                    }
-                    else
-                    {
-
-
-                        // If it is a RULE
-                        // and has zero constructor parameters
-                        // assume no dependencies
-                        // so it can be SingleInstance
-                        var reg = builder.RegisterGeneric(t).As(i);
-                        if (typeof(IRule).IsAssignableFrom(t) && zeroConstructorParams)
-                        {
-                            reg.SingleInstance();
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     public static class AutofacContainer
     {
 
 
         private static IContainer Container;
+        private static IContainer LocalPortalContainer;
 
-        public static ILifetimeScope GetLifetimeScope()
+        public static ILifetimeScope GetLifetimeScope(bool localPortal = false)
         {
 
             if (Container == null)
             {
-                var builder = new ContainerBuilder();
 
-                // Run first - some of these definition need to be modified
-                builder.RegisterModule<UnitTestModule>();
-
-
-                // SingleInstance as long it is isn't modified to accept dependencies
-                builder.RegisterType<DefaultFactory>().As<IFactory>().SingleInstance();
-
-                // Tools - More or less Static classes - but now they can be changed! (For better or worse...)
-                builder.RegisterType<Core.ValuesDiffer>().As<IValuesDiffer>().SingleInstance();
-
-                // Scope Wrapper
-                builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
-
-                // Meta Data about the properties and methods of Classes
-                // This will not change during runtime
-                // So SingleInstance
-                builder.RegisterGeneric(typeof(RegisteredPropertyManager<>)).As(typeof(IRegisteredPropertyManager<>)).SingleInstance();
-
-
-                // This was single instance; but now it resolves the Authorization Rules 
-                // When single instance it receives the root scopewhich is no good
-                builder.RegisterGeneric(typeof(PortalOperationManager<>)).As(typeof(IPortalOperationManager<>)).InstancePerLifetimeScope();
-
-                // Should not be singleinstance because AuthorizationRules can have constructor dependencies
-                builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
-                builder.RegisterGeneric(typeof(RuleExecute<>)).As(typeof(IRuleExecute<>)).AsSelf();
-
-                // Stored values for each Domain Object instance
-                // MUST BE per instance
-                builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>));
-                builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>));
-                builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>));
-
-                // Takes IServiceScope so these need to match it's lifetime
-                builder.RegisterGeneric(typeof(LocalReceivePortal<>))
-                    .As(typeof(IReceivePortal<>))
-                    .As(typeof(IReceivePortalChild<>))
-                    .InstancePerLifetimeScope();
-
-                builder.RegisterGeneric(typeof(LocalSendReceivePortal<>))
-                    .As(typeof(ISendReceivePortal<>))
-                    .As(typeof(ISendReceivePortalChild<>))
-                    .InstancePerLifetimeScope();
-
-                builder.RegisterGeneric(typeof(LocalMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
-
-                // Simple wrapper - Always InstancePerDependency
-                builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));
-                builder.RegisterGeneric(typeof(ListBaseServices<,>)).As(typeof(IListBaseServices<,>));
-                builder.RegisterGeneric(typeof(ValidateBaseServices<>)).As(typeof(IValidateBaseServices<>));
-                builder.RegisterGeneric(typeof(ValidateListBaseServices<,>)).As(typeof(IValidateListBaseServices<,>));
-                builder.RegisterGeneric(typeof(EditBaseServices<>)).As(typeof(IEditBaseServices<>));
-                builder.RegisterGeneric(typeof(EditListBaseServices<,>)).As(typeof(IEditListBaseServices<,>));
-
-
-
-                // Unit Test Library
-                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedRule>().As<BaseTests.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedAsyncRule>().As<BaseTests.Authorization.IAuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-                builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedDependencyRule>().As<BaseTests.Authorization.IAuthorizationGrantedDependencyRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
-
-                builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
-                builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
-
-                builder.Register<MethodObject.CommandMethod>(cc =>
+                IContainer CreateContainer(Autofac.Portal portal)
                 {
-                    var dd = cc.Resolve<Func<Objects.IDisposableDependency>>();
-                    return i => MethodObject.CommandMethod_(i, dd());
-                });
+                    var builder = new ContainerBuilder();
 
-                builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>
-                {
-                    return PersonObjects.PersonDto.Data();
-                }).SingleInstance();
+                    builder.RegisterModule(new OOBehave.Autofac.OOBehaveCoreModule(portal));
 
-                Container = builder.Build();
+
+                    if(portal == Autofac.Portal.NoPortal)
+                    {
+                        builder.RegisterGeneric(typeof(MockReceivePortal<>)).As(typeof(IReceivePortal<>)).AsSelf().InstancePerLifetimeScope();
+                        builder.RegisterGeneric(typeof(MockReceivePortalChild<>)).As(typeof(IReceivePortalChild<>)).AsSelf().InstancePerLifetimeScope();
+                        builder.RegisterGeneric(typeof(MockSendReceivePortal<>)).As(typeof(ISendReceivePortal<>)).AsSelf().InstancePerLifetimeScope();
+                        builder.RegisterGeneric(typeof(MockSendReceivePortalChild<>)).As(typeof(ISendReceivePortalChild<>)).AsSelf().InstancePerLifetimeScope();
+                    }
+                        
+                        
+                    builder.AutoRegisterAssemblyTypes(Assembly.GetExecutingAssembly());
+
+                    // Unit Test Library
+                    builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedRule>().As<BaseTests.Authorization.IAuthorizationGrantedRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                    builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedAsyncRule>().As<BaseTests.Authorization.IAuthorizationGrantedAsyncRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+                    builder.RegisterType<BaseTests.Authorization.AuthorizationGrantedDependencyRule>().As<BaseTests.Authorization.IAuthorizationGrantedDependencyRule>().InstancePerLifetimeScope(); // Not normal - Lifetimescope so the results can be validated
+
+                    builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
+                    builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
+
+                    builder.Register<MethodObject.CommandMethod>(cc =>
+                    {
+                        var dd = cc.Resolve<Func<Objects.IDisposableDependency>>();
+                        return i => MethodObject.CommandMethod_(i, dd());
+                    });
+
+                    builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>
+                    {
+                        return PersonObjects.PersonDto.Data();
+                    }).SingleInstance();
+
+                    return builder.Build();
+                }
+
+                Container = CreateContainer(Autofac.Portal.NoPortal);
+                LocalPortalContainer = CreateContainer(Autofac.Portal.Local);
+
             }
 
-            return Container.BeginLifetimeScope(Guid.NewGuid());
+            if (!localPortal)
+            {
+                return Container.BeginLifetimeScope();
+            }
+            else
+            {
+                return LocalPortalContainer.BeginLifetimeScope();
+            }
 
         }
 

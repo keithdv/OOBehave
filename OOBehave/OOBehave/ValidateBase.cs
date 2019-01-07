@@ -62,8 +62,10 @@ namespace OOBehave
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value);
-            PropertyHasChanged(propertyName);
+            if(PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value))
+            {
+                PropertyHasChanged(propertyName);
+            }
         }
 
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)

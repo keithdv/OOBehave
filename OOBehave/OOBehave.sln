@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Example.Lib", "OOB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.UnitTest", "OOBehave.UnitTest\OOBehave.UnitTest.csproj", "{3B6C6D42-238B-4FBE-8823-ACD9CFC948E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOBehave.Newtonsoft.Json", "OOBehave.Newtonsoft.Json\OOBehave.Newtonsoft.Json.csproj", "{4236DF9E-7BD3-4D07-B3B7-15DB2A7F93C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Newtonsoft.Json", "OOBehave.Newtonsoft.Json\OOBehave.Newtonsoft.Json.csproj", "{4236DF9E-7BD3-4D07-B3B7-15DB2A7F93C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOBehave.Netwonsoft.Json.Test", "OOBehave.Netwonsoft.Json.Test\OOBehave.Netwonsoft.Json.Test.csproj", "{28549357-D970-431D-8C48-83B0C333CAF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Netwonsoft.Json.Test", "OOBehave.Netwonsoft.Json.Test\OOBehave.Netwonsoft.Json.Test.csproj", "{28549357-D970-431D-8C48-83B0C333CAF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOBehave.Autofac", "OOBehave.Autofac\OOBehave.Autofac.csproj", "{8E3C2162-9946-477D-8992-66F0511D02F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{28549357-D970-431D-8C48-83B0C333CAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28549357-D970-431D-8C48-83B0C333CAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28549357-D970-431D-8C48-83B0C333CAF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E3C2162-9946-477D-8992-66F0511D02F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E3C2162-9946-477D-8992-66F0511D02F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E3C2162-9946-477D-8992-66F0511D02F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E3C2162-9946-477D-8992-66F0511D02F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

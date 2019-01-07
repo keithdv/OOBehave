@@ -19,7 +19,7 @@ namespace OOBehave
     {
 
         IEditPropertyValueManager<T> EditPropertyValueManager { get; }
-
+        ISendReceivePortal<T> SendReceivePortal { get; }
     }
 
     public class EditBaseServices<T> : ValidateBaseServices<T>, IEditBaseServices<T>
@@ -27,10 +27,13 @@ namespace OOBehave
     {
 
         public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
-        public EditBaseServices(IEditPropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleExecute<T> ruleExecute)
+        public ISendReceivePortal<T> SendReceivePortal { get; }
+
+        public EditBaseServices(IEditPropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleExecute<T> ruleExecute, ISendReceivePortal<T> sendReceivePortal)
             : base(registeredPropertyValueManager, registeredPropertyManager, ruleExecute)
         {
             EditPropertyValueManager = registeredPropertyValueManager;
+            SendReceivePortal = sendReceivePortal;
         }
     }
 }

@@ -97,7 +97,7 @@ namespace OOBehave.Portal.Core
                 foreach (var m in methods)
                 {
                     var parameters = m.GetParameters();
-                    var hasCriteriaParameter = parameters.Where(p => p.ParameterType == criteriaType).FirstOrDefault();
+                    var hasCriteriaParameter = parameters.Where(p => p.ParameterType.IsAssignableFrom(criteriaType)).FirstOrDefault();
 
                     if (hasCriteriaParameter != null)
                     {
@@ -194,7 +194,7 @@ namespace OOBehave.Portal.Core
                     for (var i = 0; i < parameterValues.Length; i++)
                     {
                         var parameter = parameters[i];
-                        if (parameter.ParameterType == criteria.GetType())
+                        if (parameter.ParameterType.IsAssignableFrom(criteria.GetType()))
                         {
                             parameterValues[i] = criteria;
                         }

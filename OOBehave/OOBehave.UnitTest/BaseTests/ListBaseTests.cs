@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +12,16 @@ namespace OOBehave.UnitTest.BaseTests
     [TestClass]
     public class ListBaseTests
     {
+        private ILifetimeScope scope;
         private IBaseObjectList list;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            list = AutofacContainer.GetLifetimeScope().Resolve<IBaseObjectList>();
+            scope = AutofacContainer.GetLifetimeScope();
+            list = scope.Resolve<IBaseObjectList>();
         }
+
         [TestMethod]
         public void ListBase_Construct()
         {
@@ -47,9 +51,15 @@ namespace OOBehave.UnitTest.BaseTests
         [TestMethod]
         public async Task ListBase_CreateAdd()
         {
+            var mock = scope.Resolve<MockReceivePortalChild<IBaseObject>>();
+
+            mock.MockPortal.Setup(x => x.CreateChild()).ReturnsAsync(scope.Resolve<IBaseObject>());
+
             var result = await list.CreateAdd();
             Assert.IsTrue(list.Count == 1);
             Assert.AreSame(result, list.Single());
+
+            mock.MockPortal.Verify(x => x.CreateChild(), Times.Once);
         }
 
     }

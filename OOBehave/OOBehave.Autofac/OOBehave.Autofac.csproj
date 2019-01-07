@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Keith Voels</Authors>
+    <Company>Keith Voels</Company>
+    <PackageLicenseUrl>https://github.com/keithdv/OOBehave/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/keithdv/OOBehave</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/keithdv/OOBehave/raw/master/OOBehave/Logo.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/keithdv/OOBehave</RepositoryUrl>
+    <PackageTags>Autofac CSLA</PackageTags>
+    <AssemblyVersion>0.1.1.0</AssemblyVersion>
+    <FileVersion>0.1.1.0</FileVersion>
+    <Version>0.1.1-Beta</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OOBehave\OOBehave.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OOBehave.Autofac\OOBehave.Autofac.csproj" />
     <ProjectReference Include="..\OOBehave.Newtonsoft.Json\OOBehave.Newtonsoft.Json.csproj" />
     <ProjectReference Include="..\OOBehave\OOBehave.csproj" />
   </ItemGroup>

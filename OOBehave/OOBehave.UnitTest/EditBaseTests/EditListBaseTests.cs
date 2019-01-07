@@ -25,9 +25,25 @@ namespace OOBehave.UnitTest.EditBaseTests
             scope = AutofacContainer.GetLifetimeScope();
             var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
 
-            var portal = scope.Resolve<ISendReceivePortal<IEditPersonList>>();
-            list = portal.Fetch(parentDto).Result;
-            child = list.First();
+            list = scope.Resolve<IEditPersonList>();
+            list.FillFromDto(parentDto);
+            list.MarkUnmodified();
+            list.MarkOld();
+
+            child = scope.Resolve<IEditPerson>();
+            child.MarkUnmodified();
+            child.MarkOld();
+            child.MarkAsChild();
+            list.Add(child);
+
+            Assert.IsFalse(list.IsBusy);
+
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(list.IsBusy);
         }
 
         [TestMethod]
@@ -40,10 +56,10 @@ namespace OOBehave.UnitTest.EditBaseTests
         [TestMethod]
         public void EditListBaseTest_SetString_IsModified()
         {
-            list.FirstName = Guid.NewGuid().ToString();
+            list.FullName = Guid.NewGuid().ToString();
             Assert.IsTrue(list.IsModified);
             Assert.IsTrue(list.IsSelfModified);
-            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FirstName), }, list.ModifiedProperties.ToList());
+            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FullName), }, list.ModifiedProperties.ToList());
         }
 
         [TestMethod]
@@ -65,26 +81,6 @@ namespace OOBehave.UnitTest.EditBaseTests
             CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.Age), }, list.ModifiedProperties.ToList());
         }
 
-
-        [TestMethod]
-        public void EditListBaseTest_Fetch_InitialMeta()
-        {
-            void AssertMeta(IEditBase t)
-            {
-                Assert.IsNotNull(t);
-                Assert.IsFalse(t.IsModified);
-                Assert.IsFalse(t.IsSelfModified);
-                Assert.IsFalse(t.IsNew);
-                Assert.IsFalse(t.IsSavable);
-            }
-
-            AssertMeta(list);
-            AssertMeta(child);
-
-            Assert.IsFalse(list.IsChild);
-            Assert.IsTrue(child.IsChild);
-
-        }
 
         [TestMethod]
         public async Task EditListBaseTest_ModifyChild_IsModified()

@@ -16,26 +16,37 @@ namespace OOBehave.UnitTest.EditBaseTests
     {
 
         private ILifetimeScope scope;
-        private IEditPersonParentChild parent;
-        private IEditPersonParentChild child;
-        private IEditPersonParentChild grandChild;
+        private IEditPerson parent;
+        private IEditPerson child;
 
         [TestInitialize]
         public void TestInitialize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
+            var persons = scope.Resolve<IReadOnlyList<PersonDto>>();
+            
 
-            var portal = scope.Resolve<ISendReceivePortal<IEditPersonParentChild>>();
-            parent = portal.Fetch(parentDto).Result;
-            child = parent.Child;
-            grandChild = child?.Child;
+
+            parent = scope.Resolve<IEditPerson>();
+            parent.FillFromDto(persons.Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First());
+
+            child = scope.Resolve<IEditPerson>();
+            child.FillFromDto(persons.Where(p => p.FatherId == parent.Id).First());
+            parent.Child = child;
+
+            child.MarkOld();
+            child.MarkUnmodified();
+            child.MarkAsChild();
+            parent.MarkOld();
+            parent.MarkUnmodified();
+
+
         }
 
         [TestMethod]
         public void EditParentChildFetchTest_Fetch_InitialMeta()
         {
-            void AssertMeta(IEditPersonParentChild t)
+            void AssertMeta(IEditPerson t)
             {
                 Assert.IsNotNull(t);
                 Assert.IsFalse(t.IsModified);
@@ -46,58 +57,52 @@ namespace OOBehave.UnitTest.EditBaseTests
 
             AssertMeta(parent);
             AssertMeta(child);
-            AssertMeta(grandChild);
 
             Assert.IsFalse(parent.IsChild);
             Assert.IsTrue(child.IsChild);
-            Assert.IsTrue(grandChild.IsChild);
 
         }
 
         [TestMethod]
-        public async Task EditParentChildFetchTest_ModifyGrandChild_IsModified()
+        public async Task EditParentChildFetchTest_ModifyChild_IsModified()
         {
 
-            grandChild.FirstName = Guid.NewGuid().ToString();
+            child.FirstName = Guid.NewGuid().ToString();
             await parent.WaitForRules();
             Assert.IsTrue(parent.IsModified);
             Assert.IsTrue(child.IsModified);
-            Assert.IsTrue(grandChild.IsModified);
 
         }
 
         [TestMethod]
-        public async Task EditParentChildFetchTest_ModifyGrandChild_IsSelfModified()
+        public async Task EditParentChildFetchTest_ModifyChild_IsSelfModified()
         {
 
-            grandChild.FirstName = Guid.NewGuid().ToString();
+            child.FirstName = Guid.NewGuid().ToString();
             await parent.WaitForRules();
 
             Assert.IsFalse(parent.IsSelfModified);
-            Assert.IsFalse(child.IsSelfModified);
-            Assert.IsTrue(grandChild.IsSelfModified);
+            Assert.IsTrue(child.IsSelfModified);
 
         }
 
         [TestMethod]
-        public async Task EditParentChildFetchTest_ModifyGrandChild_IsSavable()
+        public async Task EditParentChildFetchTest_ModifyChild_IsSavable()
         {
 
-            grandChild.FirstName = Guid.NewGuid().ToString();
+            child.FirstName = Guid.NewGuid().ToString();
             await parent.WaitForRules();
 
             Assert.IsTrue(parent.IsSavable);
             Assert.IsFalse(child.IsSavable);
-            Assert.IsFalse(grandChild.IsSavable);
 
         }
 
 
         [TestMethod]
-        public void EditParentChildFetchTest_IsParent()
+        public void EditParentChildFetchTest_Parent()
         {
             Assert.AreSame(parent, child.Parent);
-            Assert.AreSame(child, grandChild.Parent);
         }
     }
 }

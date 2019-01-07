@@ -11,7 +11,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     [TestClass]
     public class SendReceivePortalChildTests
     {
-        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope();
+        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
         private ISendReceivePortalChild<IEditObject> portal;
         private IEditObject editObject;
 

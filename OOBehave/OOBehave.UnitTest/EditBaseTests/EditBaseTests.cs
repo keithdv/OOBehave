@@ -1,11 +1,13 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using OOBehave.Portal;
 using OOBehave.UnitTest.PersonObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.EditBaseTests
 {
@@ -21,10 +23,19 @@ namespace OOBehave.UnitTest.EditBaseTests
         public void TestInitialize()
         {
             scope = AutofacContainer.GetLifetimeScope();
+
+            editPerson = scope.Resolve<IEditPerson>();
             var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
 
-            var portal = scope.Resolve<ISendReceivePortal<IEditPerson>>();
-            editPerson = portal.Fetch(parentDto).Result;
+            editPerson.FillFromDto(parentDto);
+            editPerson.MarkOld();
+            editPerson.MarkUnmodified();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Assert.IsFalse(editPerson.IsBusy);
         }
 
         [TestMethod]
@@ -32,15 +43,16 @@ namespace OOBehave.UnitTest.EditBaseTests
         {
             Assert.IsFalse(editPerson.IsModified);
             Assert.IsFalse(editPerson.IsSelfModified);
+            Assert.IsFalse(editPerson.IsSavable);
         }
 
         [TestMethod]
         public void EditBaseTest_SetString_IsModified()
         {
-            editPerson.FirstName = Guid.NewGuid().ToString();
+            editPerson.FullName = Guid.NewGuid().ToString();
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
-            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FirstName), }, editPerson.ModifiedProperties.ToList());
+            CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FullName), }, editPerson.ModifiedProperties.ToList());
         }
 
         [TestMethod]
@@ -100,6 +112,27 @@ namespace OOBehave.UnitTest.EditBaseTests
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
         }
+
+        [TestMethod]
+        public void EditBaseTest_IsSavable()
+        {
+            editPerson.FirstName = Guid.NewGuid().ToString();
+            Assert.IsTrue(editPerson.IsSavable);
+        }
+
+        [TestMethod]
+        public async Task EditBaseTest_Save()
+        {
+            var mock = scope.Resolve<MockSendReceivePortal<EditPerson>>();
+            mock.MockPortal.Setup(x => x.Update((EditPerson) editPerson)).Returns(Task.CompletedTask);
+
+            editPerson.FirstName = Guid.NewGuid().ToString();
+            await editPerson.Save();
+
+            mock.MockPortal.Verify(x => x.Update((EditPerson)editPerson), Times.Once);
+        }
+
+
     }
 }
 

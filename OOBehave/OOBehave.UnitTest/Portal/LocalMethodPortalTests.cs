@@ -52,7 +52,7 @@ namespace OOBehave.UnitTest.Portal
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope();
+            scope = AutofacContainer.GetLifetimeScope(true);
         }
 
         [TestMethod]

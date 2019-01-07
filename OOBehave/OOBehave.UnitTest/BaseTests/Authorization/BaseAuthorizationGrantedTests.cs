@@ -107,7 +107,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope();
+            scope = AutofacContainer.GetLifetimeScope(true);
             portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedObject>>();
         }
 
@@ -128,7 +128,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
             Assert.IsTrue(authRule.ExecuteCreateCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }
-
+        
         [TestMethod]
         public async Task BaseAuthorization_Fetch()
         {

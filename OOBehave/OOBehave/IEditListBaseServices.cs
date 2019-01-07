@@ -19,6 +19,7 @@ namespace OOBehave
     {
         IEditPropertyValueManager<T> EditPropertyValueManager { get; }
         ISendReceivePortalChild<I> SendReceivePortalChild { get; }
+        ISendReceivePortal<T> SendReceivePortal { get; }
     }
 
     public class EditListBaseServices<T, I> : ValidateListBaseServices<T, I>, IEditListBaseServices<T, I>
@@ -28,14 +29,17 @@ namespace OOBehave
 
         public IEditPropertyValueManager<T> EditPropertyValueManager { get; }
         public ISendReceivePortalChild<I> SendReceivePortalChild { get; }
+        public ISendReceivePortal<T> SendReceivePortal { get; }
 
         public EditListBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
                                         ISendReceivePortalChild<I> sendReceivePortalChild,
+                                        ISendReceivePortal<T> sendReceivePortal,
                                         IRuleExecute<T> ruleExecute)
             : base(registeredPropertyManager, sendReceivePortalChild, ruleExecute)
         {
             EditPropertyValueManager = registeredPropertyManager;
             SendReceivePortalChild = sendReceivePortalChild;
+            SendReceivePortal = sendReceivePortal;
         }
     }
 }

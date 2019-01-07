@@ -12,7 +12,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     [TestClass]
     public class ReceivePortalChildListTests
     {
-        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope();
+        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
         private IReceivePortalChild<IBaseObjectList> portal;
         private IBaseObjectList list;
 

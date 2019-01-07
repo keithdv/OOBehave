@@ -14,6 +14,8 @@ namespace OOBehave.Core
         bool IsBusy { get; }
         Task CheckAllRules(CancellationToken token);
         Task WaitForRules();
+        bool Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
+
 
     }
 
@@ -41,11 +43,8 @@ namespace OOBehave.Core
 
         public virtual IValidateBase Child { get; protected set; }
 
-        protected ValidatePropertyValue() { } // For EditPropertyValue Deserialization
-
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
-
         }
 
         public override T Value
@@ -53,9 +52,24 @@ namespace OOBehave.Core
             get => base.Value;
             set
             {
-                Child = value as IValidateBase;
+                OnValueChanging(base.Value, value);
                 base.Value = value;
+                OnValueChanged(base.Value);
             }
+        }
+
+        /// <summary>
+        /// Before any checks on if the value actually changed
+        /// </summary>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
+        protected virtual void OnValueChanging(T oldValue, T newValue)
+        {
+
+        }
+        protected virtual void OnValueChanged(T newValue)
+        {
+            Child = newValue as IValidateBase;
         }
 
         public bool IsValid => (Child?.IsValid ?? true);
@@ -69,14 +83,14 @@ namespace OOBehave.Core
     public class ValidatePropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IValidatePropertyValue>
         where T : IBase
     {
-        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
+        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory, valuesDiffer)
         {
 
         }
 
-        protected override IValidatePropertyValue CreatePropertyValue<PV>(string name, PV value)
+        protected override IValidatePropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
         {
-            return Factory.CreateValidatePropertyValue(name, value);
+            return Factory.CreateValidatePropertyValue(registeredProperty, value);
         }
     }
 
@@ -84,14 +98,16 @@ namespace OOBehave.Core
         where T : IBase
         where P : IValidatePropertyValue
     {
-        public ValidatePropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
+        public ValidatePropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory)
         {
-
+            ValuesDiffer = valuesDiffer;
         }
 
         public bool IsValid => !fieldData.Values.Any(_ => !_.IsValid);
 
         public bool IsBusy => fieldData.Values.Any(_ => _.IsBusy);
+
+        public IValuesDiffer ValuesDiffer { get; }
 
         public Task WaitForRules()
         {
@@ -104,6 +120,32 @@ namespace OOBehave.Core
             return Task.WhenAll(tasks.Where(t => t != null));
         }
 
+        public virtual bool Set<PV>(string name, PV newValue)
+        {
+            return Set(GetRegisteredProperty<PV>(name), newValue);
+        }
+
+        public virtual bool Set<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
+        {
+            if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
+            {
+                // Default(P) so that it get's marked dirty
+                // Maybe it would be better to use MarkSelfModified; you know; once I write that
+                fieldData[registeredProperty.Index] = value = CreatePropertyValue(registeredProperty, default(PV));
+            }
+
+            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(PV).FullName}");
+
+            if (ValuesDiffer.Check(fd.Value, newValue))
+            {
+                fd.Value = newValue;
+                SetParent(newValue);
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
     }
 
 

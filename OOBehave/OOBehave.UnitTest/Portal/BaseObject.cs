@@ -2,6 +2,7 @@
 using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
+using System.Collections;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
@@ -36,6 +37,12 @@ namespace OOBehave.UnitTest.ObjectPortal
             TupleCriteria = tuple;
         }
 
+        [Create]
+        private void CreateInfertype(ICollection collection)
+        {
+            Assert.IsNotNull(collection);
+            CreateCalled = true;
+        }
 
         [Create]
         private void Create(Guid criteria, IDisposableDependency dependency)

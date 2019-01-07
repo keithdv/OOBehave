@@ -6,9 +6,9 @@ namespace OOBehave
     public interface IFactory
     {
         IRegisteredProperty<T> CreateRegisteredProperty<T>(string name);
-        IPropertyValue CreatePropertyValue<P>(string name, P value);
-        IValidatePropertyValue CreateValidatePropertyValue<P>(string name, P value);
-        IEditPropertyValue CreateEditPropertyValue<P>(string name, P value);
+        IPropertyValue<P> CreatePropertyValue<P>(IRegisteredProperty<P> registeredProperty, P value);
+        IValidatePropertyValue<P> CreateValidatePropertyValue<P>(IRegisteredProperty<P> registeredProperty, P value);
+        IEditPropertyValue<P> CreateEditPropertyValue<P>(IRegisteredProperty<P> registeredProperty, P value);
     }
 
 }

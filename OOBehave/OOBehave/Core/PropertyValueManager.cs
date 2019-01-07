@@ -15,7 +15,6 @@ namespace OOBehave.Core
     public interface IPropertyValueManager
     {
         IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name);
-        void Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         P Read<P>(IRegisteredProperty<P> registeredProperty);
     }
@@ -67,9 +66,9 @@ namespace OOBehave.Core
 
         }
 
-        protected override IPropertyValue CreatePropertyValue<PV>(string name, PV value)
+        protected override IPropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
         {
-            return Factory.CreatePropertyValue(name, value);
+            return Factory.CreatePropertyValue(registeredProperty, value);
         }
     }
 
@@ -92,7 +91,7 @@ namespace OOBehave.Core
             Factory = factory;
         }
 
-        protected abstract P CreatePropertyValue<PV>(string name, PV value);
+        protected abstract P CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value);
 
         public IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
         {
@@ -104,25 +103,6 @@ namespace OOBehave.Core
             this.Target = (T)(target ?? throw new ArgumentNullException(nameof(target)));
         }
 
-        public virtual void Set<PV>(string name, PV newValue)
-        {
-            Set(GetRegisteredProperty<PV>(name), newValue);
-        }
-
-        public virtual void Set<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
-        {
-            if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
-            {
-                // Default(P) so that it get's marked dirty
-                // Maybe it would be better to use MarkSelfModified; you know; once I write that
-                fieldData[registeredProperty.Index] = value = CreatePropertyValue(registeredProperty.Name, default(PV));
-            }
-
-            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(PV).FullName}");
-            fd.Value = newValue;
-
-            SetParent(newValue);
-        }
 
         public virtual void Load<PV>(string name, PV newValue)
         {
@@ -136,7 +116,7 @@ namespace OOBehave.Core
                 // TODO Destroy and Delink to old value
             }
 
-            fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty.Name, newValue);
+            fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty, newValue);
 
             SetParent(newValue);
         }

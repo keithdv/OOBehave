@@ -38,42 +38,20 @@ namespace OOBehave.Core
     public class EditPropertyValue<T> : ValidatePropertyValue<T>, IEditPropertyValue<T>
     {
 
-        private bool initialValue = true;
-        protected IValuesDiffer ValuesDiffer { get; }
 
-        /// <summary>
-        /// For Deserialization Only
-        /// </summary>
-        /// <param name="valuesDiffer"></param>
-        public EditPropertyValue(IValuesDiffer valuesDiffer)
-        {
-            ValuesDiffer = valuesDiffer;
-        }
 
-        public EditPropertyValue(IValuesDiffer valuesDiffer, string name, T value) : base(name, value)
+        public EditPropertyValue(string name, T value) : base(name, value)
         {
-            this.ValuesDiffer = valuesDiffer ?? throw new ArgumentNullException(nameof(valuesDiffer));
             EditChild = value as IEditBase;
         }
 
         public IEditBase EditChild { get; protected set; }
 
-        public override T Value
+        protected override void OnValueChanged(T newValue)
         {
-            get => base.Value;
-            set
-            {
-                if (initialValue || ValuesDiffer.Check(base.Value, value))
-                {
-                    base.Value = value;
-                    EditChild = value as IEditBase;
-                    if (!initialValue)
-                    {
-                        IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
-                    }
-                    initialValue = false;
-                }
-            }
+            base.OnValueChanged(newValue);
+            EditChild = newValue as IEditBase;
+            IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
         }
 
         public bool IsModified => IsSelfModified || (EditChild?.IsModified ?? false);
@@ -90,14 +68,14 @@ namespace OOBehave.Core
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
         where T : IBase
     {
-        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
+        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory, valuesDiffer)
         {
 
         }
 
-        protected override IEditPropertyValue CreatePropertyValue<PV>(string name, PV value)
+        protected override IEditPropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
         {
-            return Factory.CreateEditPropertyValue(name, value);
+            return Factory.CreateEditPropertyValue(registeredProperty, value);
         }
 
         public bool IsModified => fieldData.Values.Any(p => p.IsModified);

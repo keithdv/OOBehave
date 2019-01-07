@@ -29,10 +29,12 @@ namespace OOBehave
         protected new IEditPropertyValueManager<T> PropertyValueManager => (IEditPropertyValueManager<T>)base.PropertyValueManager;
 
         protected new ISendReceivePortalChild<I> ItemPortal { get; }
+        public ISendReceivePortal<T> SendReceivePortal { get; }
 
         public EditListBase(IEditListBaseServices<T, I> services) : base(services)
         {
             this.ItemPortal = services.SendReceivePortalChild;
+            this.SendReceivePortal = services.SendReceivePortal;
         }
 
         public bool IsModified => PropertyValueManager.IsModified || this.Any(c => c.IsModified) || IsDeleted;
@@ -119,6 +121,28 @@ namespace OOBehave
             {
                 await ItemPortal.UpdateChild(i, criteria);
             }
+        }
+
+        public virtual async Task Save()
+        {
+            if (!IsSavable)
+            {
+                if (IsChild)
+                {
+                    throw new Exception("Child objects cannot be saved");
+                }
+                if (IsValid)
+                {
+                    throw new Exception("Object is not valid and cannot be saved.");
+                }
+                if (!IsModified)
+                {
+                    throw new Exception("Object has not been modified.");
+                }
+            }
+
+            await SendReceivePortal.Update((T)this);
+
         }
     }
 

@@ -91,6 +91,21 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
+        public void ValidateBase_Rule_SameValue()
+        {
+
+            validate.Title = "Mr.";
+            validate.FirstName = "John";
+            validate.LastName = "Smith";
+            var ruleCount = validate.RuleRunCount;
+            validate.Title = "Mr.";
+            validate.FirstName = "John";
+            validate.LastName = "Smith";
+
+            Assert.AreEqual(ruleCount, validate.RuleRunCount);
+        }
+
+        [TestMethod]
         public void ValidateBase_Rule_IsValid_True()
         {
             validate.Title = "Mr.";

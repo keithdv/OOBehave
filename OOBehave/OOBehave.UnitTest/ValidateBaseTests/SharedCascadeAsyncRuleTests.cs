@@ -66,7 +66,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public void TestInitailize()
         {
             scope = AutofacContainer.GetLifetimeScope();
-            target = scope.Resolve<IReceivePortal<ISharedAsyncRuleObject>>().Create().Result;
+            target = scope.Resolve<ISharedAsyncRuleObject>();
 
         }
 

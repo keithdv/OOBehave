@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace OOBehave.UnitTest
+namespace OOBehave.Autofac
 {
     public class ServiceScope : IServiceScope
     {

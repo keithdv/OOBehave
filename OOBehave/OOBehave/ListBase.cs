@@ -128,15 +128,17 @@ namespace OOBehave
             return item;
         }
 
+        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
+        {
+            PropertyValueManager.Load(registeredProperty, value);
+        }
+
         P IPropertyAccess.ReadProperty<P>(IRegisteredProperty<P> registeredProperty)
         {
             return PropertyValueManager.Read(registeredProperty);
         }
 
-        void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
-        {
-            PropertyValueManager.Set(registeredProperty, value);
-        }
+
     }
 
 }

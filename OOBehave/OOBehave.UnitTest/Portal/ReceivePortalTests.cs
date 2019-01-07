@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
@@ -11,7 +12,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     [TestClass]
     public class ReceivePortalTests
     {
-        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope();
+        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
         private IReceivePortal<IBaseObject> portal;
         private IBaseObject domainObject;
 
@@ -51,6 +52,15 @@ namespace OOBehave.UnitTest.ObjectPortal
             domainObject = await portal.Create(crit);
             Assert.AreEqual(crit, domainObject.IntCriteria);
         }
+
+        [TestMethod]
+        public async Task ReceivePortal_CreateInferredCriteriaCalled()
+        {
+            var crit = new List<int>() { 0, 1, 2 };
+            domainObject = await portal.Create(crit);
+            Assert.IsTrue(domainObject.CreateCalled);
+        }
+
 
         [TestMethod]
         public async Task ReceivePortal_CreateTupleCriteriaCalled()

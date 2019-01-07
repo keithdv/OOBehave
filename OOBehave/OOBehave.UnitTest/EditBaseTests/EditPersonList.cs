@@ -16,8 +16,8 @@ namespace OOBehave.UnitTest.EditBaseTests
     public class EditPersonList : EditListBase<EditPersonList, IEditPerson>, IEditPersonList
     {
         public EditPersonList(IEditListBaseServices<EditPersonList, IEditPerson> services,
-            IShortNameAsyncRule<EditPersonList> shortNameRule,
-            IFullNameAsyncRule<EditPersonList> fullNameRule) : base(services)
+            IShortNameRule<EditPersonList> shortNameRule,
+            IFullNameRule<EditPersonList> fullNameRule) : base(services)
         {
             RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
