@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using OOBehave.Portal;
 using OOBehave.UnitTest.PersonObjects;
 using System;
@@ -124,6 +125,54 @@ namespace OOBehave.UnitTest.EditBaseTests
             Assert.IsTrue(list.IsDeleted);
             Assert.IsTrue(list.IsModified);
             Assert.IsTrue(list.IsSelfModified);
+        }
+
+        [TestMethod]
+        public async Task EditListBaseTest_Save()
+        {
+            var listMock = scope.Resolve<MockSendReceivePortal<EditPersonList>>();
+            listMock.MockPortal.Setup(x => x.Update((EditPersonList)list)).Returns(Task.CompletedTask);
+
+            list.FirstName = Guid.NewGuid().ToString();
+
+            await list.Save();
+
+            listMock.MockPortal.Verify(x => x.Update((EditPersonList)list), Times.Once);
+        }
+
+        [TestMethod]
+        public void EditListBaseTest_Remove()
+        {
+            list.Remove(list.First());
+            Assert.AreEqual(0, list.Count);
+            Assert.AreEqual(1, list.DeletedCount);
+        }
+        [TestMethod]
+        public void EditListBaseTest_Remove_IsModified()
+        {
+            Assert.IsTrue(list.Remove(list.First()));
+            Assert.IsTrue(list.IsModified);
+            // Self modified means it's own properties
+            // List items are considered children
+            Assert.IsFalse(list.IsSelfModified);
+        }
+
+        [TestMethod]
+        public void EditListBaseTest_RemoveAt()
+        {
+            list.RemoveAt(0);
+            Assert.AreEqual(0, list.Count);
+            Assert.AreEqual(1, list.DeletedCount);
+        }
+
+        [TestMethod]
+        public void EditListBaseTest_RemoveAt_IsModified()
+        {
+            list.Remove(list.First());
+            Assert.IsTrue(list.IsModified);
+            // Self modified means it's own properties
+            // List items are considered children
+            Assert.IsFalse(list.IsSelfModified);
         }
     }
 }

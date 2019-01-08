@@ -2,13 +2,14 @@
 using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
+using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public class EditObject : EditBase<EditObject>, IEditObject
+    public class EditObjectList : EditListBase<EditObjectList, IEditObject>, IEditObjectList
     {
 
-        public EditObject(IEditBaseServices<EditObject> baseServices) : base(baseServices)
+        public EditObjectList(IEditListBaseServices<EditObjectList, IEditObject> baseServices) : base(baseServices)
         {
         }
 
@@ -210,13 +211,15 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         public bool UpdateCalled { get; set; } = false;
 
-        [Update]
-        private void Update()
+        protected override async Task Update()
         {
-            ID = Guid.NewGuid();
-            UpdateCalled = true;
+            if (IsSelfModified)
+            {
+                ID = Guid.NewGuid();
+                UpdateCalled = true;
+            }
+            await UpdateList();
         }
-
 
         [Update]
         private void Update(int criteria)
@@ -332,5 +335,6 @@ namespace OOBehave.UnitTest.ObjectPortal
             GuidCriteria = criteria;
             DeleteChildCalled = true;
         }
+
     }
 }

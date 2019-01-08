@@ -9,16 +9,16 @@ namespace OOBehave.UnitTest.ObjectPortal
 {
 
     [TestClass]
-    public class SendReceivePortalTests
+    public class SendReceivePortalListTests
     {
         private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
-        private ISendReceivePortal<IEditObject> portal;
-        private IEditObject editObject;
+        private ISendReceivePortal<IEditObjectList> portal;
+        private IEditObjectList editObject;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            portal = scope.Resolve<ISendReceivePortal<IEditObject>>();
+            portal = scope.Resolve<ISendReceivePortal<IEditObjectList>>();
         }
 
         [TestCleanup]
@@ -30,7 +30,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_Create()
+        public async Task SendReceivePortalList_Create()
         {
             editObject = await portal.Create();
             Assert.IsTrue(editObject.CreateCalled);
@@ -39,7 +39,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_CreateGuidCriteriaCalled()
+        public async Task SendReceivePortalList_CreateGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
             editObject = await portal.Create(crit);
@@ -48,7 +48,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_CreateIntCriteriaCalled()
+        public async Task SendReceivePortalList_CreateIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.Create(crit);
@@ -58,7 +58,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task SendReceivePortal_Fetch()
+        public async Task SendReceivePortalList_Fetch()
         {
             editObject = await portal.Fetch();
             Assert.IsTrue(editObject.ID.HasValue);
@@ -72,7 +72,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_FetchGuidCriteriaCalled()
+        public async Task SendReceivePortalList_FetchGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
             editObject = await portal.Fetch(crit);
@@ -81,7 +81,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_FetchIntCriteriaCalled()
+        public async Task SendReceivePortalList_FetchIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.Fetch(crit);
@@ -92,7 +92,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task SendReceivePortal_Update()
+        public async Task SendReceivePortalList_Update()
         {
             editObject = await portal.Fetch();
             var id = Guid.NewGuid();
@@ -106,7 +106,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_UpdateGuidCriteriaCalled()
+        public async Task SendReceivePortalList_UpdateGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
             editObject = await portal.Fetch();
@@ -117,7 +117,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_UpdateIntCriteriaCalled()
+        public async Task SendReceivePortalList_UpdateIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.Fetch();
@@ -130,7 +130,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task SendReceivePortal_Insert()
+        public async Task SendReceivePortalList_Insert()
         {
             editObject = await portal.Create();
             editObject.ID = Guid.Empty;
@@ -143,7 +143,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_InsertGuidCriteriaCalled()
+        public async Task SendReceivePortalList_InsertGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
             editObject = await portal.Create();
@@ -153,7 +153,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_InsertIntCriteriaCalled()
+        public async Task SendReceivePortalList_InsertIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.Create();
@@ -165,7 +165,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task SendReceivePortal_Delete()
+        public async Task SendReceivePortalList_Delete()
         {
             editObject = await portal.Fetch();
             editObject.Delete();
@@ -174,7 +174,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_DeleteGuidCriteriaCalled()
+        public async Task SendReceivePortalList_DeleteGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
             editObject = await portal.Fetch();
@@ -185,7 +185,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [TestMethod]
-        public async Task SendReceivePortal_DeleteIntCriteriaCalled()
+        public async Task SendReceivePortalList_DeleteIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.Fetch();

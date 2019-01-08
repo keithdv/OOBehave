@@ -45,6 +45,7 @@ namespace OOBehave.Core
 
         public ValidatePropertyValue(string name, T value) : base(name, value)
         {
+            Child = value as IValidateBase;
         }
 
         public override T Value

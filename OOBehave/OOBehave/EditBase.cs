@@ -20,7 +20,7 @@ namespace OOBehave
             SendReceivePortal = services.SendReceivePortal;
         }
 
-        public bool IsModified => PropertyValueManager.IsModified || IsDeleted;
+        public bool IsModified => PropertyValueManager.IsModified || IsDeleted || IsNew;
         public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         [PortalDataMember]
@@ -78,6 +78,11 @@ namespace OOBehave
             IsDeleted = true;
         }
 
+        void IPortalEditTarget.MarkDeleted()
+        {
+            MarkDeleted();
+        }
+
         public void Delete()
         {
             MarkDeleted();
@@ -91,7 +96,7 @@ namespace OOBehave
                 {
                     throw new Exception("Child objects cannot be saved");
                 }
-                if (IsValid)
+                if (!IsValid)
                 {
                     throw new Exception("Object is not valid and cannot be saved.");
                 }

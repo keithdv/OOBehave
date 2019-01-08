@@ -26,6 +26,8 @@ namespace OOBehave.Portal
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         void MarkUnmodified();
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void MarkDeleted();
 
     }
 

@@ -90,7 +90,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         public async Task SendReceivePortalChild_UpdateChild()
         {
             editObject = await portal.FetchChild();
-            editObject.Name = "abc";
+            editObject.ID = Guid.NewGuid();
             await portal.UpdateChild(editObject);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.IsFalse(editObject.IsNew);
@@ -102,7 +102,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             var crit = Guid.NewGuid();
             editObject = await portal.FetchChild();
-            editObject.Name = "abc";
+            editObject.ID = Guid.NewGuid();
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.GuidCriteria);
@@ -113,7 +113,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             int crit = DateTime.Now.Millisecond;
             editObject = await portal.FetchChild();
-            editObject.Name = "abc";
+            editObject.ID = Guid.NewGuid();
             await portal.UpdateChild(editObject, crit);
             Assert.IsTrue(editObject.UpdateChildCalled);
             Assert.AreEqual(crit, editObject.IntCriteria);

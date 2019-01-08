@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>0.1.10-Beta</Version>
+    <Version>0.1.12-Beta</Version>
     <Authors>Keith Voels</Authors>
     <Description>Behavioral OO modeling and collaboration business framework.</Description>
     <Copyright>2019</Copyright>
@@ -14,8 +14,8 @@
     <LangVersion>latest</LangVersion>
     <PackageIconUrl>https://github.com/keithdv/OOBehave/blob/master/OOBehave/Logo.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/keithdv/OOBehave</RepositoryUrl>
-    <AssemblyVersion>0.1.10.0</AssemblyVersion>
-    <FileVersion>0.1.10.0</FileVersion>
+    <AssemblyVersion>0.1.12.0</AssemblyVersion>
+    <FileVersion>0.1.12.0</FileVersion>
   </PropertyGroup>
 
 </Project>

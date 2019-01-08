@@ -39,10 +39,11 @@ namespace OOBehave.Core
     {
 
 
-
+        private bool initialValue = true;
         public EditPropertyValue(string name, T value) : base(name, value)
         {
             EditChild = value as IEditBase;
+            initialValue = false;
         }
 
         public IEditBase EditChild { get; protected set; }
@@ -51,7 +52,10 @@ namespace OOBehave.Core
         {
             base.OnValueChanged(newValue);
             EditChild = newValue as IEditBase;
-            IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+            if (!initialValue)
+            {
+                IsSelfModified = true && EditChild == null; // Never consider ourself modified if OOBehave object
+            }
         }
 
         public bool IsModified => IsSelfModified || (EditChild?.IsModified ?? false);

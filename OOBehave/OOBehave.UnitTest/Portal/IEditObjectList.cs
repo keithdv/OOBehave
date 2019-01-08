@@ -2,7 +2,7 @@
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
-    public interface IEditObject : IEditBase
+    public interface IEditObjectList : IEditListBase<IEditObject>
     {
         Guid? ID { get; set; }
         int IntCriteria { get; }
@@ -17,5 +17,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         bool UpdateChildCalled { get; set; }
         bool InsertCalled { get; set; }
         bool InsertChildCalled { get; set; }
+
     }
 }

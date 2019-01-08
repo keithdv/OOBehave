@@ -18,7 +18,7 @@ namespace OOBehave
     public interface IEditListBase<I> : IEditListBase, IValidateListBase<I>
         where I : IEditBase
     {
-
+        new void RemoveAt(int index);
     }
 
     public abstract class EditListBase<T, I> : ValidateListBase<T, I>, IOOBehaveObject, IEditListBase<I>
@@ -37,7 +37,7 @@ namespace OOBehave
             this.SendReceivePortal = services.SendReceivePortal;
         }
 
-        public bool IsModified => PropertyValueManager.IsModified || this.Any(c => c.IsModified) || IsDeleted;
+        public bool IsModified => PropertyValueManager.IsModified || IsNew || this.Any(c => c.IsModified) || IsDeleted || DeletedList.Any();
         public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }
@@ -89,12 +89,40 @@ namespace OOBehave
 
         protected virtual void MarkDeleted()
         {
+            // TODO
+            // THis concept is a little blurry
+            // I suppose I should delete all of my children??
             IsDeleted = true;
+        }
+
+        void IPortalEditTarget.MarkDeleted()
+        {
+            MarkDeleted();
         }
 
         public void Delete()
         {
             MarkDeleted();
+        }
+
+        public new bool Remove(I item)
+        {
+            if (!item.IsNew)
+            {
+                item.Delete();
+                DeletedList.Add(item);
+            }
+            return base.Remove(item);
+        }
+
+        public new void RemoveAt(int index)
+        {
+            var item = this[index];
+            if (!item.IsNew)
+            {
+                DeletedList.Add(item);
+            }
+            base.RemoveAt(index);
         }
 
         protected async Task UpdateList()
@@ -131,7 +159,7 @@ namespace OOBehave
                 {
                     throw new Exception("Child objects cannot be saved");
                 }
-                if (IsValid)
+                if (!IsValid)
                 {
                     throw new Exception("Object is not valid and cannot be saved.");
                 }
@@ -143,6 +171,17 @@ namespace OOBehave
 
             await SendReceivePortal.Update((T)this);
 
+        }
+
+        [Update]
+        [UpdateChild]
+        protected virtual async Task Update()
+        {
+            if (IsSelfModified)
+            {
+                throw new Exception($"{typeof(T).FullName} is modified you must override and define Update().");
+            }
+            await UpdateList();
         }
     }
 

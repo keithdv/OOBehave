@@ -30,6 +30,9 @@ namespace OOBehave.UnitTest.EditBaseTests
             editPerson.FillFromDto(parentDto);
             editPerson.MarkOld();
             editPerson.MarkUnmodified();
+            Assert.IsFalse(editPerson.IsModified);
+            Assert.IsFalse(editPerson.IsNew);
+            Assert.IsFalse(editPerson.IsSavable);
         }
 
         [TestCleanup]

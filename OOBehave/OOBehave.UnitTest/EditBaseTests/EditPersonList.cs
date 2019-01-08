@@ -11,6 +11,7 @@ namespace OOBehave.UnitTest.EditBaseTests
 
     public interface IEditPersonList : IEditListBase<IEditPerson>, IPersonBase
     {
+        int DeletedCount { get; }
     }
 
     public class EditPersonList : EditListBase<EditPersonList, IEditPerson>, IEditPersonList
@@ -22,7 +23,7 @@ namespace OOBehave.UnitTest.EditBaseTests
             RuleExecute.AddRules(shortNameRule, fullNameRule);
         }
 
-
+        public int DeletedCount => DeletedList.Count;
         private IRegisteredProperty<Guid> IdProperty => GetRegisteredProperty<Guid>(nameof(Id));
         public Guid Id { get { return Getter<Guid>(); } }
 
