@@ -34,13 +34,6 @@ namespace OOBehave.UnitTest.ObjectPortal
             CreateCalled = true;
         }
 
-        [Create]
-        private void Create(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            CreateCalled = true;
-        }
-
 
         [Create]
         private void Create(Guid criteria, IDisposableDependency dependency)
@@ -63,13 +56,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void CreateChild(int criteria)
         {
             IntCriteria = criteria;
-            CreateChildCalled = true;
-        }
-
-        [CreateChild]
-        private void CreateChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
             CreateChildCalled = true;
         }
 
@@ -97,13 +83,6 @@ namespace OOBehave.UnitTest.ObjectPortal
             FetchCalled = true;
         }
 
-        [Fetch]
-        private void Fetch(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            FetchCalled = true;
-        }
-
 
         [Fetch]
         private void Fetch(Guid criteria, IDisposableDependency dependency)
@@ -126,13 +105,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void FetchChild(int criteria)
         {
             IntCriteria = criteria;
-            FetchChildCalled = true;
-        }
-
-        [FetchChild]
-        private void FetchChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
             FetchChildCalled = true;
         }
 
@@ -163,13 +135,6 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Insert]
-        private void Insert(Guid criteria)
-        {
-            InsertCalled = true;
-            GuidCriteria = criteria;
-        }
-
-        [Insert]
         private void Insert(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
@@ -193,13 +158,6 @@ namespace OOBehave.UnitTest.ObjectPortal
             InsertChildCalled = true;
         }
 
-
-        [InsertChild]
-        private void InsertChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            InsertChildCalled = true;
-        }
 
         [InsertChild]
         private void InsertChild(Guid criteria, IDisposableDependency dependency)
@@ -230,13 +188,6 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Update]
-        private void Update(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            UpdateCalled = true;
-        }
-
-        [Update]
         private void Update(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
@@ -262,13 +213,6 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [UpdateChild]
-        private void UpdateChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            UpdateChildCalled = true;
-        }
-
-        [UpdateChild]
         private void UpdateChild(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
@@ -292,13 +236,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Delete]
-        private void Delete(Guid criteria)
-        {
-            GuidCriteria = criteria;
-            DeleteCalled = true;
-        }
-
-        [Delete]
         private void Delete(Guid criteria, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
@@ -318,13 +255,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         private void DeleteChild(int criteria)
         {
             IntCriteria = criteria;
-            DeleteChildCalled = true;
-        }
-
-        [DeleteChild]
-        private void DeleteChild(Guid criteria)
-        {
-            GuidCriteria = criteria;
             DeleteChildCalled = true;
         }
 

@@ -6,7 +6,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     {
         int IntCriteria { get; }
         Guid GuidCriteria { get; }
-        (int, string) TupleCriteria { get; }
+        object[] MultipleCriteria { get; }
         bool CreateCalled { get; set; }
         bool CreateChildCalled { get; set; }
         bool FetchCalled { get; set; }

@@ -25,8 +25,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestCleanup]
         public void TestCleanup()
         {
-            // Make sure only what  is expected to be called was called
-            Assert.IsNotNull(domainObject);
             scope.Dispose();
         }
 
@@ -63,11 +61,36 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [TestMethod]
-        public async Task ReceivePortal_CreateTupleCriteriaCalled()
+        public async Task ReceivePortal_CreateMultipleCriteriaCalled()
         {
-            var crit = (10, "String");
-            domainObject = await portal.Create(crit);
-            Assert.AreEqual(crit, domainObject.TupleCriteria);
+            domainObject = await portal.Create(10, "String");
+            CollectionAssert.AreEquivalent(new object[] { 10, "String" }, domainObject.MultipleCriteria);
+        }
+
+        [TestMethod]
+        public void ReceivePortal_CreateMultipleCriteria_Missing_Fail()
+        {
+            // No such method exists
+
+            Assert.ThrowsException<AggregateException>(() => domainObject = portal.Create(Guid.NewGuid(), "String").Result);
+
+        }
+
+        [TestMethod]
+        public void ReceivePortal_CreateMultipleCriteria_Duplicate_Fail()
+        {
+            // Two possibilities exist due to one with a dependency and one without
+            Assert.ThrowsException<AggregateException>(() => domainObject = portal.Create(1u).Result);
+
+        }
+
+        [TestMethod]
+        public async Task ReceivePortal_CreateMultipleCriteriaCalled_Double()
+        {
+            var r = scope.IsRegistered(typeof(int));
+
+            domainObject = await portal.Create(1, 10d);
+            CollectionAssert.AreEquivalent(new object[] { 1, 10d }, domainObject.MultipleCriteria);
         }
 
         [TestMethod]

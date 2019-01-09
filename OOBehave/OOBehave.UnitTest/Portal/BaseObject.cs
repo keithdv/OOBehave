@@ -15,7 +15,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         public Guid GuidCriteria { get; set; } = Guid.Empty;
         public int IntCriteria { get; set; } = -1;
-        public (int, string) TupleCriteria { get; set; }
+        public object[] MultipleCriteria { get; set; }
 
         public bool CreateCalled { get; set; } = false;
 
@@ -32,9 +32,27 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Create]
-        private void CreateTuple((int, string) tuple)
+        private void CreateMultiple(int i, string s)
         {
-            TupleCriteria = tuple;
+            MultipleCriteria = new object[] { i, s };
+        }
+
+        [Create]
+        private void CreateMultiple(int i, double d, IDisposableDependency dep)
+        {
+            Assert.IsNotNull(dep);
+            MultipleCriteria = new object[] { i, d };
+        }
+
+        [Create]
+        private void CreateErrorDuplicate(uint i)
+        {
+            Assert.Fail("Should not have reached");
+        }
+        [Create]
+        private void CreateErrorDuplicate(uint i, IDisposableDependency dep)
+        {
+            Assert.Fail("Should not have reached");
         }
 
         [Create]

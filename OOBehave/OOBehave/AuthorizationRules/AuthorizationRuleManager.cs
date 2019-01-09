@@ -15,7 +15,7 @@ namespace OOBehave.AuthorizationRules
         bool IsRegistered { get; }
         void AddRule<R>() where R : IAuthorizationRule;
         Task CheckAccess(AuthorizeOperation operation);
-        Task CheckAccess(AuthorizeOperation operation, object criteria);
+        Task CheckAccess(AuthorizeOperation operation, params object[] criteria);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ namespace OOBehave.AuthorizationRules
             }
         }
 
-        public async Task CheckAccess(AuthorizeOperation operation, object criteria)
+        public async Task CheckAccess(AuthorizeOperation operation, params object[] criteria)
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
@@ -186,42 +186,65 @@ namespace OOBehave.AuthorizationRules
                 foreach (var ruleMethod in methods)
                 {
                     var method = ruleMethod.Method;
-                    var parameter = method.GetParameters().SingleOrDefault();
-                    if (parameter != null && parameter.ParameterType.IsAssignableFrom(criteria.GetType()))
+
+                    if (method.GetParameters().Count() == criteria.Length)
                     {
+                        var parameterTypes = method.GetParameters().Cast<ParameterInfo>().Select(p => p.ParameterType).GetEnumerator();
+                        var criteriaTypes = criteria.Select(c => c.GetType()).GetEnumerator();
+                        var match = true;
 
-                        // Only allow one; maybe take this out later
-                        // AuthorizationRules should be stringent
-                        if (methodFound)
-                        {
-                            throw new AuthorzationRulesMethodException($"More than one {operation.ToString()} method with no criteria found in {ruleMethod.AuthorizationRule.GetType().ToString()}");
-                        }
-                        methodFound = true;
+                        parameterTypes.MoveNext();
+                        criteriaTypes.MoveNext();
 
-                        IAuthorizationRuleResult ruleResult;
-                        var methodResult = method.Invoke(ruleMethod.AuthorizationRule, new object[1] { criteria });
-                        var methodResultAsync = methodResult as Task<IAuthorizationRuleResult>;
+                        while (match && parameterTypes.Current != null && criteriaTypes.Current != null)
+                        {
+                            if (!parameterTypes.Current.IsAssignableFrom(criteriaTypes.Current))
+                            {
+                                match = false;
+                            }
 
-                        if (methodResultAsync != null)
-                        {
-                            await methodResultAsync;
-                            ruleResult = ((IAuthorizationRuleResult)methodResultAsync.Result);
-                        }
-                        else
-                        {
-                            ruleResult = ((IAuthorizationRuleResult)methodResult);
+                            parameterTypes.MoveNext();
+                            criteriaTypes.MoveNext();
+
                         }
 
-                        if (!ruleResult.HasAccess)
+
+                        if (match)
                         {
-                            throw new AccessDeniedException(ruleResult.Message);
+
+                            // Only allow one; maybe take this out later
+                            // AuthorizationRules should be stringent
+                            if (methodFound)
+                            {
+                                throw new AuthorzationRulesMethodException($"More than one {operation.ToString()} method with no criteria found in {ruleMethod.AuthorizationRule.GetType().ToString()}");
+                            }
+                            methodFound = true;
+
+                            IAuthorizationRuleResult ruleResult;
+                            var methodResult = method.Invoke(ruleMethod.AuthorizationRule, criteria);
+                            var methodResultAsync = methodResult as Task<IAuthorizationRuleResult>;
+
+                            if (methodResultAsync != null)
+                            {
+                                await methodResultAsync;
+                                ruleResult = ((IAuthorizationRuleResult)methodResultAsync.Result);
+                            }
+                            else
+                            {
+                                ruleResult = ((IAuthorizationRuleResult)methodResult);
+                            }
+
+                            if (!ruleResult.HasAccess)
+                            {
+                                throw new AccessDeniedException(ruleResult.Message);
+                            }
                         }
                     }
                 }
 
                 if (!methodFound)
                 {
-                    throw new AccessDeniedException($"Missing authorization method for {operation.ToString()} with criteria {criteria.GetType().FullName}");
+                    throw new AccessDeniedException($"Missing authorization method for {operation.ToString()} with criteria [{string.Join(", ", criteria.Select(x => x.GetType().FullName))}]");
                 }
 
             }

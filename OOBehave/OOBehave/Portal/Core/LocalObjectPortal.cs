@@ -24,9 +24,9 @@ namespace OOBehave.Portal.Core
             return await CallOperationMethod(PortalOperation.Create, false);
         }
 
-        public async Task<T> Create(object criteria)
+        public async Task<T> Create(params object[] criteria)
         {
-            return await CallOperationMethod(criteria, PortalOperation.Create);
+            return await CallOperationMethod(PortalOperation.Create, criteria);
         }
 
         public async Task<T> CreateChild()
@@ -34,9 +34,9 @@ namespace OOBehave.Portal.Core
             return await CallOperationMethod(PortalOperation.CreateChild, false);
         }
 
-        public async Task<T> CreateChild(object criteria)
+        public async Task<T> CreateChild(params object[] criteria)
         {
-            return await CallOperationMethod(criteria, PortalOperation.CreateChild);
+            return await CallOperationMethod(PortalOperation.CreateChild, criteria);
         }
 
         public async Task<T> Fetch()
@@ -44,9 +44,9 @@ namespace OOBehave.Portal.Core
             return await CallOperationMethod(PortalOperation.Fetch);
         }
 
-        public async Task<T> Fetch(object criteria)
+        public async Task<T> Fetch(params object[] criteria)
         {
-            return await CallOperationMethod(criteria, PortalOperation.Fetch);
+            return await CallOperationMethod(PortalOperation.Fetch, criteria);
         }
 
         public async Task<T> FetchChild()
@@ -54,9 +54,9 @@ namespace OOBehave.Portal.Core
             return await CallOperationMethod(PortalOperation.FetchChild);
         }
 
-        public async Task<T> FetchChild(object criteria)
+        public async Task<T> FetchChild(params object[] criteria)
         {
-            return await CallOperationMethod(criteria, PortalOperation.FetchChild);
+            return await CallOperationMethod(PortalOperation.FetchChild, criteria);
         }
 
         protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = true)
@@ -78,21 +78,21 @@ namespace OOBehave.Portal.Core
 
         }
 
-        protected async Task<T> CallOperationMethod(object criteria, PortalOperation operation)
+        protected async Task<T> CallOperationMethod(PortalOperation operation, params object[] criteria)
         {
             var target = Scope.Resolve<T>();
-            await CallOperationMethod(target, criteria, operation);
+            await CallOperationMethod(target, operation, criteria);
             return target;
         }
-        protected async Task CallOperationMethod(T target, object criteria, PortalOperation operation)
+        protected async Task CallOperationMethod(T target, PortalOperation operation, params object[] criteria)
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
-            var success = await OperationManager.TryCallOperation(target, criteria, operation);
+            var success = await OperationManager.TryCallOperation(target, operation, criteria);
 
             if (!success)
             {
-                throw new OperationMethodCallFailedException($"{operation.ToString()} method on {typeof(T).FullName} with criteria {criteria.GetType().FullName} not found.");
+                throw new OperationMethodCallFailedException($"{operation.ToString()} method on {typeof(T).FullName} with criteria [{string.Join(", ", criteria.Select(x => x.GetType().FullName))}] not found.");
             }
 
         }
@@ -128,22 +128,22 @@ namespace OOBehave.Portal.Core
             }
         }
 
-        public async Task Update(T target, object criteria)
+        public async Task Update(T target, params object[] criteria)
         {
             if (target.IsDeleted)
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, criteria, PortalOperation.Delete);
+                    await CallOperationMethod(target, PortalOperation.Delete, criteria);
                 }
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, criteria, PortalOperation.Insert);
+                await CallOperationMethod(target, PortalOperation.Insert, criteria);
             }
             else
             {
-                await CallOperationMethod(target, criteria, PortalOperation.Update);
+                await CallOperationMethod(target, PortalOperation.Update, criteria);
             }
         }
 
@@ -166,22 +166,22 @@ namespace OOBehave.Portal.Core
             }
         }
 
-        public async Task UpdateChild(T child, object criteria)
+        public async Task UpdateChild(T child, params object[] criteria)
         {
             if (child.IsDeleted)
             {
                 if (!child.IsNew)
                 {
-                    await CallOperationMethod(child, criteria, PortalOperation.DeleteChild);
+                    await CallOperationMethod(child, PortalOperation.DeleteChild, criteria);
                 }
             }
             else if (child.IsNew)
             {
-                await CallOperationMethod(child, criteria, PortalOperation.InsertChild);
+                await CallOperationMethod(child, PortalOperation.InsertChild, criteria);
             }
             else
             {
-                await CallOperationMethod(child, criteria, PortalOperation.UpdateChild);
+                await CallOperationMethod(child, PortalOperation.UpdateChild, criteria);
             }
         }
 
