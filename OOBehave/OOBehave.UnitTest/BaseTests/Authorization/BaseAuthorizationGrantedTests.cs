@@ -11,7 +11,8 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
 {
     public interface IAuthorizationGrantedRule : IAuthorizationRule
     {
-        int Criteria { get; set; }
+        int IntCriteria { get; set; }
+        Guid? GuidCriteria { get; set; }
         bool ExecuteCreateCalled { get; }
         bool ExecuteFetchCalled { get; set; }
         bool ExecuteUpdateCalled { get; set; }
@@ -19,7 +20,8 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
     }
     public class AuthorizationGrantedRule : AuthorizationRule, IAuthorizationGrantedRule
     {
-        public int Criteria { get; set; }
+        public int IntCriteria { get; set; }
+        public Guid? GuidCriteria { get; set; }
         public bool ExecuteCreateCalled { get; set; }
 
         [Execute(AuthorizeOperation.Create)]
@@ -33,7 +35,16 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         public IAuthorizationRuleResult ExecuteCreate(int criteria)
         {
             ExecuteCreateCalled = true;
-            Criteria = criteria;
+            IntCriteria = criteria;
+            return AuthorizationRuleResult.AccessGranted();
+        }
+
+        [Execute(AuthorizeOperation.Create)]
+        public IAuthorizationRuleResult ExecuteCreate(int intCriteria, Guid? guidCriteria)
+        {
+            ExecuteCreateCalled = true;
+            IntCriteria = intCriteria;
+            GuidCriteria = guidCriteria;
             return AuthorizationRuleResult.AccessGranted();
         }
 
@@ -49,7 +60,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         public IAuthorizationRuleResult ExecuteFetch(int criteria)
         {
             ExecuteFetchCalled = true;
-            Criteria = criteria;
+            IntCriteria = criteria;
             return AuthorizationRuleResult.AccessGranted();
         }
 
@@ -89,6 +100,9 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         [Create]
         public void Create(int criteria) { }
 
+        [Create]
+        public void Create(int i, Guid? g) { }
+
         [Fetch]
         private void Fetch() { }
 
@@ -126,9 +140,22 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
             var obj = await portal.Create(criteria);
             var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
-            Assert.AreEqual(criteria, authRule.Criteria);
+            Assert.AreEqual(criteria, authRule.IntCriteria);
         }
-        
+
+        [TestMethod]
+        public async Task BaseAuthorization_Create_MultipleCriteria()
+        {
+            var intC = DateTime.Now.Millisecond;
+            var guidC = Guid.NewGuid();
+
+            var obj = await portal.Create(intC, guidC);
+            var authRule = scope.Resolve<IAuthorizationGrantedRule>();
+            Assert.IsTrue(authRule.ExecuteCreateCalled);
+            Assert.AreEqual(intC, authRule.IntCriteria);
+            Assert.AreEqual(guidC, authRule.GuidCriteria.Value);
+        }
+
         [TestMethod]
         public async Task BaseAuthorization_Fetch()
         {
@@ -144,7 +171,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
             var obj = await portal.Fetch(criteria);
             var authRule = scope.Resolve<IAuthorizationGrantedRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
-            Assert.AreEqual(criteria, authRule.Criteria);
+            Assert.AreEqual(criteria, authRule.IntCriteria);
         }
     }
 }

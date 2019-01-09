@@ -19,7 +19,7 @@ namespace OOBehave.UnitTest
             return MockPortal.Object.CreateChild();
         }
 
-        public Task<T> CreateChild(object criteria)
+        public Task<T> CreateChild(params object[] criteria)
         {
             return MockPortal.Object.CreateChild(criteria);
         }
@@ -29,12 +29,12 @@ namespace OOBehave.UnitTest
             return MockPortal.Object.FetchChild();
         }
 
-        public Task<T> FetchChild(object criteria)
+        public Task<T> FetchChild(params object[] criteria)
         {
             return MockPortal.Object.FetchChild(criteria);
         }
 
-        public Task UpdateChild(T target, object criteria)
+        public Task UpdateChild(T target, params object[] criteria)
         {
             return MockPortal.Object.UpdateChild(target, criteria);
         }

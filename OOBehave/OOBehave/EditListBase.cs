@@ -138,7 +138,7 @@ namespace OOBehave
             }
         }
 
-        protected async Task UpdateList(object criteria)
+        protected async Task UpdateList(params object[] criteria)
         {
             foreach (var d in DeletedList)
             {

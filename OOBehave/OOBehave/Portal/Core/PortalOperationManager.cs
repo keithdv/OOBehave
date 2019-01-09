@@ -88,26 +88,62 @@ namespace OOBehave.Portal.Core
         }
 
 
-        public MethodInfo MethodForOperation(PortalOperation operation, Type criteriaType)
+        public MethodInfo MethodForOperation(PortalOperation operation, IEnumerable<Type> criteriaTypes)
         {
             var methods = MethodsForOperation(operation);
+            MethodInfo matchingMethod = null;
 
             if (methods != null)
             {
+
                 foreach (var m in methods)
                 {
                     var parameters = m.GetParameters();
-                    var hasCriteriaParameter = parameters.Where(p => p.ParameterType.IsAssignableFrom(criteriaType)).FirstOrDefault();
 
-                    if (hasCriteriaParameter != null)
+                    // No criteria
+                    if (!criteriaTypes.Any() && !parameters.Any())
                     {
                         return m;
                     }
+                    else if (criteriaTypes.Any() && parameters.Any() && parameters.Count() >= criteriaTypes.Count())
+                    {
 
+                        var match = true;
+                        var critEnum = criteriaTypes.GetEnumerator();
+                        var paramEnum = parameters.Cast<ParameterInfo>().Select(p => p.ParameterType).GetEnumerator();
+
+                        paramEnum.MoveNext();
+                        critEnum.MoveNext();
+
+                        while (match && paramEnum.Current != null)
+                        {
+
+                            if (critEnum.Current != null && !paramEnum.Current.IsAssignableFrom(critEnum.Current))
+                            {
+                                match = false;
+                            } else if(critEnum.Current == null && !Scope.IsRegistered(paramEnum.Current)) // Any remaining parameters need to be registered dependencies
+                            {
+                                match = false;
+                            }
+
+                            paramEnum.MoveNext();
+                            critEnum.MoveNext();
+
+                        }
+
+                        // At the end of the Crit list
+                        // The parameter list can 
+                        if (match)
+                        {
+                            if (matchingMethod != null) { throw new Exception($"More then one method for {operation.ToString()} with criteria [{string.Join(",", criteriaTypes)}]"); }
+
+                            matchingMethod = m;
+                        }
+
+                    }
                 }
             }
-
-            return null;
+            return matchingMethod;
         }
 
         protected async Task CheckAccess(AuthorizeOperation operation)
@@ -115,7 +151,7 @@ namespace OOBehave.Portal.Core
             await AuthorizationRuleManager.CheckAccess(operation);
         }
 
-        protected async Task CheckAccess(AuthorizeOperation operation, object criteria)
+        protected async Task CheckAccess(AuthorizeOperation operation, params object[] criteria)
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
@@ -175,15 +211,17 @@ namespace OOBehave.Portal.Core
                 return invoked;
             }
         }
-        public async Task<bool> TryCallOperation(IPortalTarget target, object criteria, PortalOperation operation)
+        public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, params object[] criteria)
         {
             await CheckAccess(operation.ToAuthorizationOperation(), criteria);
 
             using (await target.StopAllActions())
             {
+                var criteriaTypes = criteria.Select(x => x.GetType()).ToList();
+
                 // This needs to be target.GetType() instead of a generic method
                 // because T will be an interface but tager.GetType() will be the concrete
-                var method = MethodForOperation(operation, criteria.GetType());
+                var method = MethodForOperation(operation, criteriaTypes);
 
                 if (method != null)
                 {
@@ -191,15 +229,19 @@ namespace OOBehave.Portal.Core
                     var parameters = method.GetParameters().ToList();
                     var parameterValues = new object[parameters.Count()];
 
+                    var criteriaE = criteria.GetEnumerator();
+
                     for (var i = 0; i < parameterValues.Length; i++)
                     {
-                        var parameter = parameters[i];
-                        if (parameter.ParameterType.IsAssignableFrom(criteria.GetType()))
+                        if (criteriaE.MoveNext())
                         {
-                            parameterValues[i] = criteria;
+                            // Use up the criteria values first
+                            // Assume MethodForOperation got the types right
+                            parameterValues[i] = criteriaE.Current;
                         }
                         else
                         {
+                            var parameter = parameters[i];
                             if (Scope.TryResolve(parameter.ParameterType, out var pv))
                             {
                                 parameterValues[i] = pv;

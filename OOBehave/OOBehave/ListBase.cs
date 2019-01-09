@@ -36,7 +36,7 @@ namespace OOBehave
     public interface IListBase<I> : IListBase, IReadOnlyCollection<I>, IReadOnlyList<I>, INotifyCollectionChanged, INotifyPropertyChanged, ICollection<I>, IList<I>
     {
         Task<I> CreateAdd();
-        Task<I> CreateAdd(object criteria);
+        Task<I> CreateAdd(params object[] criteria);
         new int Count { get; }
     }
 
@@ -121,7 +121,7 @@ namespace OOBehave
             return item;
         }
 
-        public async Task<I> CreateAdd(object criteria)
+        public async Task<I> CreateAdd(params object[] criteria)
         {
             var item = await ItemPortal.CreateChild(criteria);
             base.Add(item);
