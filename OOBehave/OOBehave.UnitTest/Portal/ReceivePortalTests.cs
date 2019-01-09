@@ -79,8 +79,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public void ReceivePortal_CreateMultipleCriteria_Duplicate_Fail()
         {
-            // Two possibilities exist
-
+            // Two possibilities exist due to one with a dependency and one without
             Assert.ThrowsException<AggregateException>(() => domainObject = portal.Create(1u).Result);
 
         }

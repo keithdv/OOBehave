@@ -121,7 +121,7 @@ namespace OOBehave.Portal.Core
                             if (critEnum.Current != null && !paramEnum.Current.IsAssignableFrom(critEnum.Current))
                             {
                                 match = false;
-                            } else if(critEnum.Current == null && !Scope.IsRegistered(paramEnum.Current)) // Any remaining parameters need to be registered dependencies
+                            } else if(critEnum.Current == null && !Scope.IsRegistered(paramEnum.Current)) // For recognizing multiple positives for the same criteria
                             {
                                 match = false;
                             }
