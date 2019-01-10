@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Newtonsoft.Json", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Netwonsoft.Json.Test", "OOBehave.Netwonsoft.Json.Test\OOBehave.Netwonsoft.Json.Test.csproj", "{28549357-D970-431D-8C48-83B0C333CAF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOBehave.Autofac", "OOBehave.Autofac\OOBehave.Autofac.csproj", "{8E3C2162-9946-477D-8992-66F0511D02F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOBehave.Autofac", "OOBehave.Autofac\OOBehave.Autofac.csproj", "{8E3C2162-9946-477D-8992-66F0511D02F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

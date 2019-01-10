@@ -24,7 +24,7 @@ namespace OOBehave.UnitTest.Portal
             Method = method;
         }
 
-        public delegate int CommandMethod(int number);
+        public delegate Task<int> CommandMethod(int number);
 
         /// <summary>
         /// This will be called on the servicer (when not a unit test)
@@ -32,10 +32,10 @@ namespace OOBehave.UnitTest.Portal
         /// <param name="number"></param>
         /// <param name="dependency"></param>
         /// <returns></returns>
-        internal static int CommandMethod_(int number, IDisposableDependency dependency)
+        internal static Task<int> CommandMethod_(int number, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
-            return number * 10;
+            return Task.FromResult(number * 10);
         }
 
         public Task<int> DoRemoteWork(int number)

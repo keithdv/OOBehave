@@ -17,7 +17,18 @@ namespace OOBehave.Portal.Core
 
         public Task<T> Execute<T>(params object[] p)
         {
-            return Task.FromResult((T)Method.Method.Invoke(Method.Target, p));
+            var result = Method.Method.Invoke(Method.Target, p);
+
+            if (result is Task<T> resultTask)
+            {
+                return resultTask;
+            }
+            else if (result is T resultT)
+            {
+                return Task.FromResult(resultT);
+            }
+
+            throw new Exception($"The return value {result.GetType()} is not {typeof(T).GetType()}.");
         }
 
     }

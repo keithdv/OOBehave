@@ -17,12 +17,12 @@ namespace OOBehave
 
     }
 
-    public interface IValidateListBase<I> : IValidateListBase, IListBase<I>
+    public interface IValidateListBase<I> : IListBase<I>, IValidateBase, IValidateMetaProperties
     {
 
     }
 
-    public abstract class ValidateListBase<T, I> : ListBase<T, I>, IValidateListBase<I>, INotifyPropertyChanged, IPropertyAccess
+    public abstract class ValidateListBase<T, I> : ListBase<T, I>, IValidateListBase<I>, IValidateListBase, INotifyPropertyChanged, IPropertyAccess
         where T : ValidateListBase<T, I>
         where I : IValidateBase
     {

@@ -13,7 +13,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     {
         private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
         private ISendReceivePortal<IEditObjectList> portal;
-        private IEditObjectList editObject;
+        private IEditObjectList editObjectList;
 
         [TestInitialize]
         public void TestInitialize()
@@ -25,68 +25,68 @@ namespace OOBehave.UnitTest.ObjectPortal
         public void TestCleanup()
         {
             // Make sure only what  is expected to be called was called
-            Assert.IsNotNull(editObject);
+            Assert.IsNotNull(editObjectList);
             scope.Dispose();
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_Create()
         {
-            editObject = await portal.Create();
-            Assert.IsTrue(editObject.CreateCalled);
-            Assert.IsTrue(editObject.IsNew);
-            Assert.IsFalse(editObject.IsChild);
+            editObjectList = await portal.Create();
+            Assert.IsTrue(editObjectList.CreateCalled);
+            Assert.IsTrue(editObjectList.IsNew);
+            Assert.IsFalse(editObjectList.IsChild);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_CreateGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.Create(crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-            Assert.IsTrue(editObject.CreateCalled);
+            editObjectList = await portal.Create(crit);
+            Assert.AreEqual(crit, editObjectList.GuidCriteria);
+            Assert.IsTrue(editObjectList.CreateCalled);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_CreateIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Create(crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-            Assert.IsTrue(editObject.CreateCalled);
+            editObjectList = await portal.Create(crit);
+            Assert.AreEqual(crit, editObjectList.IntCriteria);
+            Assert.IsTrue(editObjectList.CreateCalled);
         }
 
 
         [TestMethod]
         public async Task SendReceivePortalList_Fetch()
         {
-            editObject = await portal.Fetch();
-            Assert.IsTrue(editObject.ID.HasValue);
-            Assert.IsTrue(editObject.FetchCalled);
-            Assert.IsFalse(editObject.IsNew);
-            Assert.IsFalse(editObject.IsChild);
-            Assert.IsFalse(editObject.IsModified);
-            Assert.IsFalse(editObject.IsSelfModified);
-            Assert.IsFalse(editObject.IsBusy);
-            Assert.IsFalse(editObject.IsSelfBusy);
+            editObjectList = await portal.Fetch();
+            Assert.IsTrue(editObjectList.ID.HasValue);
+            Assert.IsTrue(editObjectList.FetchCalled);
+            Assert.IsFalse(editObjectList.IsNew);
+            Assert.IsFalse(editObjectList.IsChild);
+            Assert.IsFalse(editObjectList.IsModified);
+            Assert.IsFalse(editObjectList.IsSelfModified);
+            Assert.IsFalse(editObjectList.IsBusy);
+            Assert.IsFalse(editObjectList.IsSelfBusy);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_FetchGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.Fetch(crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-            Assert.IsTrue(editObject.FetchCalled);
+            editObjectList = await portal.Fetch(crit);
+            Assert.AreEqual(crit, editObjectList.GuidCriteria);
+            Assert.IsTrue(editObjectList.FetchCalled);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_FetchIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Fetch(crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-            Assert.IsTrue(editObject.FetchCalled);
+            editObjectList = await portal.Fetch(crit);
+            Assert.AreEqual(crit, editObjectList.IntCriteria);
+            Assert.IsTrue(editObjectList.FetchCalled);
         }
 
 
@@ -94,37 +94,37 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task SendReceivePortalList_Update()
         {
-            editObject = await portal.Fetch();
+            editObjectList = await portal.Fetch();
             var id = Guid.NewGuid();
-            editObject.ID = Guid.NewGuid();
-            await portal.Update(editObject);
-            Assert.AreNotEqual(id, editObject.ID);
-            Assert.IsTrue(editObject.UpdateCalled);
-            Assert.IsFalse(editObject.IsNew);
-            Assert.IsFalse(editObject.IsChild);
-            Assert.IsFalse(editObject.IsModified);
+            editObjectList.ID = Guid.NewGuid();
+            await portal.Update(editObjectList);
+            Assert.AreNotEqual(id, editObjectList.ID);
+            Assert.IsTrue(editObjectList.UpdateCalled);
+            Assert.IsFalse(editObjectList.IsNew);
+            Assert.IsFalse(editObjectList.IsChild);
+            Assert.IsFalse(editObjectList.IsModified);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_UpdateGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.Fetch();
-            editObject.ID = Guid.NewGuid();
-            await portal.Update(editObject, crit);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
-            Assert.IsTrue(editObject.UpdateCalled);
+            editObjectList = await portal.Fetch();
+            editObjectList.ID = Guid.NewGuid();
+            await portal.Update(editObjectList, crit);
+            Assert.AreEqual(crit, editObjectList.GuidCriteria);
+            Assert.IsTrue(editObjectList.UpdateCalled);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_UpdateIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Fetch();
-            editObject.ID = Guid.NewGuid();
-            await portal.Update(editObject, crit);
-            Assert.AreEqual(crit, editObject.IntCriteria);
-            Assert.IsTrue(editObject.UpdateCalled);
+            editObjectList = await portal.Fetch();
+            editObjectList.ID = Guid.NewGuid();
+            await portal.Update(editObjectList, crit);
+            Assert.AreEqual(crit, editObjectList.IntCriteria);
+            Assert.IsTrue(editObjectList.UpdateCalled);
         }
 
 
@@ -132,34 +132,34 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task SendReceivePortalList_Insert()
         {
-            editObject = await portal.Create();
-            editObject.ID = Guid.Empty;
-            await portal.Update(editObject);
-            Assert.AreNotEqual(Guid.Empty, editObject.ID);
-            Assert.IsTrue(editObject.InsertCalled);
-            Assert.IsFalse(editObject.IsNew);
-            Assert.IsFalse(editObject.IsChild);
-            Assert.IsFalse(editObject.IsModified);
+            editObjectList = await portal.Create();
+            editObjectList.ID = Guid.Empty;
+            await portal.Update(editObjectList);
+            Assert.AreNotEqual(Guid.Empty, editObjectList.ID);
+            Assert.IsTrue(editObjectList.InsertCalled);
+            Assert.IsFalse(editObjectList.IsNew);
+            Assert.IsFalse(editObjectList.IsChild);
+            Assert.IsFalse(editObjectList.IsModified);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_InsertGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.Create();
-            await portal.Update(editObject, crit);
-            Assert.IsTrue(editObject.InsertCalled);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
+            editObjectList = await portal.Create();
+            await portal.Update(editObjectList, crit);
+            Assert.IsTrue(editObjectList.InsertCalled);
+            Assert.AreEqual(crit, editObjectList.GuidCriteria);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_InsertIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Create();
-            await portal.Update(editObject, crit);
-            Assert.IsTrue(editObject.InsertCalled);
-            Assert.AreEqual(crit, editObject.IntCriteria);
+            editObjectList = await portal.Create();
+            await portal.Update(editObjectList, crit);
+            Assert.IsTrue(editObjectList.InsertCalled);
+            Assert.AreEqual(crit, editObjectList.IntCriteria);
         }
 
 
@@ -167,32 +167,47 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task SendReceivePortalList_Delete()
         {
-            editObject = await portal.Fetch();
-            editObject.Delete();
-            await portal.Update(editObject);
-            Assert.IsTrue(editObject.DeleteCalled);
+            editObjectList = await portal.Fetch();
+            editObjectList.Delete();
+            await portal.Update(editObjectList);
+            Assert.IsTrue(editObjectList.DeleteCalled);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_DeleteGuidCriteriaCalled()
         {
             var crit = Guid.NewGuid();
-            editObject = await portal.Fetch();
-            editObject.Delete();
-            await portal.Update(editObject, crit);
-            Assert.IsTrue(editObject.DeleteCalled);
-            Assert.AreEqual(crit, editObject.GuidCriteria);
+            editObjectList = await portal.Fetch();
+            editObjectList.Delete();
+            await portal.Update(editObjectList, crit);
+            Assert.IsTrue(editObjectList.DeleteCalled);
+            Assert.AreEqual(crit, editObjectList.GuidCriteria);
         }
 
         [TestMethod]
         public async Task SendReceivePortalList_DeleteIntCriteriaCalled()
         {
             int crit = DateTime.Now.Millisecond;
-            editObject = await portal.Fetch();
-            editObject.Delete();
-            await portal.Update(editObject, crit);
-            Assert.IsTrue(editObject.DeleteCalled);
-            Assert.AreEqual(crit, editObject.IntCriteria);
+            editObjectList = await portal.Fetch();
+            editObjectList.Delete();
+            await portal.Update(editObjectList, crit);
+            Assert.IsTrue(editObjectList.DeleteCalled);
+            Assert.AreEqual(crit, editObjectList.IntCriteria);
+        }
+
+        [TestMethod]
+        public async Task SendReceivePortalList_Remove_Save_IsModified()
+        {
+            editObjectList = await portal.Fetch();
+            var child = await editObjectList.CreateAdd();
+
+            child.MarkOld();
+
+            editObjectList.Remove(child);
+            await editObjectList.Save();
+
+            Assert.IsFalse(editObjectList.IsModified);
+            Assert.IsTrue(child.DeleteChildCalled);
         }
 
     }

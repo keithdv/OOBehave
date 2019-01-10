@@ -4,6 +4,7 @@ using OOBehave.Rules;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace OOBehave.Newtonsoft.Json
@@ -50,7 +51,7 @@ namespace OOBehave.Newtonsoft.Json
         {
             if (objectType.IsInterface)
             {
-                return typeof(IListBase).IsAssignableFrom(objectType);
+                return objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IListBase<>));
             }
             else
             {
@@ -83,7 +84,7 @@ namespace OOBehave.Newtonsoft.Json
             }
 
             var editType = GetEditListBase(list.GetType());
-            if(editType != null)
+            if (editType != null)
             {
                 editType.InvokeMember(nameof(IEditBase.IsNew), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.FlattenHierarchy, null, list, new object[] { surrogate.IsNew });
                 editType.InvokeMember(nameof(IEditBase.IsChild), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.FlattenHierarchy, null, list, new object[] { surrogate.IsChild });
@@ -156,13 +157,13 @@ namespace OOBehave.Newtonsoft.Json
                 surrogate.RuleResults = ruleResults;
             }
 
-            if(value is IEditBase edit)
+            if (value is IEditBase edit)
             {
                 surrogate.IsNew = edit.IsNew;
                 surrogate.IsChild = edit.IsChild;
                 surrogate.IsDeleted = edit.IsDeleted;
             }
-             
+
 
             serializer.Serialize(writer, surrogate);
 

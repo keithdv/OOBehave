@@ -12,16 +12,16 @@ namespace OOBehave
 
     public interface IEditListBase : IValidateListBase, IEditBase, IEditMetaProperties, IPortalEditTarget
     {
-
     }
 
-    public interface IEditListBase<I> : IEditListBase, IValidateListBase<I>
+    public interface IEditListBase<I> : IValidateListBase<I>, IEditBase, IEditMetaProperties, IPortalEditTarget
         where I : IEditBase
     {
         new void RemoveAt(int index);
+
     }
 
-    public abstract class EditListBase<T, I> : ValidateListBase<T, I>, IOOBehaveObject, IEditListBase<I>
+    public abstract class EditListBase<T, I> : ValidateListBase<T, I>, IOOBehaveObject, IEditListBase<I>, IEditListBase
         where T : EditListBase<T, I>
         where I : IEditBase
     {
@@ -105,25 +105,19 @@ namespace OOBehave
             MarkDeleted();
         }
 
-        public new bool Remove(I item)
+
+        protected override void RemoveItem(int index)
         {
+            var item = this[index];
             if (!item.IsNew)
             {
                 item.Delete();
                 DeletedList.Add(item);
             }
-            return base.Remove(item);
+
+            base.RemoveItem(index);
         }
 
-        public new void RemoveAt(int index)
-        {
-            var item = this[index];
-            if (!item.IsNew)
-            {
-                DeletedList.Add(item);
-            }
-            base.RemoveAt(index);
-        }
 
         protected async Task UpdateList()
         {
@@ -131,6 +125,8 @@ namespace OOBehave
             {
                 await ItemPortal.UpdateChild(d);
             }
+
+            DeletedList.Clear();
 
             foreach (var i in this.Where(i => i.IsModified).ToList())
             {
@@ -144,6 +140,8 @@ namespace OOBehave
             {
                 await ItemPortal.UpdateChild(d, criteria);
             }
+
+            DeletedList.Clear();
 
             foreach (var i in this.Where(i => i.IsModified).ToList())
             {

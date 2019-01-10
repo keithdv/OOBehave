@@ -174,6 +174,8 @@ namespace OOBehave.UnitTest.EditBaseTests
             // List items are considered children
             Assert.IsFalse(list.IsSelfModified);
         }
+
+
     }
 }
 

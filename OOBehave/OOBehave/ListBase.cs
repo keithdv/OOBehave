@@ -16,31 +16,25 @@ using System.Threading.Tasks;
 namespace OOBehave
 {
 
-    public interface IReadOnlyListBase : IBase, IOOBehaveObject
-    {
-
-    }
-
-    public interface IReadOnlyListBase<I> : IReadOnlyListBase, IReadOnlyCollection<I>, IReadOnlyList<I>
+    public interface IReadOnlyListBase<I> : IBase, IOOBehaveObject, IPortalTarget, INotifyCollectionChanged, INotifyPropertyChanged, IReadOnlyCollection<I>, IReadOnlyList<I>
         where I : IBase
     {
         new int Count { get; }
     }
 
 
-    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, IEnumerable, ICollection, IList
+    public interface IListBase : IBase, IOOBehaveObject, IPortalTarget, INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable, ICollection, IList
     {
 
     }
 
-    public interface IListBase<I> : IListBase, IReadOnlyCollection<I>, IReadOnlyList<I>, INotifyCollectionChanged, INotifyPropertyChanged, ICollection<I>, IList<I>
+    public interface IListBase<I> : IBase, IOOBehaveObject, IPortalTarget, INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable<I>, ICollection<I>, IList<I>
     {
         Task<I> CreateAdd();
         Task<I> CreateAdd(params object[] criteria);
-        new int Count { get; }
     }
 
-    public abstract class ListBase<T, I> : ObservableCollection<I>, IOOBehaveObject, IListBase<I>, IReadOnlyListBase<I>, IPortalTarget, IPropertyAccess, ISetParent
+    public abstract class ListBase<T, I> : ObservableCollection<I>, IOOBehaveObject, IListBase<I>, IListBase, IReadOnlyListBase<I>, IPortalTarget, IPropertyAccess, ISetParent
         where T : ListBase<T, I>
         where I : IBase
     {
