@@ -132,6 +132,10 @@ namespace OOBehave
             return PropertyValueManager.Read(registeredProperty);
         }
 
+        object IPropertyAccess.ReadProperty(IRegisteredProperty registeredProperty)
+        {
+            return PropertyValueManager.Read(registeredProperty);
+        }
 
     }
 

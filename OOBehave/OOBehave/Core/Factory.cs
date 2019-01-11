@@ -22,12 +22,6 @@ namespace OOBehave.Core
             Scope = scope;
         }
 
-        public IRegisteredProperty<T> CreateRegisteredProperty<T>(string name)
-        {
-            System.Diagnostics.Debug.WriteLine($"Register Property {name}");
-            return new RegisteredProperty<T>(name, NextIndex());
-        }
-
         public IPropertyValue<P> CreatePropertyValue<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
             return new PropertyValue<P>(registeredProperty.Name, value);

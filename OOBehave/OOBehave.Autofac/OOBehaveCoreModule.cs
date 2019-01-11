@@ -12,6 +12,7 @@ using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
 
+
 namespace OOBehave.Autofac
 {
     public enum Portal
@@ -55,6 +56,17 @@ namespace OOBehave.Autofac
             // Should not be singleinstance because AuthorizationRules can have constructor dependencies
             builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(RuleExecute<>)).As(typeof(IRuleExecute<>)).AsSelf();
+
+
+            builder.RegisterGeneric(typeof(RegisteredProperty<>)).As(typeof(IRegisteredProperty<>));
+            builder.Register<CreateRegisteredProperty>(cc =>
+            {
+                var scope = cc.Resolve<Func<ILifetimeScope>>();
+                return (propertyInfo) =>
+                {
+                    return (IRegisteredProperty) scope().Resolve(typeof(IRegisteredProperty<>).MakeGenericType(propertyInfo.PropertyType), new TypedParameter(typeof(System.Reflection.PropertyInfo), propertyInfo));
+                };
+            });
 
             // Stored values for each Domain Object instance
             // MUST BE per instance

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
-    public class ShortNameRule : Rules.SharedAsyncRule
+    public class ShortNameRule : Rules.SharedAsyncRule<string>
     {
         private readonly IRegisteredProperty<string> shortName;
         private readonly IRegisteredProperty<string> firstName;
@@ -45,9 +45,9 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public SharedAsyncRuleObject(IValidateBaseServices<SharedAsyncRuleObject> services) : base(services)
         {
 
-            var fn = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(FirstName));
-            var ln = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(LastName));
-            var sn = services.RegisteredPropertyManager.GetOrRegisterProperty<string>(nameof(ShortName));
+            var fn = services.RegisteredPropertyManager.GetRegisteredProperty<string>(nameof(FirstName));
+            var ln = services.RegisteredPropertyManager.GetRegisteredProperty<string>(nameof(LastName));
+            var sn = services.RegisteredPropertyManager.GetRegisteredProperty<string>(nameof(ShortName));
 
             RuleExecute.AddRule(new ShortNameRule(sn, fn, ln));
 

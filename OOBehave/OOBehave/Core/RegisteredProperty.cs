@@ -1,23 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace OOBehave.Core
 {
 
+    public delegate IRegisteredProperty CreateRegisteredProperty(PropertyInfo property);
+
+    internal static class RegisteredPropertyIndex
+    {
+        private static uint staticIndex = 1;
+        internal static uint StaticIndex
+        {
+            get
+            {
+                staticIndex++;
+                return staticIndex;
+            }
+        }
+    }
+
     public class RegisteredProperty<T> : IRegisteredProperty, IRegisteredProperty<T>
     {
 
-        public RegisteredProperty(string name, uint index)
+        public RegisteredProperty(PropertyInfo propertyInfo)
         {
-            this.Name = name;
-            this.Index = index;
+            this.PropertyInfo = propertyInfo;
+            this.Index = RegisteredPropertyIndex.StaticIndex;
+#if DEBUG
+            if (propertyInfo.PropertyType != typeof(T)) { throw new Exception($"{propertyInfo.PropertyType.FullName} is not {typeof(T).FullName}"); }
+#endif
         }
 
-        public string Name { get; private set; }
+        public PropertyInfo PropertyInfo { get; }
 
-        public Type Type { get { return typeof(T); } }
+        public string Name => PropertyInfo.Name;
+
+        public Type Type => PropertyInfo.PropertyType;
         public uint Index { get; }
         public string Key => Name;
+
     }
 }

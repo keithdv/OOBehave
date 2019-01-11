@@ -23,16 +23,27 @@ namespace OOBehave.Rules
         Task<IRuleResult> Execute(T target, CancellationToken token);
     }
 
+    internal static class RuleIndexer
+    {
+        private static uint staticIndex = 0;
+        internal static uint StaticIndex
+        {
+            get
+            {
+                staticIndex++;
+                return staticIndex;
+            }
+        }
+    }
+
     public abstract class AsyncRule<T> : IRule<T>
     {
 
-        private static uint indexer = 1;
 
         protected AsyncRule()
         {
             /// Must be unique for every rule across all types so Static counter is important
-            UniqueIndex = indexer;
-            indexer++;
+            UniqueIndex = RuleIndexer.StaticIndex;
         }
 
         public AsyncRule(params string[] triggerProperties) : this(triggerProperties.AsEnumerable()) { }
@@ -70,6 +81,7 @@ namespace OOBehave.Rules
         {
             return Task.FromResult(Execute(target));
         }
+
 
     }
 

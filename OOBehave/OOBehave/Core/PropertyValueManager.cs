@@ -17,6 +17,11 @@ namespace OOBehave.Core
         IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name);
         void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
         P Read<P>(IRegisteredProperty<P> registeredProperty);
+
+        // This isn't possible without some nasty reflection or static backing fields
+        // If the property is being loaded for the first time you need the type
+        //void Load(IRegisteredProperty registeredProperty, object newValue);
+        object Read(IRegisteredProperty registeredProperty);
     }
 
 
@@ -95,7 +100,7 @@ namespace OOBehave.Core
 
         public IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
         {
-            return registeredPropertyManager.GetOrRegisterProperty<PV>(name);
+            return registeredPropertyManager.GetRegisteredProperty<PV>(name);
         }
 
         void ISetTarget.SetTarget(IBase target)
@@ -133,12 +138,23 @@ namespace OOBehave.Core
                 return default(PV);
             }
 
-            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(P).FullName}");
+            IPropertyValue<PV> fd = value as IPropertyValue<PV> ?? throw new PropertyTypeMismatchException($"Property {registeredProperty.Name} is not type {typeof(PV).FullName}");
 
             return fd.Value;
         }
 
-        protected void SetParent<PV>(PV newValue)
+        public virtual object Read(IRegisteredProperty registeredProperty)
+        {
+            if (fieldData.TryGetValue(registeredProperty.Index, out var fd))
+            {
+                return fd;
+            }
+
+            return null;
+
+        }
+
+        protected void SetParent(object newValue)
         {
             if (newValue is ISetParent x)
             {

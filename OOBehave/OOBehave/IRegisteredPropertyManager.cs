@@ -10,7 +10,7 @@ namespace OOBehave
     /// <typeparam name="T">Generic to ensure that types can only access their properties</typeparam>
     public interface IRegisteredPropertyManager
     {
-        IRegisteredProperty<P> GetOrRegisterProperty<P>(string name);
+        IRegisteredProperty<P> GetRegisteredProperty<P>(string name);
         IEnumerable<IRegisteredProperty> GetRegisteredProperties();
     }
 

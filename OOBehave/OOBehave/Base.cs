@@ -17,6 +17,7 @@ namespace OOBehave
     {
         P ReadProperty<P>(IRegisteredProperty<P> registeredProperty);
         void SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value);
+        object ReadProperty(IRegisteredProperty registeredProperty);
     }
 
     public interface IBase : IOOBehaveObject, IPortalTarget
@@ -115,6 +116,12 @@ namespace OOBehave
         {
             PropertyValueManager.Load(registeredProperty, value);
         }
+
+        object IPropertyAccess.ReadProperty(IRegisteredProperty registeredProperty)
+        {
+            return PropertyValueManager.Read(registeredProperty);
+        }
+
 
     }
 
