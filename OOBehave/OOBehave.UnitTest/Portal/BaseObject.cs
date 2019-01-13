@@ -3,6 +3,7 @@ using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace OOBehave.UnitTest.ObjectPortal
 {
@@ -60,6 +61,14 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             Assert.IsNotNull(collection);
             CreateCalled = true;
+        }
+
+        [Create]
+        private void CreateNullCriteria(List<int> a, List<int> b, IDisposableDependency dep)
+        {
+            Assert.IsNotNull(dep);
+            CreateCalled = true;
+            MultipleCriteria = new object[] { a, b };
         }
 
         [Create]

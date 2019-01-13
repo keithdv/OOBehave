@@ -92,9 +92,9 @@ namespace OOBehave
             return Task.WhenAll(new Task[2] { RuleManager.WaitForRules, PropertyValueManager.WaitForRules() });
         }
 
-        IRuleResultReadOnlyList IValidateBase.RuleResultList => RuleManager.Results;
+        public IRuleResultReadOnlyList RuleResultList => RuleManager.Results;
 
-        IEnumerable<string> IValidateBase.BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
+        public IEnumerable<string> BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
 
         /// <summary>
         /// Permantatly mark invalid
@@ -105,6 +105,7 @@ namespace OOBehave
         {
             RuleManager.MarkInvalid(message);
         }
+
         public override async Task<IDisposable> StopAllActions()
         {
             var result = await base.StopAllActions();

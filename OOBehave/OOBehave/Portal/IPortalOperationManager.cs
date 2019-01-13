@@ -11,7 +11,7 @@ namespace OOBehave.Portal
         void RegisterOperation(PortalOperation operation, string methodName);
         void RegisterOperation(PortalOperation operation, MethodInfo method);
         Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation);
-        Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, params object[] criteria);
+        Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, object[] criteria, Type[] criteriaTypes);
     }
     public interface IPortalOperationManager<T> : IPortalOperationManager
     {

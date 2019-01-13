@@ -112,22 +112,26 @@ namespace OOBehave.Portal.Core
                         var critEnum = criteriaTypes.GetEnumerator();
                         var paramEnum = parameters.Cast<ParameterInfo>().Select(p => p.ParameterType).GetEnumerator();
 
-                        paramEnum.MoveNext();
-                        critEnum.MoveNext();
+                        // With Array's Current doesn't become null
+                        var paramHasValue = paramEnum.MoveNext();
+                        var critHasValue = critEnum.MoveNext();
 
-                        while (match && paramEnum.Current != null)
+                        // All of the criteria parameter types match up
+                        // And any left over are registered
+                        while (match && paramHasValue)
                         {
 
-                            if (critEnum.Current != null && !paramEnum.Current.IsAssignableFrom(critEnum.Current))
+                            if (critHasValue && !paramEnum.Current.IsAssignableFrom(critEnum.Current))
                             {
                                 match = false;
-                            } else if(critEnum.Current == null && !Scope.IsRegistered(paramEnum.Current)) // For recognizing multiple positives for the same criteria
+                            }
+                            else if (!critHasValue && !Scope.IsRegistered(paramEnum.Current)) // For recognizing multiple positives for the same criteria
                             {
                                 match = false;
                             }
 
-                            paramEnum.MoveNext();
-                            critEnum.MoveNext();
+                            paramHasValue = paramEnum.MoveNext();
+                            critHasValue = critEnum.MoveNext();
 
                         }
 
@@ -135,7 +139,7 @@ namespace OOBehave.Portal.Core
                         // The parameter list can 
                         if (match)
                         {
-                            if (matchingMethod != null) { throw new Exception($"More then one method for {operation.ToString()} with criteria [{string.Join(",", criteriaTypes)}]"); }
+                            if (matchingMethod != null) { throw new Exception($"More then one method for {operation.ToString()} with criteria [{string.Join(",", criteriaTypes)}] on {typeof(T).FullName}"); }
 
                             matchingMethod = m;
                         }
@@ -211,16 +215,15 @@ namespace OOBehave.Portal.Core
                 return invoked;
             }
         }
-        public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, params object[] criteria)
+        public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
         {
             await CheckAccess(operation.ToAuthorizationOperation(), criteria);
 
             using (await target.StopAllActions())
             {
-                var criteriaTypes = criteria.Select(x => x.GetType()).ToList();
+                // The criteriaTypes need to be captured by Generic method definitions
+                // in case the values sent in are null
 
-                // This needs to be target.GetType() instead of a generic method
-                // because T will be an interface but tager.GetType() will be the concrete
                 var method = MethodForOperation(operation, criteriaTypes);
 
                 if (method != null)
