@@ -11,6 +11,7 @@ namespace OOBehave
     public interface IRegisteredPropertyManager
     {
         IRegisteredProperty<P> GetRegisteredProperty<P>(string name);
+        IRegisteredProperty GetRegisteredProperty(string name);
         IEnumerable<IRegisteredProperty> GetRegisteredProperties();
     }
 

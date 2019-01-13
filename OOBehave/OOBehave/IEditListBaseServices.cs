@@ -34,8 +34,8 @@ namespace OOBehave
         public EditListBaseServices(IEditPropertyValueManager<T> registeredPropertyManager,
                                         ISendReceivePortalChild<I> sendReceivePortalChild,
                                         ISendReceivePortal<T> sendReceivePortal,
-                                        IRuleExecute<T> ruleExecute)
-            : base(registeredPropertyManager, sendReceivePortalChild, ruleExecute)
+                                        IRuleManager<T> ruleManager)
+            : base(registeredPropertyManager, sendReceivePortalChild, ruleManager)
         {
             EditPropertyValueManager = registeredPropertyManager;
             SendReceivePortalChild = sendReceivePortalChild;

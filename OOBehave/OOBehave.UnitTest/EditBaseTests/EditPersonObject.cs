@@ -23,7 +23,7 @@ namespace OOBehave.UnitTest.EditBaseTests
             IShortNameRule<EditPerson> shortNameRule,
             IFullNameRule<EditPerson> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
             InitiallyDefined = new List<int>() { 1, 2, 3 };
         }
 

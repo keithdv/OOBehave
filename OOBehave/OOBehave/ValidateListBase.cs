@@ -28,18 +28,18 @@ namespace OOBehave
     {
         protected new IValidatePropertyValueManager<T> PropertyValueManager => (IValidatePropertyValueManager<T>)base.PropertyValueManager;
 
-        protected IRuleExecute<T> RuleExecute { get; private set; }
+        protected IRuleManager<T> RuleManager { get; private set; }
 
         public ValidateListBase(IValidateListBaseServices<T, I> services) : base(services)
         {
-            this.RuleExecute = services.RuleExecute;
-            ((ISetTarget)this.RuleExecute).SetTarget(this);
+            this.RuleManager = services.RuleManager;
+            ((ISetTarget)this.RuleManager).SetTarget(this);
         }
 
-        public bool IsValid => RuleExecute.IsValid && PropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
-        public bool IsSelfValid => RuleExecute.IsValid;
-        public bool IsBusy => RuleExecute.IsBusy || PropertyValueManager.IsBusy || this.Any(c => c.IsBusy);
-        public bool IsSelfBusy => RuleExecute.IsBusy;
+        public bool IsValid => RuleManager.IsValid && PropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
+        public bool IsSelfValid => RuleManager.IsValid;
+        public bool IsBusy => RuleManager.IsBusy || PropertyValueManager.IsBusy || this.Any(c => c.IsBusy);
+        public bool IsSelfBusy => RuleManager.IsBusy;
 
         protected override void Setter<P>(P value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
@@ -55,7 +55,7 @@ namespace OOBehave
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            if (PropertyValueManager.Set(GetRegisteredProperty<P>(propertyName), value))
+            if (PropertyValueManager.SetProperty(GetRegisteredProperty<P>(propertyName), value))
             {
                 PropertyHasChanged(propertyName);
             }
@@ -70,12 +70,12 @@ namespace OOBehave
 
         protected virtual void CheckRules(string propertyName)
         {
-            RuleExecute.CheckRulesForProperty(propertyName);
+            RuleManager.CheckRulesForProperty(propertyName);
         }
 
         public virtual Task WaitForRules()
         {
-            return Task.WhenAll(new Task[3] { RuleExecute.WaitForRules, PropertyValueManager.WaitForRules(), Task.WhenAll(this.Where(x => x.IsBusy).Select(x => x.WaitForRules())) });
+            return Task.WhenAll(new Task[3] { RuleManager.WaitForRules, PropertyValueManager.WaitForRules(), Task.WhenAll(this.Where(x => x.IsBusy).Select(x => x.WaitForRules())) });
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace OOBehave
         /// <param name="message"></param>
         protected virtual void MarkInvalid(string message)
         {
-            RuleExecute.MarkInvalid(message);
+            RuleManager.MarkInvalid(message);
         }
 
 
@@ -96,34 +96,23 @@ namespace OOBehave
             return result;
         }
 
-        public IEnumerable<string> BrokenRuleMessages
-        {
-            get
-            {
-                return RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
-
-            }
-        }
-
-        public IEnumerable<string> BrokenRulePropertyMessages(string propertyName)
-        {
-            return (RuleExecute.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Where(p => p.Key == propertyName).Select(p => p.Value));
-        }
+        IRuleResultReadOnlyList IValidateBase.RuleResultList => RuleManager.Results;
+        IEnumerable<string> IValidateBase.BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
 
 
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Set(registeredProperty, value);
+            PropertyValueManager.SetProperty(registeredProperty, value);
         }
 
         public Task CheckAllSelfRules(CancellationToken token = new CancellationToken())
         {
-            return RuleExecute.CheckAllRules(token);
+            return RuleManager.CheckAllRules(token);
         }
 
         public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
-            return Task.WhenAll(RuleExecute.CheckAllRules(token), Task.WhenAll(this.Select(t => t.CheckAllRules(token))));
+            return Task.WhenAll(RuleManager.CheckAllRules(token), Task.WhenAll(this.Select(t => t.CheckAllRules(token))));
         }
     }
 }

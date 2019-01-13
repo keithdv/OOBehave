@@ -8,7 +8,7 @@ namespace OOBehave.UnitTest.PersonObjects
 {
     public interface IFullNameRule<T> : IRule<T> where T : IPersonBase { int RunCount { get; } }
 
-    public class FullNameRule<T> : Rule<T>, IFullNameRule<T>
+    public class FullNameRule<T> : RuleBase<T>, IFullNameRule<T>
         where T : IPersonBase
     {
         public int RunCount { get; private set; } = 0;

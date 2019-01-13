@@ -20,7 +20,7 @@ namespace OOBehave.UnitTest.EditBaseTests
             IShortNameRule<EditPersonList> shortNameRule,
             IFullNameRule<EditPersonList> fullNameRule) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
         }
 
         public int DeletedCount => DeletedList.Count;

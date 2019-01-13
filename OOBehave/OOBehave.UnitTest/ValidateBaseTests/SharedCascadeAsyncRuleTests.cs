@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
-    public class ShortNameRule : Rules.SharedAsyncRule<string>
+    public class ShortNameRule : Rules.AsyncRuleBase<IBase>
     {
         private readonly IRegisteredProperty<string> shortName;
         private readonly IRegisteredProperty<string> firstName;
@@ -24,13 +24,13 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             this.lastName = lastName;
         }
 
-        protected override async Task<IRuleResult> Execute(CancellationToken token)
+        public override async Task<IRuleResult> Execute(IBase target, CancellationToken token)
         {
             await Task.Delay(10);
 
-            var sn = $"{ReadProperty(firstName)} {ReadProperty(lastName)}";
+            var sn = $"{ReadProperty(target, firstName)} {ReadProperty(target, lastName)}";
 
-            SetProperty(shortName, sn);
+            SetProperty(target, shortName, sn);
 
             return RuleResult.Empty();
 
@@ -49,7 +49,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             var ln = services.RegisteredPropertyManager.GetRegisteredProperty<string>(nameof(LastName));
             var sn = services.RegisteredPropertyManager.GetRegisteredProperty<string>(nameof(ShortName));
 
-            RuleExecute.AddRule(new ShortNameRule(sn, fn, ln));
+            RuleManager.AddRule(new ShortNameRule(sn, fn, ln));
 
         }
 

@@ -30,7 +30,9 @@ namespace OOBehave.Newtonsoft.Json
         /// </summary>
         public IPropertyValueManager PropertyValueManager { get; }
 
-        public IDictionary<int, IRuleResult> RuleResults { get; set; }
+        public IRuleResultList RuleResultList { get; set; }
+
+        public IRuleResult OverrideResult { get; set; }
 
         public bool IsNew { get; set; }
         public bool IsChild { get; set; }
@@ -78,9 +80,9 @@ namespace OOBehave.Newtonsoft.Json
             var validateType = GetValidateListBase(list.GetType());
             if (validateType != null)
             {
-                var ruleProp = validateType.GetProperty("RuleExecute", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var ruleExecute = (IRuleExecute)ruleProp.GetValue(list);
-                ruleExecute.GetType().InvokeMember("SetSerializedResults", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.FlattenHierarchy, null, ruleExecute, new object[] { surrogate.RuleResults });
+                var ruleProp = validateType.GetProperty("RuleManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var ruleManager = (IRuleManager)ruleProp.GetValue(list);
+                ruleManager.GetType().InvokeMember("SetSerializedResults", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.FlattenHierarchy, null, ruleManager, new object[] { surrogate.RuleResultList, surrogate.OverrideResult });
             }
 
             var editType = GetEditListBase(list.GetType());
@@ -150,11 +152,12 @@ namespace OOBehave.Newtonsoft.Json
             var validateType = GetValidateListBase(value.GetType());
             if (validateType != null)
             {
-                var ruleProp = validateType.GetProperty("RuleExecute", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var ruleExecute = (IRuleExecute)ruleProp.GetValue(value);
-                var ruleResultsProp = ruleExecute.GetType().GetProperty("Results", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                var ruleResults = (IDictionary<int, IRuleResult>)ruleResultsProp.GetValue(ruleExecute);
-                surrogate.RuleResults = ruleResults;
+                var ruleProp = validateType.GetProperty("RuleManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var ruleManager = (IRuleManager)ruleProp.GetValue(value);
+                var ruleResultsProp = ruleManager.GetType().GetProperty("Results", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var ruleResults = (IRuleResultList)ruleResultsProp.GetValue(ruleManager);
+                surrogate.OverrideResult = ruleResults.OverrideResult;
+                surrogate.RuleResultList = ruleResults;
             }
 
             if (value is IEditBase edit)

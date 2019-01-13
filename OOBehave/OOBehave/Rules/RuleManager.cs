@@ -1,8 +1,10 @@
 ﻿using OOBehave.Attributes;
 using OOBehave.Core;
+using OOBehave.Rules.Rules;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -12,19 +14,14 @@ using System.Threading.Tasks;
 namespace OOBehave.Rules
 {
 
-    public interface IRuleExecute
+
+    public interface IRuleManager
     {
-        IEnumerable<IRule> Rules { get; }
-
-        IEnumerable<IRuleResult> Results { get; }
-
-        void CheckRulesForProperty(string propertyName);
-
-        Task WaitForRules { get; }
 
         bool IsValid { get; }
-
         bool IsBusy { get; }
+        Task WaitForRules { get; }
+        IEnumerable<IRule> Rules { get; }
         IRuleResult OverrideResult { get; }
 
         /// <summary>
@@ -35,38 +32,64 @@ namespace OOBehave.Rules
 
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
+        IRuleResult this[string propertyName] { get; }
+        IRuleResultReadOnlyList Results { get; }
+        Task CheckRulesForProperty(string propertyName);
         Task CheckAllRules(CancellationToken token = new CancellationToken());
 
     }
 
-    public interface IRuleExecute<T> : IRuleExecute
+    public interface IRuleManager<T> : IRuleManager
         where T : IValidateBase
     {
-        FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func);
+        FluentRule<T> AddRule(Func<T, IRuleResult> func, params string[] triggerProperty);
 
     }
 
     [PortalDataContract]
-    public class RuleExecute<T> : IRuleExecute<T>, ISetTarget
+    public class RuleManager<T> : IRuleManager<T>, ISetTarget
         where T : IValidateBase
     {
 
         protected T Target { get; set; }
+
         [PortalDataMember]
-        protected IDictionary<int, IRuleResult> Results { get; private set; } = new ConcurrentDictionary<int, IRuleResult>();
+        protected IRuleResultList Results { get; private set; }
+
+        IRuleResultReadOnlyList IRuleManager.Results => Results.RuleResultList;
+
         protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;
-        public RuleExecute() { }
+        public RuleManager(IRuleResultList results, IAttributeToRule attributeToRule, IRegisteredPropertyManager<T> registeredPropertyManager)
+        {
+            Results = results;
+            AddAttributeRules(attributeToRule, registeredPropertyManager);
+        }
 
-        IEnumerable<IRule> IRuleExecute.Rules => Rules.Values;
+        IEnumerable<IRule> IRuleManager.Rules => Rules.Values;
 
         private IDictionary<uint, IRule> Rules { get; } = new ConcurrentDictionary<uint, IRule>();
 
-        IEnumerable<IRuleResult> IRuleExecute.Results => OverrideResult == null ? Results.Values : new IRuleResult[1] { OverrideResult };
+        IRuleResult IRuleManager.this[string propertyName]
+        {
+            get { return Results[propertyName]; }
+        }
 
         private ConcurrentQueue<uint> ruleQueue = new ConcurrentQueue<uint>();
 
+        protected virtual void AddAttributeRules(IAttributeToRule attributeToRule, IRegisteredPropertyManager<T> registeredPropertyManager)
+        {
+            var requiredRegisteredProp = registeredPropertyManager.GetRegisteredProperties();
 
+            foreach (var r in requiredRegisteredProp)
+            {
+                foreach (var a in r.PropertyInfo.GetCustomAttributes(true))
+                {
+                    var rule = attributeToRule.GetRule(r, a.GetType());
+                    if (rule != null) { AddRule(rule); }
+                }
+            }
+        }
 
         public void AddRules(params IRule[] rules)
         {
@@ -83,60 +106,79 @@ namespace OOBehave.Rules
             Rules.Add(rule.UniqueIndex, rule ?? throw new ArgumentNullException(nameof(rule)));
         }
 
-        public FluentRule<T> AddRule(string triggerProperty, Func<T, IRuleResult> func)
+        public FluentRule<T> AddRule(Func<T, IRuleResult> func, params string[] triggerProperty)
         {
             FluentRule<T> rule = new FluentRule<T>(func, triggerProperty); // TODO - DI
             Rules.Add(rule.UniqueIndex, rule);
             return rule;
         }
 
-        public void CheckRulesForProperty(string propertyName)
+        public Task CheckRulesForProperty(string propertyName)
         {
-
-            if (TransferredResults)
+            if (OverrideResult == null)
             {
-                var oldResults = Results.Where(x => x.Key < 0 && x.Value.TriggerProperties.Contains(propertyName)).ToList();
-                oldResults.ForEach(r => Results.Remove(r.Key));
-
-                if (!Results.Where(x => x.Key < 0).Any())
+                if (TransferredResults)
                 {
-                    TransferredResults = false;
-                }
-            }
+                    var oldResults = Results.Where(x => x.Key < 0 && x.Value.TriggerProperties.Contains(propertyName)).ToList();
+                    oldResults.ForEach(r => Results.Remove(r.Key));
 
-            foreach (var index in Rules.Values.Where(r => r.TriggerProperties.Contains(propertyName)).Select(r => r.UniqueIndex))
+                    if (!Results.Where(x => x.Key < 0).Any())
+                    {
+                        TransferredResults = false;
+                    }
+                }
+
+                foreach (var index in Rules.Values.Where(r => r.TriggerProperties.Contains(propertyName)).Select(r => r.UniqueIndex))
+                {
+                    if (!ruleQueue.Contains(index))
+                    {
+                        // System.Diagnostics.Debug.WriteLine($"Enqueue {propertyName}");
+                        ruleQueue.Enqueue(index);
+                    }
+                }
+
+                CheckRulesQueue();
+
+                return WaitForRules;
+            }
+            else
             {
-                if (!ruleQueue.Contains(index))
-                {
-                    // System.Diagnostics.Debug.WriteLine($"Enqueue {propertyName}");
-                    ruleQueue.Enqueue(index);
-                }
+                return Task.CompletedTask;
             }
-
-            CheckRulesQueue();
         }
 
-        public async Task CheckAllRules(CancellationToken token = new CancellationToken())
+        public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
-            Results.Clear(); // Cover in case something unexpected has happened like a weird Serialization cover or maybe a Rule that exists on the client or not the server
-
-            foreach (var ruleIndex in Rules.Keys)
+            if (OverrideResult == null)
             {
-                ruleQueue.Enqueue(ruleIndex);
+                Results.Clear(); // Cover in case something unexpected has happened like a weird Serialization cover or maybe a Rule that exists on the client or not the server
+
+                foreach (var ruleIndex in Rules.Keys)
+                {
+                    ruleQueue.Enqueue(ruleIndex);
+                }
+
+                CheckRulesQueue();
+
+                return WaitForRules;
             }
-
-            CheckRulesQueue();
-
-            await WaitForRules;
-
+            else
+            {
+                return Task.CompletedTask;
+            }
         }
 
         public bool IsValid
         {
-            get { return OverrideResult == null && !Results.Values.Where(r => r.IsError).Any(); }
+            get { return !Results.Values.Where(r => r.IsError).Any(); }
         }
 
-        public IRuleResult OverrideResult { get; protected set; }
+        [PortalDataMember]
+        public IRuleResult OverrideResult
+        {
+            get { return Results.OverrideResult; }
+            set { Results.OverrideResult = value; }
+        }
 
         public void MarkInvalid(string message)
         {
@@ -145,11 +187,11 @@ namespace OOBehave.Rules
                 cancellationTokenSource.Cancel();
             }
 
-            Results.Clear();
-            OverrideResult = RuleResult.PropertyError(typeof(T).FullName, message);
+            Results.OverrideResult = RuleResult.PropertyError(typeof(T).FullName, message);
         }
 
         public Task WaitForRules { get; private set; } = Task.CompletedTask;
+
         private TaskCompletionSource<object> waitForRulesSource;
         private CancellationTokenSource cancellationTokenSource;
 
@@ -207,9 +249,9 @@ namespace OOBehave.Rules
 
                     // System.Diagnostics.Debug.WriteLine($"Dequeue {propertyName}");
 
-                    var ruleExecuteTask = RunRule(Rules[ruleIndex], token);
+                    var ruleManagerTask = RunRule(Rules[ruleIndex], token);
 
-                    if (!ruleExecuteTask.IsCompleted)
+                    if (!ruleManagerTask.IsCompleted)
                     {
                         // Really important
                         // If there there is not an asyncronous fork all of the async methods will run synchronously
@@ -217,7 +259,7 @@ namespace OOBehave.Rules
                         // However, if there was an asyncronous fork we need to handle it's completion
                         // In WPF there's an executable so this will continue "hands off"
                         // In request response the WaitForRules needs to be awaited!
-                        ruleExecuteTask.ContinueWith(x =>
+                        ruleManagerTask.ContinueWith(x =>
                         {
                             CheckRulesQueue(true);
                         });
@@ -295,17 +337,25 @@ namespace OOBehave.Rules
         {
             if (Results.Any())
             {
-                Results = new ConcurrentDictionary<int, IRuleResult>(Results.Select(x => new KeyValuePair<int, IRuleResult>(x.Key * -1, x.Value)));
+                Results.SetKeysToNegative();
                 TransferredResults = true;
             }
         }
 
-        private void SetSerializedResults(ConcurrentDictionary<int, IRuleResult> transfferedResults)
+        private void SetSerializedResults(IRuleResultList transfferedResults, IRuleResult overrideResult)
         {
             if (transfferedResults.Any())
             {
-                Results = new ConcurrentDictionary<int, IRuleResult>(transfferedResults.Select(x => new KeyValuePair<int, IRuleResult>(x.Key * -1, x.Value)));
-                TransferredResults = true;
+                if (overrideResult == null)
+                {
+                    Results = transfferedResults;
+                    Results.SetKeysToNegative();
+                    TransferredResults = true;
+                }
+                else
+                {
+                    OverrideResult = overrideResult;
+                }
             }
         }
     }

@@ -14,7 +14,7 @@ namespace OOBehave.Core
         bool IsBusy { get; }
         Task CheckAllRules(CancellationToken token);
         Task WaitForRules();
-        bool Set<P>(IRegisteredProperty<P> registeredProperty, P newValue);
+        bool SetProperty<P>(IRegisteredProperty<P> registeredProperty, P newValue);
 
 
     }
@@ -121,12 +121,12 @@ namespace OOBehave.Core
             return Task.WhenAll(tasks.Where(t => t != null));
         }
 
-        public virtual bool Set<PV>(string name, PV newValue)
+        public virtual bool SetProperty<PV>(string name, PV newValue)
         {
-            return Set(GetRegisteredProperty<PV>(name), newValue);
+            return SetProperty(GetRegisteredProperty<PV>(name), newValue);
         }
 
-        public virtual bool Set<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
+        public virtual bool SetProperty<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
         {
             if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
             {

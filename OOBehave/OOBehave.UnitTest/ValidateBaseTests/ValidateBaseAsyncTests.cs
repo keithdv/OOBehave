@@ -135,7 +135,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             await validate.WaitForRules();
 
             Assert.IsFalse(validate.IsValid);
-            Assert.AreEqual("Error", validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Single());
+            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             await validate.WaitForRules();
 
             Assert.IsTrue(validate.IsValid);
-            Assert.AreEqual(0, validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Count());
+            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
 
         }
 

@@ -44,7 +44,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
 
         [TestMethod]
-        public void ValidateListBaseAsync_Set()
+        public void ValidateListBaseAsync_SetProperty()
         {
             List.FirstName = "Keith";
         }
@@ -115,7 +115,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             await List.WaitForRules();
 
             Assert.IsFalse(List.IsValid);
-            Assert.AreEqual("Error", List.BrokenRulePropertyMessages(nameof(List.FirstName)).Single());
+            Assert.AreEqual(1, List.RuleResultList.Where(r => r.IsError && r.PropertyErrorMessages.Any(p => p.Key == nameof(IValidateObject.FirstName))).Count());
         }
 
         [TestMethod]
@@ -131,7 +131,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             List.FirstName = "John";
 
             Assert.IsTrue(List.IsValid);
-            Assert.AreEqual(0, List.BrokenRulePropertyMessages(nameof(List.FirstName)).Count());
+            Assert.AreEqual(0, List.RuleResultList.Where(r => r.IsError && r.PropertyErrorMessages.Any(p => p.Key == nameof(IValidateObject.FirstName))).Count());
 
         }
 

@@ -23,7 +23,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             IFullNameAsyncRule<ValidateAsyncObject> fullNameRule
             ) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
             ShortNameRule = shortNameRule;
             FullNameRule = fullNameRule;
         }
@@ -63,7 +63,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             IFullNameRule<ValidateAsyncObjectList> fullNameRule
             ) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
             ShortNameRule = shortNameRule;
             FullNameRule = fullNameRule;
 

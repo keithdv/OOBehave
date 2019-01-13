@@ -19,8 +19,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
                 IShortNameDependencyRule<ValidateDependencyRules> shortNameRule,
                 IFullNameDependencyRule<ValidateDependencyRules> fullNameRule) : base(services)
         {
-            RuleExecute.AddRule(shortNameRule);
-            RuleExecute.AddRule(fullNameRule);
+            RuleManager.AddRule(shortNameRule);
+            RuleManager.AddRule(fullNameRule);
         }
 
     }
@@ -117,7 +117,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
-            Assert.AreEqual("Error", validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Single());
+            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.FirstName = "John";
 
             Assert.IsTrue(validate.IsValid);
-            Assert.AreEqual(0, validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Count());
+            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
 
         }
 

@@ -58,14 +58,21 @@ namespace OOBehave.Core
 
         public IRegisteredProperty<P> GetRegisteredProperty<P>(string propertyName)
         {
-
-            if (!RegisteredProperties.TryGetValue(propertyName, out var prop))
-            {
-                throw new Exception($"{propertyName} missing on {typeof(IRegisteredProperty<P>).FullName}");
-            }
+            var prop = GetRegisteredProperty(propertyName);
 
             var ret = prop as IRegisteredProperty<P> ?? throw new PropertyTypeMismatchException($"Cannot cast {prop.GetType().FullName} to {typeof(IRegisteredProperty<P>).FullName}.");
             return ret;
+
+        }
+
+        public IRegisteredProperty GetRegisteredProperty(string propertyName)
+        {
+            if (!RegisteredProperties.TryGetValue(propertyName, out var prop))
+            {
+                throw new Exception($"{propertyName} missing on {typeof(T).FullName}");
+            }
+
+            return prop;
         }
 
         public IEnumerable<IRegisteredProperty> GetRegisteredProperties()

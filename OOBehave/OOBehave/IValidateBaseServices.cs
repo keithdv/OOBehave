@@ -18,7 +18,7 @@ namespace OOBehave
     {
         IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
 
-        IRuleExecute<T> RuleExecute { get; }
+        IRuleManager<T> RuleManager { get; }
 
     }
 
@@ -27,16 +27,16 @@ namespace OOBehave
         where T : ValidateBase<T>
     {
 
-        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleExecute<T> ruleExecute)
+        public ValidateBaseServices(IValidatePropertyValueManager<T> registeredPropertyValueManager, IRegisteredPropertyManager<T> registeredPropertyManager, IRuleManager<T> ruleManager)
             : base(registeredPropertyValueManager, registeredPropertyManager)
         {
             this.ValidatePropertyValueManager = registeredPropertyValueManager;
-            RuleExecute = ruleExecute;
+            RuleManager = ruleManager;
 
         }
 
         public IValidatePropertyValueManager<T> ValidatePropertyValueManager { get; }
-        public IRuleExecute<T> RuleExecute { get; }
+        public IRuleManager<T> RuleManager { get; }
 
         IPropertyValueManager<T> IBaseServices<T>.PropertyValueManager
         {

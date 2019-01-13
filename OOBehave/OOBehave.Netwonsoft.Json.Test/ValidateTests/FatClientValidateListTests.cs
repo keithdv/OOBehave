@@ -36,7 +36,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Serialize()
+        public void FatClientListValidate_Serialize()
         {
 
             var result = Serialize(target);
@@ -46,7 +46,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Serialize_Invalid()
+        public void FatClientListValidate_Serialize_Invalid()
         {
             target.Name = "Error";
             var result = Serialize(target);
@@ -79,7 +79,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize()
+        public void FatClientListValidate_Deserialize()
         {
 
             var json = Serialize(target);
@@ -91,7 +91,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_RuleExecute()
+        public void FatClientListValidate_Deserialize_RuleManager()
         {
             target.Name = "Error";
             Assert.IsFalse(target.IsValid);
@@ -100,7 +100,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
             var newTarget = Deserialize(json);
 
-            Assert.AreEqual(2, newTarget.RuleRunCount); // Ensure that RuleExecute was deserialized, not run
+            Assert.AreEqual(2, newTarget.RuleRunCount); // Ensure that RuleManager was deserialized, not run
             Assert.AreEqual(1, newTarget.Rules.Count());
             Assert.IsFalse(newTarget.IsValid);
 
@@ -111,7 +111,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_Child()
+        public void FatClientListValidate_Deserialize_Child()
         {
 
             var json = Serialize(target);
@@ -124,7 +124,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_Child_RuleExecute()
+        public void FatClientListValidate_Deserialize_Child_RuleManager()
         {
 
             child.Name = "Error";
@@ -145,9 +145,9 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_IsValid_False_Fix()
+        public void FatClientListValidate_Deserialize_IsValid_False_Fix()
         {
-            // This caught a really critical issue that lead to the RuleExecute.TransferredResults logic
+            // This caught a really critical issue that lead to the RuleManager.TransferredResults logic
             // After being transferred the RuleIndex values would not match up
             // So the object would be stuck in InValid
 
@@ -164,7 +164,22 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
         }
 
+        [TestMethod]
+        public void FatClientListValidate_Deserialize_MarkInvalid()
+        {
+            // This caught a really critical issue that lead to the RuleManager.TransferredResults logic
+            // After being transferred the RuleIndex values would not match up
+            // So the object would be stuck in InValid
 
+            target.MarkInvalid(Guid.NewGuid().ToString());
+
+            var json = Serialize(target);
+            var newTarget = Deserialize(json);
+
+            Assert.IsFalse(target.IsValid);
+            Assert.IsFalse(newTarget.IsValid);
+            Assert.IsNotNull(newTarget.OverrideResult);
+        }
     }
 }
 

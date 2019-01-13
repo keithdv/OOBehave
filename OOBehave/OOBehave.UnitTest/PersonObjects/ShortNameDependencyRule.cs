@@ -7,7 +7,7 @@ namespace OOBehave.UnitTest.PersonObjects
 {
     public interface IShortNameDependencyRule<T> : IRule<T> where T : IPersonBase { }
 
-    public class ShortNameDependencyRule<T> : Rule<T>, IShortNameDependencyRule<T>
+    public class ShortNameDependencyRule<T> : RuleBase<T>, IShortNameDependencyRule<T>
         where T : IPersonBase
     {
 

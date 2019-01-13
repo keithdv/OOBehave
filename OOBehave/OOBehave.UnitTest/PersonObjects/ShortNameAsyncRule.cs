@@ -7,7 +7,7 @@ namespace OOBehave.UnitTest.PersonObjects
 {
     public interface IShortNameAsyncRule<T> : IRule<T> where T : IPersonBase { int RunCount { get; } }
 
-    public class ShortNameAsyncRule<T> : AsyncRule<T>, IShortNameAsyncRule<T>
+    public class ShortNameAsyncRule<T> : AsyncRuleBase<T>, IShortNameAsyncRule<T>
         where T : IPersonBase
     {
 

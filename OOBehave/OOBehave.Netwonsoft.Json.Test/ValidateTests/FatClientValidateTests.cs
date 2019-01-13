@@ -91,7 +91,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_RuleExecute()
+        public void FatClientValidate_Deserialize_RuleManager()
         {
             target.Name = "Error";
             Assert.IsFalse(target.IsValid);
@@ -101,12 +101,11 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             // ITaskRespository and ILogger constructor parameters are injected by Autofac 
             var newTarget = Deserialize(json);
 
-            Assert.AreEqual(2, newTarget.RuleRunCount); // Ensure that RuleExecute was deserialized, not run
+            Assert.AreEqual(2, newTarget.RuleRunCount); // Ensure that RuleManager was deserialized, not run
             Assert.AreEqual(1, newTarget.Rules.Count());
             Assert.IsFalse(newTarget.IsValid);
 
-            Assert.AreEqual(1, newTarget.BrokenRuleMessages.Count());
-            Assert.AreEqual("Error", newTarget.BrokenRuleMessages.Single());
+            Assert.IsTrue(newTarget.RuleResultList[nameof(IValidateObject.Name)].IsError);
 
         }
 
@@ -132,7 +131,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         }
 
         [TestMethod]
-        public void FatClientValidate_Deserialize_Child_RuleExecute()
+        public void FatClientValidate_Deserialize_Child_RuleManager()
         {
 
             var child = target.Child = scope.Resolve<IValidateObject>();
@@ -197,6 +196,22 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
         }
 
+        [TestMethod]
+        public void FatClientValidate_Deserialize_MarkInvalid()
+        {
+            // This caught a really critical issue that lead to the RuleManager.TransferredResults logic
+            // After being transferred the RuleIndex values would not match up
+            // So the object would be stuck in InValid
+
+            target.MarkInvalid(Guid.NewGuid().ToString());
+
+            var json = Serialize(target);
+            var newTarget = Deserialize(json);
+
+            Assert.IsFalse(target.IsValid);
+            Assert.IsFalse(newTarget.IsValid);
+            Assert.IsNotNull(newTarget.OverrideResult);
+        }
     }
 }
 

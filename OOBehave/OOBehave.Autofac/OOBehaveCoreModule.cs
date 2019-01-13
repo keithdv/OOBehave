@@ -11,7 +11,7 @@ using System.Threading;
 using System.Linq;
 using Autofac.Builder;
 using OOBehave.Rules;
-
+using OOBehave.Rules.Rules;
 
 namespace OOBehave.Autofac
 {
@@ -55,8 +55,10 @@ namespace OOBehave.Autofac
 
             // Should not be singleinstance because AuthorizationRules can have constructor dependencies
             builder.RegisterGeneric(typeof(AuthorizationRuleManager<>)).As(typeof(IAuthorizationRuleManager<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(RuleExecute<>)).As(typeof(IRuleExecute<>)).AsSelf();
-
+            builder.RegisterGeneric(typeof(RuleManager<>)).As(typeof(IRuleManager<>)).AsSelf();
+            builder.RegisterType<RuleResultList>().As<IRuleResultList>();
+            builder.RegisterType<RequiredRule>().As<IRequiredRule>();
+            builder.RegisterType<AttributeToRule>().As<IAttributeToRule>().SingleInstance(); // SingleInstance is save as long as it only resolves Func<>s
 
             builder.RegisterGeneric(typeof(RegisteredProperty<>)).As(typeof(IRegisteredProperty<>));
             builder.Register<CreateRegisteredProperty>(cc =>

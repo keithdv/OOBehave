@@ -123,7 +123,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
-            Assert.AreEqual("Error", validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Single());
+            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
         }
 
         [TestMethod]
@@ -138,7 +138,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.FirstName = "John";
 
             Assert.IsTrue(validate.IsValid);
-            Assert.AreEqual(0, validate.BrokenRulePropertyMessages(nameof(validate.FirstName)).Count());
+            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
 
         }
 
@@ -194,8 +194,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.TestMarkInvalid(message = Guid.NewGuid().ToString());
             Assert.IsFalse(validate.IsValid);
             Assert.IsFalse(validate.IsSelfValid);
-            Assert.AreEqual(1, validate.BrokenRuleMessages.Count());
-            Assert.AreEqual(message, validate.BrokenRuleMessages.Single());
+            Assert.AreEqual(1, validate.RuleResultList.Count());
+            Assert.AreEqual(message, validate.RuleResultList.Single().PropertyErrorMessages.Single().Value);
         }
 
         [TestMethod]

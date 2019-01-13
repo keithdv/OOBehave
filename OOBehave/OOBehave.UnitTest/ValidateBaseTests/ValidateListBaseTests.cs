@@ -108,7 +108,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             List.LastName = "Smith";
 
             Assert.IsFalse(List.IsValid);
-            Assert.AreEqual("Error", List.BrokenRulePropertyMessages(nameof(List.FirstName)).Single());
+            Assert.IsTrue(List.RuleResultList[nameof(List.FirstName)].IsError);
         }
 
         [TestMethod]
@@ -123,7 +123,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             List.FirstName = "John";
 
             Assert.IsTrue(List.IsValid);
-            Assert.AreEqual(0, List.BrokenRulePropertyMessages(nameof(List.FirstName)).Count());
+            Assert.IsNull(List.RuleResultList[nameof(List.FirstName)]);
 
         }
 

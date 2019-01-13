@@ -15,9 +15,12 @@ namespace OOBehave
 
     internal interface IPropertyAccess
     {
+        IPropertyValue ReadPropertyValue(string propertyName);
+        IPropertyValue ReadPropertyValue(IRegisteredProperty registeredProperty);
         P ReadProperty<P>(IRegisteredProperty<P> registeredProperty);
         void SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value);
-        object ReadProperty(IRegisteredProperty registeredProperty);
+        void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value);
+
     }
 
     public interface IBase : IOOBehaveObject, IPortalTarget
@@ -72,12 +75,12 @@ namespace OOBehave
 
         protected virtual P ReadProperty<P>(IRegisteredProperty<P> property)
         {
-            return PropertyValueManager.Read<P>(property);
+            return PropertyValueManager.ReadProperty<P>(property);
         }
 
         protected virtual void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Load(registeredProperty, value);
+            PropertyValueManager.LoadProperty(registeredProperty, value);
         }
 
         public bool IsStopped { get; protected set; }
@@ -109,20 +112,28 @@ namespace OOBehave
 
         P IPropertyAccess.ReadProperty<P>(IRegisteredProperty<P> registeredProperty)
         {
-            return PropertyValueManager.Read(registeredProperty);
+            return PropertyValueManager.ReadProperty(registeredProperty);
         }
-
+               
         void IPropertyAccess.SetProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            PropertyValueManager.Load(registeredProperty, value);
+            PropertyValueManager.LoadProperty(registeredProperty, value);
         }
 
-        object IPropertyAccess.ReadProperty(IRegisteredProperty registeredProperty)
+        void IPropertyAccess.LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P value)
         {
-            return PropertyValueManager.Read(registeredProperty);
+            PropertyValueManager.LoadProperty(registeredProperty, value);
         }
 
+        IPropertyValue IPropertyAccess.ReadPropertyValue(string propertyName)
+        {
+            return PropertyValueManager.ReadProperty(propertyName);
+        }
 
+        IPropertyValue IPropertyAccess.ReadPropertyValue(IRegisteredProperty registeredProperty)
+        {
+            return PropertyValueManager.ReadProperty(registeredProperty);
+        }
     }
 
 }

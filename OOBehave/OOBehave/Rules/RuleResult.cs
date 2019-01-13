@@ -53,7 +53,8 @@ namespace OOBehave.Rules
         public void OnSerializing(StreamingContext context)
         {
             // Readonly list cannot be serialized
-            TriggerProperties = TriggerProperties.ToList();
+
+            TriggerProperties = TriggerProperties?.ToList();
         }
 
     }

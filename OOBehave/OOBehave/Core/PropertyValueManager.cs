@@ -15,13 +15,15 @@ namespace OOBehave.Core
     public interface IPropertyValueManager
     {
         IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name);
-        void Load<P>(IRegisteredProperty<P> registeredProperty, P newValue);
-        P Read<P>(IRegisteredProperty<P> registeredProperty);
+        void LoadProperty<P>(IRegisteredProperty<P> registeredProperty, P newValue);
+        P ReadProperty<P>(IRegisteredProperty<P> registeredProperty);
+        P ReadProperty<P>(string propertyName);
 
         // This isn't possible without some nasty reflection or static backing fields
         // If the property is being loaded for the first time you need the type
-        //void Load(IRegisteredProperty registeredProperty, object newValue);
-        object Read(IRegisteredProperty registeredProperty);
+        //void LoadProperty(IRegisteredProperty registeredProperty, object newValue);
+        IPropertyValue ReadProperty(string propertyName);
+        IPropertyValue ReadProperty(IRegisteredProperty registeredProperty);
     }
 
 
@@ -37,6 +39,7 @@ namespace OOBehave.Core
     public interface IPropertyValue
     {
         string Name { get; }
+        object Value { get; }
 
     }
 
@@ -53,6 +56,8 @@ namespace OOBehave.Core
 
         [PortalDataMember]
         public virtual T Value { get; set; }
+
+        object IPropertyValue.Value => Value;
 
         protected PropertyValue() { } // For EditPropertyValue Deserialization
 
@@ -109,12 +114,12 @@ namespace OOBehave.Core
         }
 
 
-        public virtual void Load<PV>(string name, PV newValue)
+        public virtual void LoadProperty<PV>(string name, PV newValue)
         {
-            Load(GetRegisteredProperty<PV>(name), newValue);
+            LoadProperty(GetRegisteredProperty<PV>(name), newValue);
         }
 
-        public virtual void Load<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
+        public virtual void LoadProperty<PV>(IRegisteredProperty<PV> registeredProperty, PV newValue)
         {
             if (!fieldData.ContainsKey(registeredProperty.Index))
             {
@@ -126,12 +131,12 @@ namespace OOBehave.Core
             SetParent(newValue);
         }
 
-        public PV Read<PV>(string name)
+        public PV ReadProperty<PV>(string name)
         {
-            return Read<PV>(GetRegisteredProperty<PV>(name));
+            return ReadProperty<PV>(GetRegisteredProperty<PV>(name));
         }
 
-        public virtual PV Read<PV>(IRegisteredProperty<PV> registeredProperty)
+        public virtual PV ReadProperty<PV>(IRegisteredProperty<PV> registeredProperty)
         {
             if (!fieldData.TryGetValue(registeredProperty.Index, out var value))
             {
@@ -143,7 +148,13 @@ namespace OOBehave.Core
             return fd.Value;
         }
 
-        public virtual object Read(IRegisteredProperty registeredProperty)
+
+        public virtual IPropertyValue ReadProperty(string propertyName)
+        {
+            return ReadProperty(registeredPropertyManager.GetRegisteredProperty(propertyName));
+        }
+
+        public virtual IPropertyValue ReadProperty(IRegisteredProperty registeredProperty)
         {
             if (fieldData.TryGetValue(registeredProperty.Index, out var fd))
             {
@@ -151,7 +162,6 @@ namespace OOBehave.Core
             }
 
             return null;
-
         }
 
         protected void SetParent(object newValue)
@@ -191,3 +201,4 @@ namespace OOBehave.Core
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
+

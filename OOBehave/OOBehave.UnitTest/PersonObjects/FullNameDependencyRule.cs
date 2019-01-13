@@ -7,7 +7,7 @@ namespace OOBehave.UnitTest.PersonObjects
 {
     public interface IFullNameDependencyRule<T> : IRule<T> where T : IPersonBase { }
 
-    public class FullNameDependencyRule<T> : Rule<T>, IFullNameDependencyRule<T>
+    public class FullNameDependencyRule<T> : RuleBase<T>, IFullNameDependencyRule<T>
         where T : IPersonBase
     {
 

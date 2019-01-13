@@ -25,7 +25,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             IFullNameRule<ValidateObject> fullNameRule
             ) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
             ShortNameRule = shortNameRule;
             FullNameRule = fullNameRule;
         }
@@ -71,7 +71,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             IFullNameRule<ValidateObjectList> fullNameRule
             ) : base(services)
         {
-            RuleExecute.AddRules(shortNameRule, fullNameRule);
+            RuleManager.AddRules(shortNameRule, fullNameRule);
             ShortNameRule = shortNameRule;
             FullNameRule = fullNameRule;
         }
