@@ -29,11 +29,18 @@ namespace OOBehave.Netwonsoft.Json.Test
         P Param { get; set; }
     }
 
-    public class RemoteMethod<S, P, T> : IRemoteMethod<S, P, T>
+    /// <summary>
+    /// Serialize the parameters there
+    /// Than serialize the result back
+    /// </summary>
+    /// <typeparam name="S"></typeparam>
+    /// <typeparam name="P"></typeparam>
+    /// <typeparam name="T"></typeparam>
+    public class RemoteMethodCall<S, P, T> : IRemoteMethod<S, P, T>
         where S : Delegate
     {
 
-        public RemoteMethod(S method)
+        public RemoteMethodCall(S method)
         {
             this.Method = method;
         }
@@ -42,11 +49,11 @@ namespace OOBehave.Netwonsoft.Json.Test
 
         public P Param { get; set; }
 
-        public T Result { get; set; }
+        public T Return { get; set; }
 
         public void Execute()
         {
-            Result = (T)Method.Method.Invoke(Method.Target, new object[1] { Param });
+            Return = (T)Method.Method.Invoke(Method.Target, new object[1] { Param });
         }
 
     }

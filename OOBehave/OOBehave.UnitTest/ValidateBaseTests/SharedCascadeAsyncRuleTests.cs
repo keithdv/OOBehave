@@ -11,7 +11,11 @@ using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ValidateBaseTests
 {
-    public class ShortNameRule : Rules.AsyncRuleBase<IBase>
+
+    // Contravariance on IRule< in T > is required for this to work
+    // That way ActualType that inherits from IValidateBase can be cast to IRule < IValidateBase >
+
+    public class ShortNameRule : Rules.AsyncRuleBase<IValidateBase>
     {
         private readonly IRegisteredProperty<string> shortName;
         private readonly IRegisteredProperty<string> firstName;
@@ -24,7 +28,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             this.lastName = lastName;
         }
 
-        public override async Task<IRuleResult> Execute(IBase target, CancellationToken token)
+        public override async Task<IRuleResult> Execute(IValidateBase target, CancellationToken token)
         {
             await Task.Delay(10);
 

@@ -58,10 +58,10 @@ namespace OOBehave.UnitTest
                     builder.RegisterType<Objects.DisposableDependency>().As<Objects.IDisposableDependency>();
                     builder.RegisterType<Objects.DisposableDependencyList>().InstancePerLifetimeScope();
 
-                    builder.Register<MethodObject.CommandMethod>(cc =>
+                    builder.Register<MethodObject.Execute>(cc =>
                     {
                         var dd = cc.Resolve<Func<Objects.IDisposableDependency>>();
-                        return i => MethodObject.CommandMethod_(i, dd());
+                        return i => MethodObject.ExecuteServer(i, dd());
                     });
 
                     builder.Register<IReadOnlyList<PersonObjects.PersonDto>>(cc =>

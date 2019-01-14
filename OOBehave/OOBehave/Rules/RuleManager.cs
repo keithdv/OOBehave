@@ -39,7 +39,6 @@ namespace OOBehave.Rules
     }
 
     public interface IRuleManager<T> : IRuleManager
-        where T : IValidateBase
     {
         FluentRule<T> AddRule(Func<T, IRuleResult> func, params string[] triggerProperty);
 
@@ -47,7 +46,6 @@ namespace OOBehave.Rules
 
     [PortalDataContract]
     public class RuleManager<T> : IRuleManager<T>, ISetTarget
-        where T : IValidateBase
     {
 
         protected T Target { get; set; }
@@ -280,10 +278,6 @@ namespace OOBehave.Rules
                 if (r is IRule<T> rule)
                 {
                     result = await rule.Execute(Target, token);
-                }
-                else if (r is IRule<IBase> sharedRule)
-                {
-                    result = await sharedRule.Execute(Target, token);
                 }
                 else
                 {

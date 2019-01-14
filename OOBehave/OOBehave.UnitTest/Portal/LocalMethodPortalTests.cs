@@ -17,22 +17,24 @@ namespace OOBehave.UnitTest.Portal
 
     public class MethodObject : IMethodObject
     {
-        private IRemoteMethodPortal<CommandMethod> Method { get; }
+        private IRemoteMethodPortal<Execute> Method { get; }
 
-        public MethodObject(IRemoteMethodPortal<CommandMethod> method)
+        public MethodObject(IRemoteMethodPortal<Execute> method)
         {
             Method = method;
         }
 
-        public delegate Task<int> CommandMethod(int number);
+        // This entire approach is driven off of the fact that while the Delegate is not serializable
+        // The Type definition of the Delegate is and we can resolve that Type from the container
+        public delegate Task<int> Execute(int number);
 
         /// <summary>
-        /// This will be called on the servicer (when not a unit test)
+        /// This will be called on the server (when not a unit test)
         /// </summary>
         /// <param name="number"></param>
         /// <param name="dependency"></param>
         /// <returns></returns>
-        internal static Task<int> CommandMethod_(int number, IDisposableDependency dependency)
+        internal static Task<int> ExecuteServer(int number, IDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             return Task.FromResult(number * 10);
@@ -56,24 +58,27 @@ namespace OOBehave.UnitTest.Portal
         }
 
         [TestMethod]
-        public async Task LocalMethodPortal_Execute()
+        public async Task LocalMethodPortal_ExecuteServer()
         {
-            var portal = scope.Resolve<LocalMethodPortal<MethodObject.CommandMethod>>();
-
-            var result = await portal.Execute<int>(10);
-
-            Assert.AreEqual(100, result);
-        }
-
-        [TestMethod]
-        public async Task LocalMethodPortal_MethodObject()
-        {
+            // Hide the fact that there is a remote call from the client
             var methodObject = scope.Resolve<IMethodObject>();
 
             var result = await methodObject.DoRemoteWork(20);
 
             Assert.AreEqual(200, result);
         }
+
+        [TestMethod]
+        public async Task LocalMethodPortal_Execute()
+        {
+            var portal = scope.Resolve<LocalMethodPortal<MethodObject.Execute>>();
+
+            var result = await portal.Execute<int>(10);
+
+            Assert.AreEqual(100, result);
+        }
+
+
 
     }
 }

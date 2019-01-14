@@ -51,7 +51,7 @@ namespace OOBehave.Netwonsoft.Json.Test
                     return i => MethodObject.CommendMethod_(i, dd());
                 });
 
-                builder.RegisterGeneric(typeof(RemoteMethod<,,>)).As(typeof(IRemoteMethod<,,>)).AsSelf();
+                builder.RegisterGeneric(typeof(RemoteMethodCall<,,>)).As(typeof(IRemoteMethod<,,>)).AsSelf();
                 builder.RegisterType<MethodObject>();
 
                 Container = builder.Build();

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OOBehave.Core;
 using OOBehave.Rules;
 using OOBehave.UnitTest.PersonObjects;
 using System;
@@ -207,5 +208,6 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.FirstName = Guid.NewGuid().ToString();
             Assert.AreEqual(rrc, validate.RuleRunCount);
         }
+
     }
 }

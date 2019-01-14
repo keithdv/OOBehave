@@ -19,7 +19,11 @@ namespace OOBehave.Rules
 
     }
 
-    public interface IRule<T> : IRule
+    /// <summary>
+    /// Contravariant - Allows RuleManager to call even when generic types are different
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IRule<in T> : IRule
     {
         Task<IRuleResult> Execute(T target, CancellationToken token);
     }
