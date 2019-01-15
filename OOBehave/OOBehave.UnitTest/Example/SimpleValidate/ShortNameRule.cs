@@ -7,7 +7,7 @@ namespace OOBehave.UnitTest.Example.SimpleValidate
 {
     public interface IShortNameRule : IRule<ISimpleValidateObject> { }
 
-    public class ShortNameRule : RuleBase<ISimpleValidateObject>, IShortNameRule
+    internal class ShortNameRule : RuleBase<ISimpleValidateObject>, IShortNameRule
     {
         public ShortNameRule() : base()
         {
@@ -33,6 +33,10 @@ namespace OOBehave.UnitTest.Example.SimpleValidate
             if (!result.IsError)
             {
                 target.ShortName = $"{target.FirstName} {target.LastName}";
+            }
+            else
+            {
+                target.ShortName = string.Empty;
             }
 
             return result;
