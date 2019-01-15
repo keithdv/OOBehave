@@ -13,11 +13,11 @@ It features:
 
 I built OOBehave because in the modern development landscape there are dizzying number of tools available.  The challenge is how to learn, apply and combine the tools to build business object. OOBehave does this for you by bringing these powerful tools and patterns into one framework for your team to build maintainable business libraries. 
 
-<img src="/OOBehave/ConnectingTheDots.png" alt="drawing" width="300" height="300"/>
+<img src="/OOBehave/ConnectingTheDots.png" alt="drawing" width="634" height="403"/>
 
 ## Getting Started
 
-The project is in its infancy. There will be more examples to follow. Right now, the most examples are the various objects in the unit test library. Also, here’s a few examples.
+The project is in its infancy. There will be more examples to follow. Right now, the most examples are the various objects in the unit test library. Also, here’s a short example.
 
 #### ValidateBase
 
@@ -99,7 +99,7 @@ Here's ShortNameRule:
     }
 ```
 
-Each time FirstName or LastName are executed the rule is ran. If both FirstName and LastName have a value ShortName is updated. If not SimpleValidateObject.IsValid will be false.
+Each time FirstName or LastName are modified this rule is triggered. If both FirstName and LastName have a value ShortName is updated. If not SimpleValidateObject.IsValid will be false.
 
 Some things to note:
 -   RuleBase<> is the base class for Validation Rules. There are more features of RuleBase than are shown here.
