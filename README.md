@@ -25,31 +25,31 @@ ValidateBase provides the rules engine RuleManager and the corresponding meta pr
 Here’s a simple example object:
 
 ```
-    internal class SimpleValidateObject : ValidateBase<SimpleValidateObject>, ISimpleValidateObject
+internal class SimpleValidateObject : ValidateBase<SimpleValidateObject>, ISimpleValidateObject
+{
+    public SimpleValidateObject(IValidateBaseServices<SimpleValidateObject> services,
+                                IShortNameRule shortNameRule) : base(services)
     {
-        public SimpleValidateObject(IValidateBaseServices<SimpleValidateObject> services,
-                                    IShortNameRule shortNameRule) : base(services)
-        {
-            RuleManager.AddRule(shortNameRule);
-        }
-
-        public Guid Id { get { return Getter<Guid>(); } }
-
-        public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
-
-        public string LastName { get { return Getter<string>(); } set { Setter(value); } }
-
-        public string ShortName { get { return Getter<string>(); } set { Setter(value); } }
-
+        RuleManager.AddRule(shortNameRule);
     }
 
-    public interface ISimpleValidateObject : IValidateBase
-    {
-        Guid Id { get; }
-        string FirstName { get; set; }
-        string LastName { get; set; }
-        string ShortName { get; set; }
-    }
+    public Guid Id { get { return Getter<Guid>(); } }
+
+    public string FirstName { get { return Getter<string>(); } set { Setter(value); } }
+
+    public string LastName { get { return Getter<string>(); } set { Setter(value); } }
+
+    public string ShortName { get { return Getter<string>(); } set { Setter(value); } }
+
+}
+
+public interface ISimpleValidateObject : IValidateBase
+{
+    Guid Id { get; }
+    string FirstName { get; set; }
+    string LastName { get; set; }
+    string ShortName { get; set; }
+}
 ```
 
 Some things to note:
@@ -63,40 +63,44 @@ Some things to note:
 Here's ShortNameRule:
 
 ```
-    public interface IShortNameRule : IRule<ISimpleValidateObject> { }
+public interface IShortNameRule : IRule<ISimpleValidateObject> { }
 
-    public class ShortNameRule : RuleBase<ISimpleValidateObject>, IShortNameRule
+public class ShortNameRule : RuleBase<ISimpleValidateObject>, IShortNameRule
+{
+    public ShortNameRule() : base()
     {
-        public ShortNameRule() : base()
-        {
-            TriggerProperties.Add(nameof(ISimpleValidateObject.FirstName));
-            TriggerProperties.Add(nameof(ISimpleValidateObject.LastName));
-        }
-
-        public override IRuleResult Execute(ISimpleValidateObject target)
-        {
-
-            var result = RuleResult.Empty();
-
-            if (string.IsNullOrWhiteSpace(target.FirstName))
-            {
-                result.AddPropertyError(nameof(ISimpleValidateObject.FirstName), $"{nameof(ISimpleValidateObject.FirstName)} is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(target.LastName))
-            {
-                result.AddPropertyError(nameof(ISimpleValidateObject.LastName), $"{nameof(ISimpleValidateObject.LastName)} is required.");
-            }
-
-            if (!result.IsError)
-            {
-                target.ShortName = $"{target.FirstName} {target.LastName}";
-            }
-
-            return result;
-        }
-
+        TriggerProperties.Add(nameof(ISimpleValidateObject.FirstName));
+        TriggerProperties.Add(nameof(ISimpleValidateObject.LastName));
     }
+
+    public override IRuleResult Execute(ISimpleValidateObject target)
+    {
+
+        var result = RuleResult.Empty();
+
+        if (string.IsNullOrWhiteSpace(target.FirstName))
+        {
+            result.AddPropertyError(nameof(ISimpleValidateObject.FirstName), $"{nameof(ISimpleValidateObject.FirstName)} is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(target.LastName))
+        {
+            result.AddPropertyError(nameof(ISimpleValidateObject.LastName), $"{nameof(ISimpleValidateObject.LastName)} is required.");
+        }
+
+        if (!result.IsError)
+        {
+            target.ShortName = $"{target.FirstName} {target.LastName}";
+        }
+        else
+        {
+            target.ShortName = string.Empty;
+        }
+
+        return result;
+    }
+
+}
 ```
 
 Each time FirstName or LastName are modified this rule is triggered. If both FirstName and LastName have a value ShortName is updated. If not SimpleValidateObject.IsValid will be false.
