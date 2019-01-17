@@ -123,14 +123,14 @@ namespace OOBehave
         {
             foreach (var d in DeletedList)
             {
-                await ItemPortal.UpdateChild(d);
+                await ItemPortal.UpdateChild(d).ConfigureAwait(false);
             }
 
             DeletedList.Clear();
 
             foreach (var i in this.Where(i => i.IsModified).ToList())
             {
-                await ItemPortal.UpdateChild(i);
+                await ItemPortal.UpdateChild(i).ConfigureAwait(false);
             }
         }
 
@@ -138,14 +138,14 @@ namespace OOBehave
         {
             foreach (var d in DeletedList)
             {
-                await ItemPortal.UpdateChild(d, criteria);
+                await ItemPortal.UpdateChild(d, criteria).ConfigureAwait(false);
             }
 
             DeletedList.Clear();
 
             foreach (var i in this.Where(i => i.IsModified).ToList())
             {
-                await ItemPortal.UpdateChild(i, criteria);
+                await ItemPortal.UpdateChild(i, criteria).ConfigureAwait(false);
             }
         }
 
@@ -167,7 +167,7 @@ namespace OOBehave
                 }
             }
 
-            await SendReceivePortal.Update((T)this);
+            await SendReceivePortal.Update((T)this).ConfigureAwait(false);
 
         }
 
@@ -179,7 +179,7 @@ namespace OOBehave
             {
                 throw new Exception($"{typeof(T).FullName} is modified you must override and define Update().");
             }
-            await UpdateList();
+            await UpdateList().ConfigureAwait(false);
         }
     }
 

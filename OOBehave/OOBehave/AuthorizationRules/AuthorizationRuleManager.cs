@@ -152,7 +152,7 @@ namespace OOBehave.AuthorizationRules
 
                         if (methodResultAsync != null)
                         {
-                            await methodResultAsync;
+                            await methodResultAsync.ConfigureAwait(false);
                             ruleResult = ((IAuthorizationRuleResult)methodResultAsync.Result);
                         }
                         else
@@ -226,7 +226,7 @@ namespace OOBehave.AuthorizationRules
 
                             if (methodResultAsync != null)
                             {
-                                await methodResultAsync;
+                                await methodResultAsync.ConfigureAwait(false);
                                 ruleResult = ((IAuthorizationRuleResult)methodResultAsync.Result);
                             }
                             else

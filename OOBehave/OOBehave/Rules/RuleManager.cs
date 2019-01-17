@@ -4,6 +4,7 @@ using OOBehave.Rules.Rules;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -31,10 +32,11 @@ namespace OOBehave.Rules
 
         void AddRule(IRule rule);
         void AddRules(params IRule[] rules);
-        IRuleResult this[string propertyName] { get; }
+        IEnumerable<string> this[string propertyName] { get; }
         IRuleResultReadOnlyList Results { get; }
         Task CheckRulesForProperty(string propertyName);
         Task CheckAllRules(CancellationToken token = new CancellationToken());
+        event PropertyChangedEventHandler PropertyChanged;
 
     }
 
@@ -57,6 +59,8 @@ namespace OOBehave.Rules
 
         protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public RuleManager(IRuleResultList results, IAttributeToRule attributeToRule, IRegisteredPropertyManager<T> registeredPropertyManager)
         {
             Results = results;
@@ -67,7 +71,7 @@ namespace OOBehave.Rules
 
         private IDictionary<uint, IRule> Rules { get; } = new ConcurrentDictionary<uint, IRule>();
 
-        IRuleResult IRuleManager.this[string propertyName]
+        IEnumerable<string> IRuleManager.this[string propertyName]
         {
             get { return Results[propertyName]; }
         }
@@ -191,6 +195,7 @@ namespace OOBehave.Rules
 
         private TaskCompletionSource<object> waitForRulesSource;
         private CancellationTokenSource cancellationTokenSource;
+        private ConcurrentQueue<string> propertyHasChanged;
 
         private bool isRunningRules = false;
 
@@ -214,6 +219,7 @@ namespace OOBehave.Rules
                     cancellationTokenSource = new CancellationTokenSource();
                     waitForRulesSource = new TaskCompletionSource<object>();
                     WaitForRules = waitForRulesSource.Task;
+                    propertyHasChanged = new ConcurrentQueue<string>();
                 }
             }
 
@@ -232,7 +238,17 @@ namespace OOBehave.Rules
 #endif
 
                     isRunningRules = false;
+
+                    // What if this calls other rules??
+                    var phc = propertyHasChanged;
+                    foreach (var p in phc)
+                    {
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
+                    }
+
                     waitForRulesSource.SetResult(new object());
+
+
                 }
             }
 
@@ -277,7 +293,7 @@ namespace OOBehave.Rules
             {
                 if (r is IRule<T> rule)
                 {
-                    result = await rule.Execute(Target, token);
+                    result = await rule.Execute(Target, token).ConfigureAwait(false);
                 }
                 else
                 {
@@ -300,15 +316,31 @@ namespace OOBehave.Rules
                 }
             }
 
+            if (Results.ContainsKey((int)r.UniqueIndex))
+            {
+                var existingResult = Results[(int)r.UniqueIndex];
+                foreach (var pr in existingResult.PropertyErrorMessages)
+                {
+                    if (!propertyHasChanged.Contains(pr.Key))
+                    {
+                        propertyHasChanged.Enqueue(pr.Key);
+                    }
+                }
+                Results.Remove((int)r.UniqueIndex);
+            }
+
             if (result.IsError)
             {
                 result.TriggerProperties = r.TriggerProperties;
                 Results[(int)r.UniqueIndex] = result;
-            }
-            else if (Results.ContainsKey((int)r.UniqueIndex))
-            {
-                // Optimized approach for when/if this is serialized
-                Results.Remove((int)r.UniqueIndex);
+
+                foreach (var pr in result.PropertyErrorMessages)
+                {
+                    if (!propertyHasChanged.Contains(pr.Key))
+                    {
+                        propertyHasChanged.Enqueue(pr.Key);
+                    }
+                }
             }
 
         }

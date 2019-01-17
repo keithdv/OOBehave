@@ -152,23 +152,23 @@ namespace OOBehave.Portal.Core
 
         protected async Task CheckAccess(AuthorizeOperation operation)
         {
-            await AuthorizationRuleManager.CheckAccess(operation);
+            await AuthorizationRuleManager.CheckAccess(operation).ConfigureAwait(false);
         }
 
         protected async Task CheckAccess(AuthorizeOperation operation, params object[] criteria)
         {
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
-            await AuthorizationRuleManager.CheckAccess(operation, criteria);
+            await AuthorizationRuleManager.CheckAccess(operation, criteria).ConfigureAwait(false);
         }
 
         public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation)
         {
-            await CheckAccess(operation.ToAuthorizationOperation());
+            await CheckAccess(operation.ToAuthorizationOperation()).ConfigureAwait(false);
 
             var methods = MethodsForOperation(operation) ?? new List<MethodInfo>();
 
-            using (await target.StopAllActions())
+            using (await target.StopAllActions().ConfigureAwait(false))
             {
                 var invoked = false;
 
@@ -203,7 +203,7 @@ namespace OOBehave.Portal.Core
                         var result = method.Invoke(target, parameterValues);
                         if (method.ReturnType == typeof(Task))
                         {
-                            await (Task)result;
+                            await ((Task)result).ConfigureAwait(false);
                         }
 
                         PostOperation(target, operation);
@@ -217,9 +217,9 @@ namespace OOBehave.Portal.Core
         }
         public async Task<bool> TryCallOperation(IPortalTarget target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
         {
-            await CheckAccess(operation.ToAuthorizationOperation(), criteria);
+            await CheckAccess(operation.ToAuthorizationOperation(), criteria).ConfigureAwait(false);
 
-            using (await target.StopAllActions())
+            using (await target.StopAllActions().ConfigureAwait(false))
             {
                 // The criteriaTypes need to be captured by Generic method definitions
                 // in case the values sent in are null
@@ -256,7 +256,7 @@ namespace OOBehave.Portal.Core
 
                     if (method.ReturnType == typeof(Task))
                     {
-                        await (Task)result;
+                        await ((Task)result).ConfigureAwait(false);
                     }
 
                     PostOperation(target, operation);

@@ -110,14 +110,14 @@ namespace OOBehave
 
         public async Task<I> CreateAdd()
         {
-            var item = await ItemPortal.CreateChild();
+            var item = await ItemPortal.CreateChild().ConfigureAwait(false);
             base.Add(item);
             return item;
         }
 
         public async Task<I> CreateAdd(params object[] criteria)
         {
-            var item = await ItemPortal.CreateChild(criteria);
+            var item = await ItemPortal.CreateChild(criteria).ConfigureAwait(false);
             base.Add(item);
             return item;
         }

@@ -17,6 +17,7 @@ namespace OOBehave.Rules
         IReadOnlyDictionary<string, string> PropertyErrorMessages { get; }
 
         IReadOnlyList<string> TriggerProperties { get; set; }
+        string this[string propertyName] { get; }
     }
 
     [PortalDataContract]
@@ -31,6 +32,18 @@ namespace OOBehave.Rules
 
         [PortalDataMember]
         public IReadOnlyList<string> TriggerProperties { get; set; }
+
+        string IRuleResult.this[string propertyName]
+        {
+            get
+            {
+                if (PropertyErrorMessages.TryGetValue(propertyName, out var result))
+                {
+                    return result;
+                }
+                return string.Empty;
+            }
+        }
 
         public static RuleResult Empty()
         {

@@ -110,7 +110,7 @@ namespace OOBehave
                 }
             }
 
-            await SendReceivePortal.Update((T) this);
+            await SendReceivePortal.Update((T)this).ConfigureAwait(false);
 
         }
     }

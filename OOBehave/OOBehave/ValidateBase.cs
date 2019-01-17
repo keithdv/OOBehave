@@ -25,7 +25,7 @@ namespace OOBehave
     }
 
     [PortalDataContract]
-    public abstract class ValidateBase<T> : Base<T>, IValidateBase, INotifyPropertyChanged, IPropertyAccess
+    public abstract class ValidateBase<T> : Base<T>, IValidateBase, INotifyPropertyChanged, IPropertyAccess, IDataErrorInfo
         where T : ValidateBase<T>
     {
 
@@ -38,8 +38,10 @@ namespace OOBehave
         public ValidateBase(IValidateBaseServices<T> services) : base(services)
         {
             this.RuleManager = services.RuleManager;
+            this.RuleManager.PropertyChanged += RuleManager_PropertyChanged;
             ((ISetTarget)this.RuleManager).SetTarget(this);
         }
+
 
         public bool IsValid => RuleManager.IsValid && PropertyValueManager.IsValid;
 
@@ -63,7 +65,7 @@ namespace OOBehave
 
         protected virtual void SetProperty<P>(string propertyName, P value)
         {
-            if(PropertyValueManager.SetProperty(GetRegisteredProperty<P>(propertyName), value))
+            if (PropertyValueManager.SetProperty(GetRegisteredProperty<P>(propertyName), value))
             {
                 PropertyHasChanged(propertyName);
             }
@@ -82,6 +84,12 @@ namespace OOBehave
             CheckRules(propertyName);
         }
 
+
+        private void RuleManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
         protected virtual void CheckRules(string propertyName)
         {
             RuleManager.CheckRulesForProperty(propertyName);
@@ -96,6 +104,37 @@ namespace OOBehave
 
         public IEnumerable<string> BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
 
+        string IDataErrorInfo.Error
+        {
+            get
+            {
+                if (!IsSelfValid)
+                {
+                    if (RuleManager.OverrideResult != null)
+                    {
+                        return RuleManager.OverrideResult.PropertyErrorMessages.First().Value;
+                    }
+                    else
+                    {
+                        return RuleManager.Results.FirstOrDefault()?.PropertyErrorMessages.First().Value ?? string.Empty;
+                    }
+                }
+                return string.Empty;
+            }
+        }
+
+        string IDataErrorInfo.this[string columnName]
+        {
+            get
+            {
+                if (!IsSelfValid)
+                {
+                    return RuleManager[columnName].FirstOrDefault() ?? string.Empty;
+                }
+                return string.Empty;
+            }
+        }
+
         /// <summary>
         /// Permantatly mark invalid
         /// Note: not associated with any specific property
@@ -108,8 +147,8 @@ namespace OOBehave
 
         public override async Task<IDisposable> StopAllActions()
         {
-            var result = await base.StopAllActions();
-            await WaitForRules();
+            var result = await base.StopAllActions().ConfigureAwait(false);
+            await WaitForRules().ConfigureAwait(false);
             return result;
         }
 

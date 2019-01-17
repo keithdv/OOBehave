@@ -91,8 +91,8 @@ namespace OOBehave
 
         public override async Task<IDisposable> StopAllActions()
         {
-            var result = await base.StopAllActions();
-            await WaitForRules();
+            var result = await base.StopAllActions().ConfigureAwait(false);
+            await WaitForRules().ConfigureAwait(false);
             return result;
         }
 

@@ -19,162 +19,162 @@ namespace OOBehave.Portal.Core
         {
         }
 
-        public async Task<T> Create()
+        public Task<T> Create()
         {
-            return await CallOperationMethod(PortalOperation.Create, false);
+            return CallOperationMethod(PortalOperation.Create, false);
         }
-        public async Task<T> Create<C0>(C0 criteria0)
+        public Task<T> Create<C0>(C0 criteria0)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0 }, new Type[] { typeof(C0) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0 }, new Type[] { typeof(C0) });
         }
-        public async Task<T> Create<C0, C1>(C0 criteria0, C1 criteria1)
+        public Task<T> Create<C0, C1>(C0 criteria0, C1 criteria1)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
         }
-        public async Task<T> Create<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task<T> Create<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
         }
-        public async Task<T> Create<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task<T> Create<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
         }
-        public async Task<T> Create<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task<T> Create<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
         }
-        public async Task<T> Create<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task<T> Create<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
         }
-        public async Task<T> Create<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task<T> Create<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
         }
-        public async Task<T> Create<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task<T> Create<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
-            return await CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
+            return CallOperationMethod(PortalOperation.Create, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
-        public async Task<T> Fetch()
+        public Task<T> Fetch()
         {
-            return await CallOperationMethod(PortalOperation.Fetch);
+            return CallOperationMethod(PortalOperation.Fetch);
         }
-        public async Task<T> Fetch<C0>(C0 criteria0)
+        public Task<T> Fetch<C0>(C0 criteria0)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0 }, new Type[] { typeof(C0) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0 }, new Type[] { typeof(C0) });
         }
-        public async Task<T> Fetch<C0, C1>(C0 criteria0, C1 criteria1)
+        public Task<T> Fetch<C0, C1>(C0 criteria0, C1 criteria1)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
         }
-        public async Task<T> Fetch<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task<T> Fetch<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
         }
-        public async Task<T> Fetch<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task<T> Fetch<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
         }
-        public async Task<T> Fetch<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task<T> Fetch<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
         }
-        public async Task<T> Fetch<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task<T> Fetch<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
         }
-        public async Task<T> Fetch<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task<T> Fetch<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
         }
-        public async Task<T> Fetch<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task<T> Fetch<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
-            return await CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
+            return CallOperationMethod(PortalOperation.Fetch, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
-        public async Task<T> CreateChild()
+        public Task<T> CreateChild()
         {
-            return await CallOperationMethod(PortalOperation.CreateChild);
+            return CallOperationMethod(PortalOperation.CreateChild);
         }
-        public async Task<T> CreateChild<C0>(C0 criteria0)
+        public Task<T> CreateChild<C0>(C0 criteria0)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0 }, new Type[] { typeof(C0) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0 }, new Type[] { typeof(C0) });
         }
-        public async Task<T> CreateChild<C0, C1>(C0 criteria0, C1 criteria1)
+        public Task<T> CreateChild<C0, C1>(C0 criteria0, C1 criteria1)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
         }
-        public async Task<T> CreateChild<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task<T> CreateChild<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
         }
-        public async Task<T> CreateChild<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task<T> CreateChild<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
         }
-        public async Task<T> CreateChild<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task<T> CreateChild<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
         }
-        public async Task<T> CreateChild<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task<T> CreateChild<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
         }
-        public async Task<T> CreateChild<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task<T> CreateChild<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
         }
-        public async Task<T> CreateChild<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task<T> CreateChild<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
-            return await CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
+            return CallOperationMethod(PortalOperation.CreateChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
-        public async Task<T> FetchChild()
+        public Task<T> FetchChild()
         {
-            return await CallOperationMethod(PortalOperation.FetchChild);
+            return CallOperationMethod(PortalOperation.FetchChild);
         }
-        public async Task<T> FetchChild<C0>(C0 criteria0)
+        public Task<T> FetchChild<C0>(C0 criteria0)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0 }, new Type[] { typeof(C0) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0 }, new Type[] { typeof(C0) });
         }
-        public async Task<T> FetchChild<C0, C1>(C0 criteria0, C1 criteria1)
+        public Task<T> FetchChild<C0, C1>(C0 criteria0, C1 criteria1)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1 }, new Type[] { typeof(C0), typeof(C1) });
         }
-        public async Task<T> FetchChild<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task<T> FetchChild<C0, C1, C2>(C0 criteria0, C1 criteria1, C2 criteria2)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2 }, new Type[] { typeof(C0), typeof(C1), typeof(C2) });
         }
-        public async Task<T> FetchChild<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task<T> FetchChild<C0, C1, C2, C3>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3) });
         }
-        public async Task<T> FetchChild<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task<T> FetchChild<C0, C1, C2, C3, C4>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4) });
         }
-        public async Task<T> FetchChild<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task<T> FetchChild<C0, C1, C2, C3, C4, C5>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5) });
         }
-        public async Task<T> FetchChild<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task<T> FetchChild<C0, C1, C2, C3, C4, C5, C6>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6) });
         }
-        public async Task<T> FetchChild<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task<T> FetchChild<C0, C1, C2, C3, C4, C5, C6, C7>(C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
-            return await CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
+            return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
 
         protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = true)
         {
             var target = Scope.Resolve<T>();
-            await CallOperationMethod(target, operation, throwException);
+            await CallOperationMethod(target, operation, throwException).ConfigureAwait(false);
             return target;
         }
 
         protected async Task CallOperationMethod(T target, PortalOperation operation, bool throwException = true)
         {
 
-            var success = await OperationManager.TryCallOperation(target, operation);
+            var success = await OperationManager.TryCallOperation(target, operation).ConfigureAwait(false);
 
             if (!success && throwException)
             {
@@ -186,7 +186,7 @@ namespace OOBehave.Portal.Core
         protected async Task<T> CallOperationMethod(PortalOperation operation, object[] criteria, Type[] criteriaTypes)
         {
             var target = Scope.Resolve<T>();
-            await CallOperationMethod(target, operation, criteria, criteriaTypes);
+            await CallOperationMethod(target, operation, criteria, criteriaTypes).ConfigureAwait(false);
             return target;
         }
 
@@ -195,7 +195,7 @@ namespace OOBehave.Portal.Core
             if (target == null) { throw new ArgumentNullException(nameof(target)); }
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
 
-            var success = await OperationManager.TryCallOperation(target, operation, criteria, criteriaTypes);
+            var success = await OperationManager.TryCallOperation(target, operation, criteria, criteriaTypes).ConfigureAwait(false);
 
             if (!success)
             {
@@ -216,25 +216,26 @@ namespace OOBehave.Portal.Core
         {
         }
 
-        public async Task Update(T target)
+        public Task Update(T target)
         {
             if (target.IsDeleted)
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete);
+                    return CallOperationMethod(target, PortalOperation.Delete);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert);
+                return CallOperationMethod(target, PortalOperation.Insert);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update);
+                return CallOperationMethod(target, PortalOperation.Update);
             }
         }
-        public async Task Update<C0>(T target, C0 criteria0)
+        public Task Update<C0>(T target, C0 criteria0)
         {
 
             var objectArray = new object[] { criteria0 };
@@ -244,19 +245,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1>(T target, C0 criteria0, C1 criteria1)
+        public Task Update<C0, C1>(T target, C0 criteria0, C1 criteria1)
         {
 
             var objectArray = new object[] { criteria0, criteria1 };
@@ -266,19 +268,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task Update<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2 };
@@ -288,19 +291,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task Update<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3 };
@@ -310,19 +314,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task Update<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 };
@@ -332,19 +337,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task Update<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 };
@@ -354,19 +360,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task Update<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 };
@@ -376,19 +383,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task Update<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task Update<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 };
@@ -398,37 +406,39 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild(T target)
+        public Task UpdateChild(T target)
         {
             if (target.IsDeleted)
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild);
+                return CallOperationMethod(target, PortalOperation.InsertChild);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild);
+                return CallOperationMethod(target, PortalOperation.UpdateChild);
             }
         }
-        public async Task UpdateChild<C0>(T target, C0 criteria0)
+        public Task UpdateChild<C0>(T target, C0 criteria0)
         {
 
             var objectArray = new object[] { criteria0 };
@@ -438,19 +448,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1>(T target, C0 criteria0, C1 criteria1)
+        public Task UpdateChild<C0, C1>(T target, C0 criteria0, C1 criteria1)
         {
 
             var objectArray = new object[] { criteria0, criteria1 };
@@ -460,19 +471,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
+        public Task UpdateChild<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2 };
@@ -482,19 +494,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
+        public Task UpdateChild<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3 };
@@ -504,19 +517,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        public Task UpdateChild<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4 };
@@ -526,19 +540,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
+        public Task UpdateChild<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5 };
@@ -548,19 +563,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
+        public Task UpdateChild<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6 };
@@ -570,19 +586,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
-        public async Task UpdateChild<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
+        public Task UpdateChild<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
 
             var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 };
@@ -592,16 +609,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
+                return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                await CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
 

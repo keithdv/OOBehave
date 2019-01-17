@@ -58,7 +58,7 @@ namespace OOBehave.Rules
 
     public interface IRuleResultList : IDictionary<int, IRuleResult>
     {
-        IRuleResult this[string propertyName] { get; }
+        IEnumerable<string> this[string propertyName] { get; }
         void SetKeysToNegative();
 
         IRuleResultReadOnlyList RuleResultList { get; }
@@ -72,11 +72,11 @@ namespace OOBehave.Rules
 
         IRuleResultReadOnlyList IRuleResultList.RuleResultList => new RuleResultReadOnlyList(this.Values);
 
-        public IRuleResult this[string propertyName]
+        public IEnumerable<string> this[string propertyName]
         {
             get
             {
-                return this.Values.FirstOrDefault(r => r.PropertyErrorMessages[propertyName] != null);
+                return this.Values.Select(r => r[propertyName]).Where(x => !string.IsNullOrEmpty(x));
             }
         }
 
