@@ -13,6 +13,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         int RuleRunCount { get; }
 
         void TestMarkInvalid(string message);
+
+        string NoRules { get; set; }
     }
 
     public class ValidateObject : PersonValidateBase<ValidateObject>, IValidateObject
@@ -31,6 +33,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         public IValidateObject Child { get { return Getter<IValidateObject>(); } set { Setter(value); } }
+
+        public string NoRules { get => Getter<string>(); set => Setter(value); }
 
         [Fetch]
         [FetchChild]

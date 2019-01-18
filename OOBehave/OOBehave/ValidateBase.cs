@@ -14,6 +14,12 @@ using System.Threading.Tasks;
 
 namespace OOBehave
 {
+
+    internal interface IRuleAccess
+    {
+        IValidatePropertyValueInternal this[string propertyName] { get; }
+    }
+
     public interface IValidateBase : IBase, IValidateMetaProperties
     {
         Task WaitForRules();
@@ -22,10 +28,13 @@ namespace OOBehave
         IRuleResultReadOnlyList RuleResultList { get; }
 
         IEnumerable<string> BrokenRuleMessages { get; }
+
+        IValidatePropertyMeta this[string propertyName] { get; }
     }
 
+
     [PortalDataContract]
-    public abstract class ValidateBase<T> : Base<T>, IValidateBase, INotifyPropertyChanged, IPropertyAccess, IDataErrorInfo
+    public abstract class ValidateBase<T> : Base<T>, IValidateBase, INotifyPropertyChanged, IPropertyAccess, IDataErrorInfo, IRuleAccess
         where T : ValidateBase<T>
     {
 
@@ -67,6 +76,7 @@ namespace OOBehave
         {
             if (PropertyValueManager.SetProperty(GetRegisteredProperty<P>(propertyName), value))
             {
+                CheckRules(propertyName);
                 PropertyHasChanged(propertyName);
             }
         }
@@ -81,7 +91,6 @@ namespace OOBehave
         protected void PropertyHasChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            CheckRules(propertyName);
         }
 
 
@@ -160,6 +169,24 @@ namespace OOBehave
         public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
             return Task.WhenAll(RuleManager.CheckAllRules(token), PropertyValueManager.CheckAllRules(token));
+        }
+
+        IValidatePropertyValueInternal IRuleAccess.this[string propertyName]
+        {
+            get
+            {
+                return this.PropertyValueManager[propertyName] as IValidatePropertyValueInternal;
+            }
+        }
+
+        public IValidatePropertyMeta this[string propertyName]
+        {
+            get
+            {
+                var pv = PropertyValueManager[propertyName];
+
+                return pv != null ? new ValidatePropertyMeta(PropertyValueManager[propertyName]) : null;
+            }
         }
 
     }

@@ -22,7 +22,7 @@ namespace OOBehave
 
     }
 
-    public abstract class ValidateListBase<T, I> : ListBase<T, I>, IValidateListBase<I>, IValidateListBase, INotifyPropertyChanged, IPropertyAccess
+    public abstract class ValidateListBase<T, I> : ListBase<T, I>, IValidateListBase<I>, IValidateListBase, INotifyPropertyChanged, IPropertyAccess, IRuleAccess
         where T : ValidateListBase<T, I>
         where I : IValidateBase
     {
@@ -113,6 +113,22 @@ namespace OOBehave
         public Task CheckAllRules(CancellationToken token = new CancellationToken())
         {
             return Task.WhenAll(RuleManager.CheckAllRules(token), Task.WhenAll(this.Select(t => t.CheckAllRules(token))));
+        }
+
+        IValidatePropertyValueInternal IRuleAccess.this[string propertyName]
+        {
+            get
+            {
+                return this.PropertyValueManager[propertyName] as IValidatePropertyValueInternal;
+            }
+        }
+
+        public IValidatePropertyMeta this[string propertyName]
+        {
+            get
+            {
+                return new ValidatePropertyMeta(PropertyValueManager[propertyName]);
+            }
         }
     }
 }

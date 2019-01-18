@@ -209,5 +209,16 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.AreEqual(rrc, validate.RuleRunCount);
         }
 
+        [TestMethod]
+        public void ValidateBase_PropertyWithNoRules()
+        {
+            // If the property has no rules than we shouldn't call CheckRulesQueue
+
+            validate.NoRules = "Value";
+
+            Assert.IsFalse(validate.IsBusy);
+
+        }
+
     }
 }

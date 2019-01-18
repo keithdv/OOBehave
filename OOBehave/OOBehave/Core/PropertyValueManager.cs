@@ -24,6 +24,9 @@ namespace OOBehave.Core
         //void LoadProperty(IRegisteredProperty registeredProperty, object newValue);
         IPropertyValue ReadProperty(string propertyName);
         IPropertyValue ReadProperty(IRegisteredProperty registeredProperty);
+
+        IPropertyValue this[string propertyName] { get; }
+
     }
 
 
@@ -103,6 +106,20 @@ namespace OOBehave.Core
 
         protected abstract P CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value);
 
+        public IPropertyValue this[string propertyName]
+        {
+            get
+            {
+                var prop = registeredPropertyManager.GetRegisteredProperty(propertyName);
+                if (prop == null) { throw new Exception($"Property {propertyName} is not registered."); }
+                if (fieldData.TryGetValue(prop.Index, out var value))
+                {
+                    return value;
+                }
+                return null;
+            }
+        }
+
         public IRegisteredProperty<PV> GetRegisteredProperty<PV>(string name)
         {
             return registeredPropertyManager.GetRegisteredProperty<PV>(name);
@@ -126,6 +143,9 @@ namespace OOBehave.Core
                 // TODO Destroy and Delink to old value
             }
 
+
+            // Replace with a new one
+            // This is a load so we assum IsValid and no broken rules
             fieldData[registeredProperty.Index] = CreatePropertyValue(registeredProperty, newValue);
 
             SetParent(newValue);

@@ -21,7 +21,7 @@ namespace Wpf
         public override async Task<IRuleResult> Execute(ISimpleValidateObject target, CancellationToken token)
         {
 
-            await Task.Delay(10).ConfigureAwait(false);
+            await Task.Delay(1000).ConfigureAwait(false);
 
             var result = RuleResult.Empty();
 

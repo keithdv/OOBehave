@@ -16,20 +16,35 @@ namespace OOBehave.Core
         Task WaitForRules();
         bool SetProperty<P>(IRegisteredProperty<P> registeredProperty, P newValue);
 
-
     }
 
     public interface IValidatePropertyValueManager<T> : IValidatePropertyValueManager, IPropertyValueManager<T>
     {
+        new IValidatePropertyValue this[string propertyName] { get; }
+    }
 
+    internal interface IValidatePropertyValueInternal
+    {
+        bool IsValid { get; set; }
+        bool IsBusy { get; set; }
+        string ErrorMessage { get; set; }
+
+    }
+
+    public interface IValidatePropertyMeta
+    {
+        bool IsValid { get; }
+        bool IsBusy { get; }
+        string ErrorMessage { get; }
+        object Value { get; }
     }
 
     public interface IValidatePropertyValue : IPropertyValue
     {
         bool IsValid { get; }
         bool IsBusy { get; }
+        string ErrorMessage { get; }
         Task CheckAllRules(CancellationToken token);
-
         Task WaitForRules();
     }
 
@@ -38,7 +53,7 @@ namespace OOBehave.Core
 
     }
 
-    public class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>
+    public class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>, IValidatePropertyValueInternal
     {
 
         public virtual IValidateBase Child { get; protected set; }
@@ -73,8 +88,23 @@ namespace OOBehave.Core
             Child = newValue as IValidateBase;
         }
 
-        public bool IsValid => (Child?.IsValid ?? true);
-        public bool IsBusy => (Child?.IsBusy ?? false);
+        private bool isValid = true;
+
+        public bool IsValid
+        {
+            get { return (Child?.IsValid) ?? isValid; }
+            set { isValid = value; }
+        }
+
+        private bool isBusy = false;
+
+        public bool IsBusy
+        {
+            get { return (Child?.IsBusy) ?? isBusy; }
+            set { isBusy = value; }
+        }
+
+        public string ErrorMessage { get; set; }
 
         public Task WaitForRules() { return Child?.WaitForRules() ?? Task.CompletedTask; }
         public Task CheckAllRules(CancellationToken token) { return Child?.CheckAllRules(token); }
@@ -115,6 +145,14 @@ namespace OOBehave.Core
             return Task.WhenAll(fieldData.Values.Select(x => x.WaitForRules()));
         }
 
+        public new IValidatePropertyValue this[string propertyName]
+        {
+            get
+            {
+                return base[propertyName] as IValidatePropertyValue;
+            }
+        }
+
         public Task CheckAllRules(CancellationToken token)
         {
             var tasks = fieldData.Values.Select(x => x.CheckAllRules(token)).ToList();
@@ -142,7 +180,8 @@ namespace OOBehave.Core
                 fd.Value = newValue;
                 SetParent(newValue);
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
@@ -162,3 +201,4 @@ namespace OOBehave.Core
     }
 
 }
+

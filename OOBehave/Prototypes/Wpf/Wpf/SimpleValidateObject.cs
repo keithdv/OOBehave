@@ -14,6 +14,22 @@ namespace Wpf
         {
             RuleManager.AddRule(shortNameRule);
             RuleManager.AddRule(fullNameRule);
+            this.PropertyChanged += SimpleValidateObject_PropertyChanged;
+            Properties = new Properties_(this);
+            PropertyIsBusy = new IsBusy(this);
+        }
+
+        private void SimpleValidateObject_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IValidateBase.IsValid))
+            {
+                PropertyHasChanged(nameof(Properties));
+            }
+
+            if (e.PropertyName == nameof(IValidateBase.IsBusy))
+            {
+                PropertyHasChanged(nameof(PropertyIsBusy));
+            }
         }
 
         public Guid Id { get { return Getter<Guid>(); } }
@@ -28,9 +44,48 @@ namespace Wpf
 
         public string FullName { get { return Getter<string>(); } set { Setter(value); } }
 
+        public Properties_ Properties { get; }
+
+        public IsBusy PropertyIsBusy { get; }
 
     }
 
+    public class IsBusy
+    {
+        public IsBusy(SimpleValidateObject simpleValidateObject)
+        {
+            SimpleValidateObject = simpleValidateObject;
+        }
+
+        public bool this[string propertyName]
+        {
+            get
+            {
+                return SimpleValidateObject[propertyName]?.IsBusy ?? false;
+            }
+        }
+
+        public SimpleValidateObject SimpleValidateObject { get; }
+    }
+
+    public class Properties_
+    {
+        public Properties_(SimpleValidateObject simpleValidateObject)
+        {
+            SimpleValidateObject = simpleValidateObject;
+        }
+
+        public SimpleValidateObject SimpleValidateObject { get; }
+        public IValidatePropertyMeta this[string propertyName]
+        {
+            get
+            {
+                return SimpleValidateObject[propertyName];
+            }
+        }
+
+
+    }
     public interface ISimpleValidateObject : IValidateBase
     {
         Guid Id { get; }

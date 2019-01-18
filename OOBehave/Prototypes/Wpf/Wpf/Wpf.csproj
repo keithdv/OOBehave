@@ -38,8 +38,8 @@
     <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="OOBehave, Version=0.1.30.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OOBehave.0.1.30-Beta\lib\netstandard2.0\OOBehave.dll</HintPath>
+    <Reference Include="OOBehave, Version=0.1.36.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OOBehave.0.1.36-Beta\lib\netstandard2.0\OOBehave.dll</HintPath>
     </Reference>
     <Reference Include="OOBehave.Autofac, Version=0.1.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OOBehave.Autofac.0.1.4-Beta\lib\netstandard2.0\OOBehave.Autofac.dll</HintPath>
@@ -69,6 +69,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FullNameRule.cs" />
+    <Compile Include="InverseBooleanConverter.cs" />
     <Compile Include="ShortNameRule.cs" />
     <Compile Include="SimpleValidateObject.cs" />
     <Page Include="MainWindow.xaml">

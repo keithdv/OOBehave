@@ -50,10 +50,6 @@ namespace OOBehave.Core
 
             } while (!type.IsGenericType || !ooBehaveTypes.Contains(type.GetGenericTypeDefinition()));
 
-
-
-
-
         }
 
         public IRegisteredProperty<P> GetRegisteredProperty<P>(string propertyName)

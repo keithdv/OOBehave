@@ -6,19 +6,32 @@
         xmlns:local="clr-namespace:Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="boolConv"></local:InverseBooleanConverter>
+    </Window.Resources>
     <StackPanel>
 
         <TextBlock>First Name</TextBlock>
-        <TextBox Text="{Binding Path=FirstName, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBox>
+        <TextBox Text="{Binding Path=FirstName, Mode=TwoWay, ValidatesOnDataErrors=True}" 
+                 ToolTip="{Binding Path=Properties[FirstName].ErrorMessage, Mode=OneWay}"
+                 IsEnabled="{Binding Path=PropertyIsBusy[FirstName], Mode=OneWay, Converter={StaticResource boolConv}}"
+                 ></TextBox>
+        <TextBlock Text="{Binding Path=Properties[FirstName].ErrorMessage, Mode=OneWay}"></TextBlock>
 
         <TextBlock>Last Name</TextBlock>
-        <TextBox Text="{Binding Path=LastName, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBox>
+
+        <TextBox Text="{Binding Path=LastName, Mode=TwoWay, ValidatesOnDataErrors=True}" 
+                 ToolTip="{Binding Path=Properties[LastName].ErrorMessage, Mode=OneWay}"
+                 IsEnabled="{Binding Path=PropertyIsBusy[LastName], Mode=OneWay, Converter={StaticResource boolConv}}"></TextBox>
+
 
         <TextBlock>Short Name</TextBlock>
         <TextBlock Text="{Binding Path=ShortName, Mode=OneWay}"></TextBlock>
 
         <TextBlock>Title</TextBlock>
-        <TextBox Text="{Binding Path=Title, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBox>
+        <TextBox Text="{Binding Path=Title, Mode=TwoWay, ValidatesOnDataErrors=True}" 
+                 ToolTip="{Binding Path=Properties[Title].ErrorMessage, Mode=OneWay}"
+                 IsEnabled="{Binding Path=PropertyIsBusy[Title], Mode=OneWay}"></TextBox>
 
         <TextBlock>Full Name</TextBlock>
         <TextBlock Text="{Binding Path=FullName, Mode=OneWay}"></TextBlock>

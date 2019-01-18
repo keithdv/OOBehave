@@ -15,7 +15,7 @@ namespace OOBehave.Rules
 {
 
 
-    public interface IRuleManager
+    public interface IRuleManager : ISetTarget
     {
 
         bool IsValid { get; }
@@ -47,10 +47,12 @@ namespace OOBehave.Rules
     }
 
     [PortalDataContract]
-    public class RuleManager<T> : IRuleManager<T>, ISetTarget
+    public class RuleManager<T> : IRuleManager<T>
     {
 
         protected T Target { get; set; }
+
+        private IRuleAccess TargetRuleAccess { get; set; }
 
         [PortalDataMember]
         protected IRuleResultList Results { get; private set; }
@@ -59,19 +61,23 @@ namespace OOBehave.Rules
 
         protected bool TransferredResults = false;
         public bool IsBusy => isRunningRules;
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private IReadOnlyList<string> TargetProperties { get; }
 
         public RuleManager(IRuleResultList results, IAttributeToRule attributeToRule, IRegisteredPropertyManager<T> registeredPropertyManager)
         {
             Results = results;
             AddAttributeRules(attributeToRule, registeredPropertyManager);
+            TargetProperties = registeredPropertyManager.GetRegisteredProperties().Select(r => r.Name).ToList().AsReadOnly();
         }
 
         IEnumerable<IRule> IRuleManager.Rules => Rules.Values;
 
         private IDictionary<uint, IRule> Rules { get; } = new ConcurrentDictionary<uint, IRule>();
 
-        IEnumerable<string> IRuleManager.this[string propertyName]
+        public IEnumerable<string> this[string propertyName]
         {
             get { return Results[propertyName]; }
         }
@@ -138,9 +144,16 @@ namespace OOBehave.Rules
                     }
                 }
 
-                CheckRulesQueue();
+                if (ruleQueue.Count() > 0)
+                {
+                    CheckRulesQueue();
+                    return WaitForRules;
+                }
+                else
+                {
+                    return Task.CompletedTask;
+                }
 
-                return WaitForRules;
             }
             else
             {
@@ -216,6 +229,8 @@ namespace OOBehave.Rules
                     if (!WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
 #endif
                     isRunningRules = true;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
+
                     cancellationTokenSource = new CancellationTokenSource();
                     waitForRulesSource = new TaskCompletionSource<object>();
                     WaitForRules = waitForRulesSource.Task;
@@ -236,6 +251,16 @@ namespace OOBehave.Rules
 #if DEBUG
                     if (WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
 #endif
+                    // Go thru all of the Validate properties and set or clear the error
+                    foreach (var p in TargetProperties)
+                    {
+                        var pp = TargetRuleAccess[p];
+                        if (pp != null) // Would be weird - if it hasn't been assigned or loaded may still be null
+                        {
+                            pp.ErrorMessage = this[p].FirstOrDefault() ?? string.Empty;
+                            pp.IsValid = !this[p].Any();
+                        }
+                    }
 
                     isRunningRules = false;
 
@@ -248,7 +273,8 @@ namespace OOBehave.Rules
 
                     waitForRulesSource.SetResult(new object());
 
-
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsValid)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
                 }
             }
 
@@ -261,8 +287,9 @@ namespace OOBehave.Rules
                 {
 
                     // System.Diagnostics.Debug.WriteLine($"Dequeue {propertyName}");
+                    var rule = Rules[ruleIndex];
 
-                    var ruleManagerTask = RunRule(Rules[ruleIndex], token);
+                    var ruleManagerTask = RunRule(rule, token);
 
                     if (!ruleManagerTask.IsCompleted)
                     {
@@ -289,6 +316,20 @@ namespace OOBehave.Rules
         {
             IRuleResult result = null;
 
+            List<IValidatePropertyValueInternal> properties = new List<IValidatePropertyValueInternal>();
+
+            foreach (var p in r.TriggerProperties)
+            {
+                var pp = TargetRuleAccess[p];
+                if (pp != null)
+                {
+                    properties.Add(TargetRuleAccess[p]);
+                    pp.IsBusy = true;
+                }
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
+
             try
             {
                 if (r is IRule<T> rule)
@@ -306,7 +347,6 @@ namespace OOBehave.Rules
                 }
 
             }
-
             catch (Exception ex)
             {
                 // If there is an error mark all properties as failed
@@ -315,9 +355,18 @@ namespace OOBehave.Rules
                     result = RuleResult.PropertyError(p, ex.Message);
                 }
             }
+            finally
+            {
+                foreach (var p in properties)
+                {
+                    p.IsBusy = false;
+                }
+            }
 
             if (Results.ContainsKey((int)r.UniqueIndex))
             {
+                // This is important for WPF binding
+                // If the property goes from broken to unbroken needs propertyHasChanged
                 var existingResult = Results[(int)r.UniqueIndex];
                 foreach (var pr in existingResult.PropertyErrorMessages)
                 {
@@ -350,6 +399,7 @@ namespace OOBehave.Rules
             if (target is T tt)
             {
                 Target = tt;
+                TargetRuleAccess = tt as IRuleAccess ?? throw new Exception($"{typeof(T)} must inherit from ValidateBase<> to work with RuleManager.");
             }
             else
             {

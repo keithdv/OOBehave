@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OOBehave.Core
 {
-    internal interface ISetTarget
+    public interface ISetTarget
     {
         void SetTarget(IBase target);
     }
