@@ -70,6 +70,36 @@ namespace OOBehave.Autofac
                 };
             });
 
+            builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>));
+            builder.Register<CreatePropertyValue>(cc =>
+            {
+                var scope = cc.Resolve<Func<ILifetimeScope>>();
+                return (IRegisteredProperty property, object value) =>
+                {
+                    return (IPropertyValue)scope().Resolve(typeof(IPropertyValue<>).MakeGenericType(property.Type), new NamedParameter("name", property.Name), new NamedParameter("value", value));
+                };
+            });
+
+            builder.RegisterGeneric(typeof(ValidatePropertyValue<>)).As(typeof(IValidatePropertyValue<>));
+            builder.Register<CreateValidatePropertyValue>(cc =>
+            {
+                var scope = cc.Resolve<Func<ILifetimeScope>>();
+                return (IRegisteredProperty property, object value) =>
+                {
+                    return (IValidatePropertyValue)scope().Resolve(typeof(IValidatePropertyValue<>).MakeGenericType(property.Type), new NamedParameter("name", property.Name), new NamedParameter("value", value));
+                };
+            });
+
+            builder.RegisterGeneric(typeof(EditPropertyValue<>)).As(typeof(IEditPropertyValue<>));
+            builder.Register<CreateEditPropertyValue>(cc =>
+            {
+                var scope = cc.Resolve<Func<ILifetimeScope>>();
+                return (IRegisteredProperty property, object value) =>
+                {
+                    return (IEditPropertyValue)scope().Resolve(typeof(IEditPropertyValue<>).MakeGenericType(property.Type), new NamedParameter("name", property.Name), new NamedParameter("value", value));
+                };
+            });
+
             // Stored values for each Domain Object instance
             // MUST BE per instance
             builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>)).AsSelf();

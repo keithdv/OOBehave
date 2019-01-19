@@ -18,6 +18,7 @@ namespace OOBehave
         public EditBase(IEditBaseServices<T> services) : base(services)
         {
             SendReceivePortal = services.SendReceivePortal;
+            PropertyIsModified = new EditPropertyMetaByName<bool>(this, p => p.IsModified);
         }
 
         public bool IsModified => PropertyValueManager.IsModified || IsDeleted || IsNew;
@@ -31,6 +32,18 @@ namespace OOBehave
         [PortalDataMember]
         public bool IsChild { get; protected set; }
         protected ISendReceivePortal<T> SendReceivePortal { get; }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if (!(e is MetaPropertyChangedEventArgs))
+            {
+                PropertyHasChanged(nameof(IsModified), true);
+                PropertyHasChanged(nameof(IsSelfModified), true);
+                PropertyHasChanged(nameof(PropertyIsModified), true);
+            }
+        }
 
         protected virtual void MarkAsChild()
         {
@@ -113,8 +126,40 @@ namespace OOBehave
             await SendReceivePortal.Update((T)this).ConfigureAwait(false);
 
         }
+
+
+        public new IEditPropertyMeta this[string propertyName]
+        {
+            get
+            {
+                var pv = PropertyValueManager[propertyName] ?? throw new ArgumentNullException(propertyName);
+
+                return new EditPropertyMeta(pv);
+            }
+        }
+
+
+        public EditPropertyMetaByName<bool> PropertyIsModified { get; }
     }
 
+    public class EditPropertyMetaByName<R>
+    {
+        public EditPropertyMetaByName(IEditBase target, Func<IEditPropertyMeta, R> toReturn)
+        {
+            Target = target;
+            TranslateFunc = toReturn;
+        }
 
+        private IEditBase Target { get; }
+        private Func<IEditPropertyMeta, R> TranslateFunc { get; }
+
+        public R this[string propertyName]
+        {
+            get
+            {
+                return TranslateFunc(Target[propertyName]);
+            }
+        }
+    }
 
 }

@@ -14,13 +14,14 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
 
     [TestClass]
+    [TestCategory("ValidateBase")]
     public class ValidateBaseTests
     {
 
         private ILifetimeScope scope;
         private IValidateObject validate;
         private IValidateObject child;
-
+        private List<string> propertyChangeList = new List<string>();
         [TestInitialize]
         public void TestInitailize()
         {
@@ -28,6 +29,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate = scope.Resolve<IValidateObject>();
             child = scope.Resolve<IValidateObject>();
             validate.Child = child;
+            validate.PropertyChanged += (o, e) => propertyChangeList.Add(e.PropertyName);
         }
 
         [TestCleanup]
@@ -38,7 +40,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         [TestMethod]
-        public void ValidateBase_Constructor()
+        public void ValidateBase_InitialValues()
         {
 
         }
@@ -48,6 +50,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         public void ValidateBase_Set()
         {
             validate.FirstName = "Keith";
+            Assert.IsTrue(propertyChangeList.Contains(nameof(IValidateObject.FirstName)));
         }
 
         [TestMethod]
@@ -75,7 +78,6 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.LastName = "Smith";
 
             Assert.AreEqual("John Smith", validate.ShortName);
-
         }
 
         [TestMethod]
@@ -124,7 +126,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
-            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
+            Assert.IsFalse(validate[nameof(validate.FirstName)].IsValid);
         }
 
         [TestMethod]
@@ -139,7 +141,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.FirstName = "John";
 
             Assert.IsTrue(validate.IsValid);
-            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
+            Assert.IsTrue(validate[nameof(validate.FirstName)].IsValid);
 
         }
 
@@ -209,16 +211,43 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.AreEqual(rrc, validate.RuleRunCount);
         }
 
+
+
         [TestMethod]
-        public void ValidateBase_PropertyWithNoRules()
+        public void ValidateBase_PropertyIsValid_True()
         {
-            // If the property has no rules than we shouldn't call CheckRulesQueue
-
-            validate.NoRules = "Value";
-
-            Assert.IsFalse(validate.IsBusy);
-
+            validate.FirstName = "Valid";
+            Assert.IsTrue(validate.PropertyIsValid[nameof(IValidateObject.FirstName)]);
+            // Property event doesn't get raised unless valid actually changes
+            Assert.IsFalse(propertyChangeList.Contains(nameof(IValidateBase.PropertyIsValid)));
         }
 
+        [TestMethod]
+        public void ValidateBase_PropertyIsValid_False()
+        {
+            validate.FirstName = "Error";
+            Assert.IsFalse(validate.PropertyIsValid[nameof(IValidateObject.FirstName)]);
+            // Property event doesn't get raised unless valid actually changes
+            Assert.IsTrue(propertyChangeList.Contains(nameof(IValidateBase.PropertyIsValid)));
+        }
+
+        [TestMethod]
+        public void ValidateBase_PropertyErrorMessage_True()
+        {
+            validate.FirstName = "Valid";
+            Assert.IsTrue(string.IsNullOrWhiteSpace(validate.PropertyErrorMessage[nameof(IValidateObject.FirstName)]));
+            // Property event doesn't get raised unless valid actually changes
+            Assert.IsFalse(propertyChangeList.Contains(nameof(IValidateBase.PropertyErrorMessage)));
+        }
+
+        [TestMethod]
+        public void ValidateBase_PropertyErrorMessage_False()
+        {
+            validate.FirstName = "Error";
+            Assert.IsFalse(string.IsNullOrWhiteSpace(validate.PropertyErrorMessage[nameof(IValidateObject.FirstName)]));
+            // Property event doesn't get raised unless valid actually changes
+            Assert.IsTrue(propertyChangeList.Contains(nameof(IValidateBase.PropertyErrorMessage)));
+
+        }
     }
 }

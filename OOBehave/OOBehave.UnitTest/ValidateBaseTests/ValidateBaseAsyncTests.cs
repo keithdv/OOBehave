@@ -22,6 +22,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         private ILifetimeScope scope;
         private IValidateAsyncObject validate;
         private IValidateAsyncObject child;
+        private List<string> propertyChangedList = new List<string>();
 
         [TestInitialize]
         public void TestInitailize()
@@ -31,6 +32,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate = scope.Resolve<IValidateAsyncObject>();
             child = scope.Resolve<IValidateAsyncObject>();
             validate.Child = child;
+
+            validate.PropertyChanged += (o, e) => propertyChangedList.Add(e.PropertyName);
         }
 
         [TestCleanup]
@@ -135,7 +138,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             await validate.WaitForRules();
 
             Assert.IsFalse(validate.IsValid);
-            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
+            Assert.IsFalse(validate[nameof(validate.FirstName)].IsValid);
         }
 
         [TestMethod]
@@ -154,7 +157,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             await validate.WaitForRules();
 
             Assert.IsTrue(validate.IsValid);
-            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
+            Assert.IsTrue(validate[nameof(validate.FirstName)].IsValid);
 
         }
 
@@ -203,6 +206,34 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.IsTrue(validate.IsSelfValid);
             Assert.IsFalse(child.IsValid);
             Assert.IsFalse(child.IsSelfValid);
+        }
+
+        [TestMethod]
+        public void ValidateBaseAsync_PropertyWithNoRules()
+        {
+            // If the property has no rules than we shouldn't call CheckRulesQueue
+
+            validate.NoRules = "Value";
+
+            Assert.IsFalse(validate.IsBusy);
+
+        }
+
+        [TestMethod]
+        public async Task ValidateBaseAsync_PropertyIsBusy_TrueAsync()
+        {
+            validate.FirstName = "Valid";
+            Assert.IsTrue(validate.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
+            await validate.WaitForRules();
+        }
+
+        [TestMethod]
+        public async Task ValidateBaseAsync_PropertyIsBusy_False()
+        {
+            Assert.IsFalse(validate.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
+            validate.FirstName = "Valid";
+            await validate.WaitForRules();
+            Assert.IsFalse(validate.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
         }
     }
 }

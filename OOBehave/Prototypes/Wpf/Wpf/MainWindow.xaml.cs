@@ -43,7 +43,7 @@ namespace Wpf
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var validate = container.Resolve<ISimpleValidateObject>();
+            var validate = container.Resolve<ISimpleObject>();
             await validate.CheckAllRules();
             DataContext = validate;
         }

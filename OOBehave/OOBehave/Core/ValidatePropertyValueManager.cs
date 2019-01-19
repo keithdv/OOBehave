@@ -111,17 +111,22 @@ namespace OOBehave.Core
 
     }
 
+    public delegate IValidatePropertyValue CreateValidatePropertyValue(IRegisteredProperty property, object value);
+
+
     public class ValidatePropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IValidatePropertyValue>
         where T : IBase
     {
-        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory, valuesDiffer)
+        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer, CreateValidatePropertyValue createValidatePropertyValue) : base(registeredPropertyManager, factory, valuesDiffer)
         {
-
+            CreateValidatePropertyValue = createValidatePropertyValue;
         }
 
-        protected override IValidatePropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
+        public CreateValidatePropertyValue CreateValidatePropertyValue { get; }
+
+        protected override IValidatePropertyValue CreatePropertyValue(IRegisteredProperty registeredProperty, object value)
         {
-            return Factory.CreateValidatePropertyValue(registeredProperty, value);
+            return CreateValidatePropertyValue(registeredProperty, value);
         }
     }
 

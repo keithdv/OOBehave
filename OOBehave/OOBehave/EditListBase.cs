@@ -35,6 +35,7 @@ namespace OOBehave
         {
             this.ItemPortal = services.SendReceivePortalChild;
             this.SendReceivePortal = services.SendReceivePortal;
+            PropertyIsModified = new EditPropertyMetaByName<bool>(this, p => p.IsModified);
         }
 
         public bool IsModified => PropertyValueManager.IsModified || IsNew || this.Any(c => c.IsModified) || IsDeleted || DeletedList.Any();
@@ -46,6 +47,15 @@ namespace OOBehave
         public bool IsChild { get; protected set; }
         protected List<I> DeletedList { get; } = new List<I>();
 
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if (e.PropertyName == nameof(IsModified))
+            {
+                PropertyHasChanged(nameof(PropertyIsModified));
+            }
+        }
 
         protected virtual void MarkAsChild()
         {
@@ -105,6 +115,17 @@ namespace OOBehave
             MarkDeleted();
         }
 
+        public new IEditPropertyMeta this[string propertyName]
+        {
+            get
+            {
+                var pv = PropertyValueManager[propertyName] ?? throw new ArgumentNullException(propertyName);
+
+                return new EditPropertyMeta(pv);
+            }
+        }
+
+        public EditPropertyMetaByName<bool> PropertyIsModified { get; }
 
         protected override void RemoveItem(int index)
         {
@@ -181,6 +202,7 @@ namespace OOBehave
             }
             await UpdateList().ConfigureAwait(false);
         }
+
     }
 
 

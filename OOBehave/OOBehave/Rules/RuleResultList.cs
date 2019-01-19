@@ -13,7 +13,7 @@ namespace OOBehave.Rules
     public interface IRuleResultReadOnlyList : IReadOnlyList<IRuleResult>
     {
         bool IsError { get; }
-        IRuleResult this[string propertyName] { get; }
+        IEnumerable<IRuleResult> this[string propertyName] { get; }
 
         IReadOnlyList<IRuleResult> Results(string propertyName);
     }
@@ -32,11 +32,11 @@ namespace OOBehave.Rules
 
         IRuleResult IReadOnlyList<IRuleResult>.this[int index] => throw new NotImplementedException();
 
-        IRuleResult IRuleResultReadOnlyList.this[string propertyName]
+        IEnumerable<IRuleResult> IRuleResultReadOnlyList.this[string propertyName]
         {
             get
             {
-                return RuleResultList.FirstOrDefault(r => r.PropertyErrorMessages[propertyName] != null);
+                return RuleResultList.Where(r => r.PropertyErrorMessages[propertyName] != null);
             }
         }
 

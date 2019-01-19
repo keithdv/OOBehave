@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Rules;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,9 +18,13 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         {
             public ValidateObject(IValidateBaseServices<ValidateObject> services) : base(services)
             {
+
             }
 
             public string FirstName { get => Getter<string>(); set => Setter(value); }
+
+            [Required]
+            public string NoInitialValue { get => Getter<string>(); set => Setter(value); }
         }
 
         public class RuleManagerAsyncTest : AsyncRuleBase<ValidateObject>
@@ -110,6 +115,17 @@ namespace OOBehave.UnitTest.ValidateBaseTests
                 validate.FirstName = "Value";
                 await ruleManager.WaitForRules;
                 Assert.IsTrue(string.IsNullOrWhiteSpace(validate[nameof(ValidateObject.FirstName)].ErrorMessage));
+            }
+
+            [TestMethod]
+            public async Task RuleManager_NoInitialValue()
+            {
+                // PropertyValues weren't getting created until a load or set. 
+                // Now get created if there is a broken rule for them
+
+                await ruleManager.CheckRulesForProperty(nameof(ValidateObject.NoInitialValue));
+
+                Assert.IsFalse(validate[nameof(ValidateObject.NoInitialValue)].IsValid);
             }
 
         }

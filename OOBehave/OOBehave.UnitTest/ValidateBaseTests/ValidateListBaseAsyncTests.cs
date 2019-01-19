@@ -44,17 +44,19 @@ namespace OOBehave.UnitTest.ValidateBaseTests
 
 
         [TestMethod]
-        public void ValidateListBaseAsync_SetProperty()
+        public async Task ValidateListBaseAsync_SetPropertyAsync()
         {
             List.FirstName = "Keith";
+            await List.WaitForRules();
         }
 
         [TestMethod]
-        public void ValidateListBaseAsync_SetGet()
+        public async Task ValidateListBaseAsync_SetGetAsync()
         {
             var name = Guid.NewGuid().ToString();
             List.ShortName = name;
             Assert.AreEqual(name, List.ShortName);
+            await List.WaitForRules();
         }
 
         //[TestMethod]
@@ -129,6 +131,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             Assert.IsFalse(List.IsValid);
 
             List.FirstName = "John";
+            await List.WaitForRules();
 
             Assert.IsTrue(List.IsValid);
             Assert.AreEqual(0, List.RuleResultList.Where(r => r.IsError && r.PropertyErrorMessages.Any(p => p.Key == nameof(IValidateObject.FirstName))).Count());
@@ -193,6 +196,23 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             var ruleCount = List.RuleRunCount;
             await List.CheckAllRules();
             Assert.AreEqual(ruleCount + 4, List.RuleRunCount); // +2 for child
+        }
+
+        [TestMethod]
+        public async Task ValidateListBaseAsync_PropertyIsBusy_TrueAsync()
+        {
+            List.FirstName = "Valid";
+            Assert.IsTrue(List.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
+            await List.WaitForRules();
+        }
+
+        [TestMethod]
+        public async Task ValidateListBaseAsync_PropertyIsBusy_False()
+        {
+            Assert.IsFalse(List.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
+            List.FirstName = "Valid";
+            await List.WaitForRules();
+            Assert.IsFalse(List.PropertyIsBusy[nameof(IValidateObject.FirstName)]);
         }
     }
 }

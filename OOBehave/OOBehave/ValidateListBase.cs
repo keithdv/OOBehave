@@ -33,7 +33,13 @@ namespace OOBehave
         public ValidateListBase(IValidateListBaseServices<T, I> services) : base(services)
         {
             this.RuleManager = services.RuleManager;
+            this.RuleManager.PropertyChanged += RuleManager_PropertyChanged;
             ((ISetTarget)this.RuleManager).SetTarget(this);
+
+            PropertyIsBusy = new ValidatePropertyMetaByName<bool>(this, (p) => p.IsBusy);
+            PropertyIsValid = new ValidatePropertyMetaByName<bool>(this, (p) => p.IsValid);
+            PropertyErrorMessage = new ValidatePropertyMetaByName<string>(this, (p) => p.ErrorMessage);
+
         }
 
         public bool IsValid => RuleManager.IsValid && PropertyValueManager.IsValid && !this.Any(c => !c.IsValid);
@@ -57,15 +63,34 @@ namespace OOBehave
         {
             if (PropertyValueManager.SetProperty(GetRegisteredProperty<P>(propertyName), value))
             {
+                CheckRules(propertyName);
                 PropertyHasChanged(propertyName);
             }
         }
 
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
 
+            if (e.PropertyName == nameof(IsValid))
+            {
+                PropertyHasChanged(nameof(PropertyIsValid));
+                PropertyHasChanged(nameof(PropertyErrorMessage));
+            }
+            else if (e.PropertyName == nameof(IsBusy))
+            {
+                PropertyHasChanged(nameof(PropertyIsBusy));
+            }
+
+        }
         protected void PropertyHasChanged(string propertyName)
         {
-            base.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-            CheckRules(propertyName);
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void RuleManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            PropertyHasChanged(e.PropertyName);
         }
 
         protected virtual void CheckRules(string propertyName)
@@ -130,5 +155,12 @@ namespace OOBehave
                 return new ValidatePropertyMeta(PropertyValueManager[propertyName]);
             }
         }
+
+
+        // For XAML Binding
+        public ValidatePropertyMetaByName<bool> PropertyIsBusy { get; }
+        public ValidatePropertyMetaByName<bool> PropertyIsValid { get; }
+        public ValidatePropertyMetaByName<string> PropertyErrorMessage { get; }
+
     }
 }

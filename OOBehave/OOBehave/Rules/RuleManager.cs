@@ -208,7 +208,7 @@ namespace OOBehave.Rules
 
         private TaskCompletionSource<object> waitForRulesSource;
         private CancellationTokenSource cancellationTokenSource;
-        private ConcurrentQueue<string> propertyHasChanged;
+        private bool encounteredAsyncRule = false;
 
         private bool isRunningRules = false;
 
@@ -229,12 +229,11 @@ namespace OOBehave.Rules
                     if (!WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
 #endif
                     isRunningRules = true;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
+                    encounteredAsyncRule = false;
 
                     cancellationTokenSource = new CancellationTokenSource();
                     waitForRulesSource = new TaskCompletionSource<object>();
                     WaitForRules = waitForRulesSource.Task;
-                    propertyHasChanged = new ConcurrentQueue<string>();
                 }
             }
 
@@ -251,31 +250,40 @@ namespace OOBehave.Rules
 #if DEBUG
                     if (WaitForRules.IsCompleted) throw new Exception("Unexpected WaitForRules.IsCompleted is false");
 #endif
-                    // Go thru all of the Validate properties and set or clear the error
-                    foreach (var p in TargetProperties)
-                    {
-                        var pp = TargetRuleAccess[p];
-                        if (pp != null) // Would be weird - if it hasn't been assigned or loaded may still be null
-                        {
-                            pp.ErrorMessage = this[p].FirstOrDefault() ?? string.Empty;
-                            pp.IsValid = !this[p].Any();
-                        }
-                    }
 
                     isRunningRules = false;
-
-                    // What if this calls other rules??
-                    var phc = propertyHasChanged;
-                    foreach (var p in phc)
+                    if (encounteredAsyncRule)
                     {
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
+                        PropertyHasChanged(nameof(IsBusy));
                     }
 
                     waitForRulesSource.SetResult(new object());
 
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsValid)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
                 }
+            }
+
+            void UpdateValidatePropertyMeta()
+            {
+                var throwIsValid = false;
+                // This is for databinding
+                // Go thru all of the Validate properties and set or clear the error
+                foreach (var p in TargetProperties)
+                {
+                    var pp = TargetRuleAccess[p] ?? throw new ArgumentNullException(p);
+                    var errorMsg = this[p].FirstOrDefault() ?? string.Empty;
+                    var newIsValid = errorMsg == string.Empty;
+
+                    if (pp.IsValid != newIsValid)
+                    {
+                        pp.ErrorMessage = errorMsg;
+                        pp.IsValid = newIsValid;
+
+                        // Raise propertyChanged - for ValidatesOnDataErrors in WPF
+                        PropertyHasChanged(p);
+                        throwIsValid = true;
+                    }
+                }
+                if (throwIsValid) { PropertyHasChanged(nameof(IsValid)); }
             }
 
             if (OverrideResult == null && !isRunningRules || isRecursiveCall)
@@ -301,13 +309,23 @@ namespace OOBehave.Rules
                         // In request response the WaitForRules needs to be awaited!
                         ruleManagerTask.ContinueWith(x =>
                         {
+                            UpdateValidatePropertyMeta();
                             CheckRulesQueue(true);
                         });
+
+                        /// Optimization
+                        /// If I don't run into an async rule no need to raise IsBusy
+                        if (!encounteredAsyncRule)
+                        {
+                            PropertyHasChanged(nameof(IsBusy));
+                            encounteredAsyncRule = true;
+                        }
 
                         return; // Let the ContinueWith call CheckRulesQueue again
                     }
                 }
 
+                UpdateValidatePropertyMeta();
                 Stop();
             }
         }
@@ -315,26 +333,31 @@ namespace OOBehave.Rules
         private async Task RunRule(IRule r, CancellationToken token)
         {
             IRuleResult result = null;
-
+            var isAsync = false;
             List<IValidatePropertyValueInternal> properties = new List<IValidatePropertyValueInternal>();
 
-            foreach (var p in r.TriggerProperties)
-            {
-                var pp = TargetRuleAccess[p];
-                if (pp != null)
-                {
-                    properties.Add(TargetRuleAccess[p]);
-                    pp.IsBusy = true;
-                }
-            }
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsBusy)));
 
             try
             {
                 if (r is IRule<T> rule)
                 {
-                    result = await rule.Execute(Target, token).ConfigureAwait(false);
+                    var task = rule.Execute(Target, token);
+
+                    // If it is a synchronous rule no need to raise IsBusy
+                    if (!task.IsCompleted)
+                    {
+                        isAsync = true;
+                        foreach (var p in r.TriggerProperties)
+                        {
+                            var pp = TargetRuleAccess[p] ?? throw new ArgumentNullException(p);
+                            properties.Add(TargetRuleAccess[p]);
+                            pp.IsBusy = true;
+                        }
+
+                        PropertyHasChanged(nameof(IValidateBase.PropertyIsBusy)); // Not IsBusy. Hmmm...break single responsibility?
+                    }
+
+                    result = await task.ConfigureAwait(false);
                 }
                 else
                 {
@@ -357,9 +380,13 @@ namespace OOBehave.Rules
             }
             finally
             {
-                foreach (var p in properties)
+                if (isAsync)
                 {
-                    p.IsBusy = false;
+                    foreach (var p in properties)
+                    {
+                        p.IsBusy = false;
+                    }
+                    PropertyHasChanged(nameof(IValidateBase.PropertyIsBusy)); // Hmmm...break single responsibility?
                 }
             }
 
@@ -368,13 +395,6 @@ namespace OOBehave.Rules
                 // This is important for WPF binding
                 // If the property goes from broken to unbroken needs propertyHasChanged
                 var existingResult = Results[(int)r.UniqueIndex];
-                foreach (var pr in existingResult.PropertyErrorMessages)
-                {
-                    if (!propertyHasChanged.Contains(pr.Key))
-                    {
-                        propertyHasChanged.Enqueue(pr.Key);
-                    }
-                }
                 Results.Remove((int)r.UniqueIndex);
             }
 
@@ -382,16 +402,13 @@ namespace OOBehave.Rules
             {
                 result.TriggerProperties = r.TriggerProperties;
                 Results[(int)r.UniqueIndex] = result;
-
-                foreach (var pr in result.PropertyErrorMessages)
-                {
-                    if (!propertyHasChanged.Contains(pr.Key))
-                    {
-                        propertyHasChanged.Enqueue(pr.Key);
-                    }
-                }
             }
 
+        }
+
+        protected virtual void PropertyHasChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         void ISetTarget.SetTarget(IBase target)

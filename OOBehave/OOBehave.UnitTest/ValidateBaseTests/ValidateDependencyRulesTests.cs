@@ -117,7 +117,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.LastName = "Smith";
 
             Assert.IsFalse(validate.IsValid);
-            Assert.IsTrue(validate.RuleResultList[nameof(validate.FirstName)].IsError);
+            Assert.IsFalse(validate[nameof(validate.FirstName)].IsValid);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
             validate.FirstName = "John";
 
             Assert.IsTrue(validate.IsValid);
-            Assert.IsNull(validate.RuleResultList[nameof(validate.FirstName)]);
+            Assert.IsTrue(validate[nameof(validate.FirstName)].IsValid);
 
         }
 

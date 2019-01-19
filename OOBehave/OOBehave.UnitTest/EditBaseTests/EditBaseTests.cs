@@ -18,6 +18,7 @@ namespace OOBehave.UnitTest.EditBaseTests
 
         private ILifetimeScope scope;
         private IEditPerson editPerson;
+        private List<string> propertyChangedList = new List<string>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -33,6 +34,9 @@ namespace OOBehave.UnitTest.EditBaseTests
             Assert.IsFalse(editPerson.IsModified);
             Assert.IsFalse(editPerson.IsNew);
             Assert.IsFalse(editPerson.IsSavable);
+
+            editPerson.PropertyChanged += (o, e) => propertyChangedList.Add(e.PropertyName);
+
         }
 
         [TestCleanup]
@@ -56,6 +60,16 @@ namespace OOBehave.UnitTest.EditBaseTests
             Assert.IsTrue(editPerson.IsModified);
             Assert.IsTrue(editPerson.IsSelfModified);
             CollectionAssert.AreEquivalent(new List<string>() { nameof(IEditPerson.FullName), }, editPerson.ModifiedProperties.ToList());
+
+        }
+
+        [TestMethod]
+        public void EditBaseTest_SetString_Events()
+        {
+            editPerson.FullName = Guid.NewGuid().ToString();
+            Assert.IsTrue(propertyChangedList.Contains(nameof(IEditPerson.FullName)));
+            Assert.IsTrue(propertyChangedList.Contains(nameof(IEditBase.IsModified)));
+            Assert.IsTrue(propertyChangedList.Contains(nameof(IEditBase.IsSelfModified)));
         }
 
         [TestMethod]
@@ -127,7 +141,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         public async Task EditBaseTest_Save()
         {
             var mock = scope.Resolve<MockSendReceivePortal<EditPerson>>();
-            mock.MockPortal.Setup(x => x.Update((EditPerson) editPerson)).Returns(Task.CompletedTask);
+            mock.MockPortal.Setup(x => x.Update((EditPerson)editPerson)).Returns(Task.CompletedTask);
 
             editPerson.FirstName = Guid.NewGuid().ToString();
             await editPerson.Save();
@@ -135,6 +149,19 @@ namespace OOBehave.UnitTest.EditBaseTests
             mock.MockPortal.Verify(x => x.Update((EditPerson)editPerson), Times.Once);
         }
 
+        [TestMethod]
+        public void EditBaseTest_PropertyIsModified_False()
+        {
+            Assert.IsFalse(editPerson.PropertyIsModified[nameof(IEditPerson.InitiallyDefined)]);
+        }
+
+        [TestMethod]
+        public void EditBaseTest_PropertyIsModified_True()
+        {
+            editPerson.InitiallyNull = new List<int>() { 1, 2, 3 };
+            Assert.IsTrue(editPerson.PropertyIsModified[nameof(IEditPerson.InitiallyNull)]);
+            Assert.IsTrue(propertyChangedList.Contains(nameof(IEditBase.PropertyIsModified)));
+        }
 
     }
 }

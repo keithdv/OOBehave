@@ -11,6 +11,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     {
         IValidateAsyncObject Child { get; set; }
         int RuleRunCount { get; }
+
+        string NoRules { get; set; }
     }
 
     public class ValidateAsyncObject : PersonValidateBase<ValidateAsyncObject>, IValidateAsyncObject
@@ -29,6 +31,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         public IValidateAsyncObject Child { get { return Getter<IValidateAsyncObject>(); } set { Setter(value); } }
+
+        public string NoRules { get => Getter<string>(); set => Setter(value); }
 
         [Fetch]
         [FetchChild]
@@ -59,8 +63,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
     {
 
         public ValidateAsyncObjectList(IValidateListBaseServices<ValidateAsyncObjectList, IValidateAsyncObject> services,
-            IShortNameRule<ValidateAsyncObjectList> shortNameRule,
-            IFullNameRule<ValidateAsyncObjectList> fullNameRule
+            IShortNameAsyncRule<ValidateAsyncObjectList> shortNameRule,
+            IFullNameAsyncRule<ValidateAsyncObjectList> fullNameRule
             ) : base(services)
         {
             RuleManager.AddRules(shortNameRule, fullNameRule);
@@ -70,8 +74,8 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         }
 
         public int RuleRunCount => ShortNameRule.RunCount + FullNameRule.RunCount + this.Select(v => v.RuleRunCount).Sum();
-        public IShortNameRule<ValidateAsyncObjectList> ShortNameRule { get; }
-        public IFullNameRule<ValidateAsyncObjectList> FullNameRule { get; }
+        public IShortNameAsyncRule<ValidateAsyncObjectList> ShortNameRule { get; }
+        public IFullNameAsyncRule<ValidateAsyncObjectList> FullNameRule { get; }
     }
 
 }

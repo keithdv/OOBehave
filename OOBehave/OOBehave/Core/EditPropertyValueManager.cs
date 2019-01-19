@@ -19,7 +19,7 @@ namespace OOBehave.Core
 
     public interface IEditPropertyValueManager<T> : IEditPropertyValueManager, IValidatePropertyValueManager<T>
     {
-
+        new IEditPropertyValue this[string propertyName] { get; }
     }
 
     public interface IEditPropertyValue : IValidatePropertyValue
@@ -69,17 +69,19 @@ namespace OOBehave.Core
         }
     }
 
+    public delegate IEditPropertyValue CreateEditPropertyValue(IRegisteredProperty property, object value);
+
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
         where T : IBase
     {
-        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory, valuesDiffer)
+        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer, CreateEditPropertyValue createEditPropertyValue) : base(registeredPropertyManager, factory, valuesDiffer)
         {
-
+            CreateEditPropertyValue = createEditPropertyValue;
         }
 
-        protected override IEditPropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
+        protected override IEditPropertyValue CreatePropertyValue(IRegisteredProperty registeredProperty, object value)
         {
-            return Factory.CreateEditPropertyValue(registeredProperty, value);
+            return CreateEditPropertyValue(registeredProperty, value);
         }
 
         public bool IsModified => fieldData.Values.Any(p => p.IsModified);
@@ -87,11 +89,21 @@ namespace OOBehave.Core
 
         public IEnumerable<string> ModifiedProperties => fieldData.Values.Where(f => f.IsModified).Select(f => f.Name);
 
+        public CreateEditPropertyValue CreateEditPropertyValue { get; }
+
         public void MarkSelfUnmodified()
         {
             foreach (var fd in fieldData.Values)
             {
                 fd.MarkSelfUnmodified();
+            }
+        }
+
+        public new IEditPropertyValue this[string propertyName]
+        {
+            get
+            {
+                return base[propertyName] as IEditPropertyValue;
             }
         }
     }

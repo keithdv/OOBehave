@@ -105,7 +105,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             Assert.AreEqual(1, newTarget.Rules.Count());
             Assert.IsFalse(newTarget.IsValid);
 
-            Assert.IsTrue(newTarget.RuleResultList[nameof(IValidateObject.Name)].IsError);
+            Assert.IsFalse(newTarget[nameof(IValidateObject.Name)].IsValid);
 
         }
 

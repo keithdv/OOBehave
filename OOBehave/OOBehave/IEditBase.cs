@@ -16,6 +16,9 @@ namespace OOBehave
 
         Task Save();
 
+        new IEditPropertyMeta this[string propertyName] { get; }
+
+        EditPropertyMetaByName<bool> PropertyIsModified { get; }
     }
 
 

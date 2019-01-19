@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace Wpf
 {
-    public interface IFullNameRule : IRule<ISimpleValidateObject> { }
+    public interface IFullNameRule : IRule<ISimpleObject> { }
 
-    internal class FullNameRule : AsyncRuleBase<ISimpleValidateObject>, IFullNameRule
+    internal class FullNameRule : AsyncRuleBase<ISimpleObject>, IFullNameRule
     {
         public FullNameRule() : base()
         {
-            TriggerProperties.Add(nameof(ISimpleValidateObject.Title));
-            TriggerProperties.Add(nameof(ISimpleValidateObject.ShortName));
+            TriggerProperties.Add(nameof(ISimpleObject.Title));
+            TriggerProperties.Add(nameof(ISimpleObject.ShortName));
         }
 
-        public override async Task<IRuleResult> Execute(ISimpleValidateObject target, CancellationToken token)
+        public override async Task<IRuleResult> Execute(ISimpleObject target, CancellationToken token)
         {
 
             await Task.Delay(1000).ConfigureAwait(false);
@@ -27,19 +27,19 @@ namespace Wpf
 
             if (string.IsNullOrWhiteSpace(target.Title))
             {
-                result.AddPropertyError(nameof(ISimpleValidateObject.Title), $"{nameof(ISimpleValidateObject.Title)} is required.");
+                result.AddPropertyError(nameof(ISimpleObject.Title), $"{nameof(ISimpleObject.Title)} is required.");
             }
 
             if (string.IsNullOrWhiteSpace(target.ShortName))
             {
-                result.AddPropertyError(nameof(ISimpleValidateObject.ShortName), $"{nameof(ISimpleValidateObject.ShortName)} is required.");
+                result.AddPropertyError(nameof(ISimpleObject.ShortName), $"{nameof(ISimpleObject.ShortName)} is required.");
             }
 
             if (!result.IsError)
             {
                 target.FullName = $"{target.Title} {target.ShortName}";
             }
-            else
+            else if (!string.IsNullOrEmpty(target.FullName)) // Don't mark the object as modified
             {
                 target.FullName = string.Empty;
             }

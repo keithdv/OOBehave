@@ -20,7 +20,7 @@ namespace OOBehave
         IValidatePropertyValueInternal this[string propertyName] { get; }
     }
 
-    public interface IValidateBase : IBase, IValidateMetaProperties
+    public interface IValidateBase : IBase, IValidateMetaProperties, INotifyPropertyChanged
     {
         Task WaitForRules();
         Task CheckAllRules(CancellationToken token = new CancellationToken());
@@ -30,6 +30,10 @@ namespace OOBehave
         IEnumerable<string> BrokenRuleMessages { get; }
 
         IValidatePropertyMeta this[string propertyName] { get; }
+
+        ValidatePropertyMetaByName<bool> PropertyIsBusy { get; }
+        ValidatePropertyMetaByName<bool> PropertyIsValid { get; }
+        ValidatePropertyMetaByName<string> PropertyErrorMessage { get; }
     }
 
 
@@ -49,6 +53,11 @@ namespace OOBehave
             this.RuleManager = services.RuleManager;
             this.RuleManager.PropertyChanged += RuleManager_PropertyChanged;
             ((ISetTarget)this.RuleManager).SetTarget(this);
+
+            PropertyIsBusy = new ValidatePropertyMetaByName<bool>(this, (p) => p.IsBusy);
+            PropertyIsValid = new ValidatePropertyMetaByName<bool>(this, (p) => p.IsValid);
+            PropertyErrorMessage = new ValidatePropertyMetaByName<string>(this, (p) => p.ErrorMessage);
+
         }
 
 
@@ -88,15 +97,30 @@ namespace OOBehave
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void PropertyHasChanged(string propertyName)
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (e.PropertyName == nameof(IsValid))
+            {
+                PropertyHasChanged(nameof(IsSelfValid), true);
+                PropertyHasChanged(nameof(PropertyIsValid), true);
+                PropertyHasChanged(nameof(PropertyErrorMessage), true);
+            }
+            else if (e.PropertyName == nameof(IsBusy))
+            {
+                PropertyHasChanged(nameof(PropertyIsBusy), true);
+            }
         }
 
+        protected void PropertyHasChanged(string propertyName, bool isMeta = false)
+        {
+            PropertyChangedEventArgs e = isMeta ? new MetaPropertyChangedEventArgs(propertyName) : new PropertyChangedEventArgs(propertyName);
+            PropertyChanged?.Invoke(this, e);
+            OnPropertyChanged(e);
+        }
 
         private void RuleManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, e);
+            PropertyHasChanged(e.PropertyName, true);
         }
 
         protected virtual void CheckRules(string propertyName)
@@ -185,9 +209,36 @@ namespace OOBehave
             {
                 var pv = PropertyValueManager[propertyName];
 
-                return pv != null ? new ValidatePropertyMeta(PropertyValueManager[propertyName]) : null;
+                return pv != null ? new ValidatePropertyMeta(pv) : null;
             }
         }
 
+
+        // For XAML Binding
+        public ValidatePropertyMetaByName<bool> PropertyIsBusy { get; }
+        public ValidatePropertyMetaByName<bool> PropertyIsValid { get; }
+        public ValidatePropertyMetaByName<string> PropertyErrorMessage { get; }
+
+
+    }
+
+    public class ValidatePropertyMetaByName<R>
+    {
+        public ValidatePropertyMetaByName(IValidateBase target, Func<IValidatePropertyMeta, R> toReturn)
+        {
+            Target = target;
+            TranslateFunc = toReturn;
+        }
+
+        private IValidateBase Target { get; }
+        private Func<IValidatePropertyMeta, R> TranslateFunc { get; }
+
+        public R this[string propertyName]
+        {
+            get
+            {
+                return TranslateFunc(Target[propertyName]);
+            }
+        }
     }
 }

@@ -71,17 +71,21 @@ namespace OOBehave.Core
         }
     }
 
+    public delegate IPropertyValue CreatePropertyValue(IRegisteredProperty property, object value);
+
     public class PropertyValueManager<T> : PropertyValueManagerBase<T, IPropertyValue>
         where T : IBase
     {
-        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory) : base(registeredPropertyManager, factory)
+        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, CreatePropertyValue createPropertyValue) : base(registeredPropertyManager, factory)
         {
-
+            CreatePropertyValue1 = createPropertyValue;
         }
 
-        protected override IPropertyValue CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value)
+        public CreatePropertyValue CreatePropertyValue1 { get; }
+
+        protected override IPropertyValue CreatePropertyValue(IRegisteredProperty registeredProperty, object value)
         {
-            return Factory.CreatePropertyValue(registeredProperty, value);
+            return CreatePropertyValue1(registeredProperty, value);
         }
     }
 
@@ -104,19 +108,18 @@ namespace OOBehave.Core
             Factory = factory;
         }
 
-        protected abstract P CreatePropertyValue<PV>(IRegisteredProperty<PV> registeredProperty, PV value);
+        protected abstract P CreatePropertyValue(IRegisteredProperty registeredProperty, object value);
 
         public IPropertyValue this[string propertyName]
         {
             get
             {
                 var prop = registeredPropertyManager.GetRegisteredProperty(propertyName);
-                if (prop == null) { throw new Exception($"Property {propertyName} is not registered."); }
-                if (fieldData.TryGetValue(prop.Index, out var value))
+                if (!fieldData.TryGetValue(prop.Index, out var value))
                 {
-                    return value;
+                    fieldData[prop.Index] = CreatePropertyValue(prop, default);
                 }
-                return null;
+                return fieldData[prop.Index];
             }
         }
 
