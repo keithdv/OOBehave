@@ -11,16 +11,17 @@ namespace OOBehave.Netwonsoft.Json
     public class ServiceScope : IServiceScope
     {
         private ILifetimeScope scope { get; }
+
+        public bool IsDisposed { get; private set; } = false;
+
         public ServiceScope(ILifetimeScope scope)
         {
             this.scope = scope;
-
         }
-
 
         public IServiceScope BeginNewScope(object tag = null)
         {
-            return new ServiceScope(scope.BeginLifetimeScope(tag));
+            return new ServiceScope(scope.BeginLifetimeScope(tag ?? string.Empty));
         }
 
         public T Resolve<T>()
@@ -58,9 +59,9 @@ namespace OOBehave.Netwonsoft.Json
             return ConcreteType(typeof(T));
         }
 
-        public Type ConcreteType(Type T)
+        public Type ConcreteType(Type t)
         {
-            IComponentRegistration registration = scope.ComponentRegistry.RegistrationsFor(new TypedService(T)).FirstOrDefault();
+            IComponentRegistration registration = scope.ComponentRegistry.RegistrationsFor(new TypedService(t)).FirstOrDefault();
 
             if (registration != null)
             {
@@ -71,7 +72,9 @@ namespace OOBehave.Netwonsoft.Json
 
         public void Dispose()
         {
+            IsDisposed = true;
             scope.Dispose();
         }
+        public object Tag => scope.Tag;
     }
 }

@@ -19,6 +19,9 @@ namespace OOBehave
         bool IsRegistered<T>();
 
         bool IsRegistered(Type type);
+        bool IsDisposed { get; }
+
+        object Tag { get; }
     }
 
 }

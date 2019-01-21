@@ -11,16 +11,17 @@ namespace OOBehave.Autofac
     public class ServiceScope : IServiceScope
     {
         private ILifetimeScope scope { get; }
+
+        public bool IsDisposed { get; private set; } = false;
+
         public ServiceScope(ILifetimeScope scope)
         {
             this.scope = scope;
-
         }
-
 
         public IServiceScope BeginNewScope(object tag = null)
         {
-            return new ServiceScope(scope.BeginLifetimeScope(tag));
+            return new ServiceScope(scope.BeginLifetimeScope(tag ?? string.Empty));
         }
 
         public T Resolve<T>()
@@ -71,7 +72,10 @@ namespace OOBehave.Autofac
 
         public void Dispose()
         {
+            IsDisposed = true;
             scope.Dispose();
         }
+
+        public object Tag => scope.Tag;
     }
 }

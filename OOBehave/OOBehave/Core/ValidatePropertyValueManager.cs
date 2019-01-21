@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OOBehave.Attributes;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,7 @@ namespace OOBehave.Core
 
     }
 
+    [PortalDataContract]
     public class ValidatePropertyValue<T> : PropertyValue<T>, IValidatePropertyValue<T>, IValidatePropertyValueInternal
     {
 
@@ -90,6 +92,7 @@ namespace OOBehave.Core
 
         private bool isValid = true;
 
+        [PortalDataMember]
         public bool IsValid
         {
             get { return (Child?.IsValid) ?? isValid; }
@@ -117,7 +120,7 @@ namespace OOBehave.Core
     public class ValidatePropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IValidatePropertyValue>
         where T : IBase
     {
-        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer, CreateValidatePropertyValue createValidatePropertyValue) : base(registeredPropertyManager, factory, valuesDiffer)
+        public ValidatePropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IValuesDiffer valuesDiffer, CreateValidatePropertyValue createValidatePropertyValue) : base(registeredPropertyManager, valuesDiffer)
         {
             CreateValidatePropertyValue = createValidatePropertyValue;
         }
@@ -134,7 +137,7 @@ namespace OOBehave.Core
         where T : IBase
         where P : IValidatePropertyValue
     {
-        public ValidatePropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer) : base(registeredPropertyManager, factory)
+        public ValidatePropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IValuesDiffer valuesDiffer) : base(registeredPropertyManager)
         {
             ValuesDiffer = valuesDiffer;
         }

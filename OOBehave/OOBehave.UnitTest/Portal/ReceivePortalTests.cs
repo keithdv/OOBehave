@@ -4,6 +4,7 @@ using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
@@ -25,7 +26,11 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestCleanup]
         public void TestCleanup()
         {
+            var cddl = scope.Resolve<ConstructorDisposableDependencyList>();
+            var pddl = scope.Resolve<PortalOperationDisposableDependencyList>();
             scope.Dispose();
+            Assert.IsFalse(cddl.Any(i => !i.IsDisposed));
+            Assert.IsFalse(pddl.Any(i => !i.IsDisposed));
         }
 
         [TestMethod]
@@ -87,10 +92,21 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task ReceivePortal_CreateMultipleCriteriaCalled_Double()
         {
-            var r = scope.IsRegistered(typeof(int));
-
             domainObject = await portal.Create(1, 10d);
-            CollectionAssert.AreEquivalent(new object[] { 1, 10d }, domainObject.MultipleCriteria);
+            CollectionAssert.AreEquivalent(new object[] { 1, 10d }, domainObject.MultipleCriteria.Take(2).ToList());
+
+
+        }
+
+        [TestMethod]
+        public async Task ReceivePortal_DependencyDisposed()
+        {
+            // This was hard to get right and should use some more testing
+            domainObject = await portal.Create(1, 10d);
+            var disposableDependency = domainObject.MultipleCriteria.Last() as IPortalOperationDisposableDependency;
+            Assert.IsNotNull(disposableDependency);
+            // Portal Operation Method Injected dependencies should be disposed at the end of the operation
+            Assert.IsTrue(disposableDependency.IsDisposed);
         }
 
         [TestMethod]

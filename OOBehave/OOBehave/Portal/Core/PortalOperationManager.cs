@@ -22,14 +22,14 @@ namespace OOBehave.Portal.Core
         protected IAuthorizationRuleManager AuthorizationRuleManager { get; }
 
 
-        public PortalOperationManager(IServiceScope scope)
+        public PortalOperationManager(IServiceScope scope, IAuthorizationRuleManager<T> authorizationRuleManager)
         {
 #if DEBUG
             if (typeof(T).IsInterface) { throw new Exception($"PortalOperationManager should be service type not interface. {typeof(T).FullName}"); }
 #endif
             RegisterPortalOperations();
             Scope = scope;
-            AuthorizationRuleManager = scope.Resolve<IAuthorizationRuleManager<T>>();
+            AuthorizationRuleManager = authorizationRuleManager;
         }
 
 

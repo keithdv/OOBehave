@@ -106,7 +106,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             Assert.IsFalse(newTarget.IsValid);
 
             Assert.IsFalse(newTarget[nameof(IValidateObject.Name)].IsValid);
-
+            Assert.IsFalse(newTarget.PropertyIsValid[nameof(IValidateObject.Name)]);
         }
 
 

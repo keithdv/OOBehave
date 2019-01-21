@@ -34,7 +34,7 @@ namespace OOBehave.UnitTest.Portal
         /// <param name="number"></param>
         /// <param name="dependency"></param>
         /// <returns></returns>
-        internal static Task<int> ExecuteServer(int number, IDisposableDependency dependency)
+        internal static Task<int> ExecuteServer(int number, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             return Task.FromResult(number * 10);

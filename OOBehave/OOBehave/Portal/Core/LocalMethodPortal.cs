@@ -8,27 +8,33 @@ namespace OOBehave.Portal.Core
     public class LocalMethodPortal<D> : IRemoteMethodPortal<D> where D : Delegate
     {
 
-        public LocalMethodPortal(D method)
+        public LocalMethodPortal(IServiceScope scope)
         {
-            Method = method;
+            Scope = scope;
         }
 
-        public D Method { get; }
+        public IServiceScope Scope { get; }
 
-        public Task<T> Execute<T>(params object[] p)
+        public async Task<T> Execute<T>(params object[] p)
         {
-            var result = Method.Method.Invoke(Method.Target, p);
 
-            if (result is Task<T> resultTask)
+            // Execute methods get their own scope
+            using (var scope = Scope.BeginNewScope("DependencyScope"))
             {
-                return resultTask;
-            }
-            else if (result is T resultT)
-            {
-                return Task.FromResult(resultT);
-            }
+                var method = (D)scope.Resolve(typeof(D));
+                var result = method.Method.Invoke(method.Target, p);
 
-            throw new Exception($"The return value {result.GetType()} is not {typeof(T).GetType()}.");
+                if (result is Task<T> resultTask)
+                {
+                    return await resultTask.ConfigureAwait(false);
+                }
+                else if (result is T resultT)
+                {
+                    return resultT;
+                }
+
+                throw new Exception($"The return value {result.GetType()} is not {typeof(T).GetType()}.");
+            }
         }
 
     }

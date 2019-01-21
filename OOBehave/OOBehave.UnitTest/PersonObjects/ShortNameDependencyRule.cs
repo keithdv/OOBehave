@@ -11,14 +11,14 @@ namespace OOBehave.UnitTest.PersonObjects
         where T : IPersonBase
     {
 
-        public ShortNameDependencyRule(IDisposableDependency dd) : base()
+        public ShortNameDependencyRule(IConstructorDisposableDependency dd) : base()
         {
             TriggerProperties.Add(nameof(IPersonBase.FirstName));
             TriggerProperties.Add(nameof(IPersonBase.LastName));
             DisposableDependency = dd;
         }
 
-        private IDisposableDependency DisposableDependency { get; }
+        private IConstructorDisposableDependency DisposableDependency { get; }
 
         public override IRuleResult Execute(T target)
         {

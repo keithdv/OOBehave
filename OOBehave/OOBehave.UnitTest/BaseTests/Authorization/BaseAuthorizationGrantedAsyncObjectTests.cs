@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.AuthorizationRules;
 using OOBehave.Portal;
+using OOBehave.Portal.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,19 +112,22 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
 
         ILifetimeScope scope;
         IReceivePortal<IBaseAuthorizationGrantedAsyncObject> portal;
+        IServiceScope dependencyScope;
 
         [TestInitialize]
         public void TestInitialize()
         {
             scope = AutofacContainer.GetLifetimeScope(true);
             portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedAsyncObject>>();
+            var ps = portal.PortalOperationScope();
+            dependencyScope = ps.DependencyScope;
         }
 
         [TestMethod]
         public async Task BaseAuthorizationGrantedAsync_Create()
         {
             var obj = await portal.Create();
-            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
+            var authRule = dependencyScope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
         }
 
@@ -132,7 +136,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Create(criteria);
-            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
+            var authRule = dependencyScope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }
@@ -141,7 +145,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         public async Task BaseAuthorizationGrantedAsync_Fetch()
         {
             var obj = await portal.Fetch();
-            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
+            var authRule = dependencyScope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
         }
 
@@ -150,7 +154,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Fetch(criteria);
-            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
+            var authRule = dependencyScope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }

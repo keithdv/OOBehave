@@ -34,14 +34,13 @@ namespace OOBehave.Autofac
         {
             base.Load(builder);
 
-            // SingleInstance as long it is isn't modified to accept dependencies
-            builder.RegisterType<DefaultFactory>().As<IFactory>().SingleInstance();
-
             // Tools - More or less Static classes - but now they can be changed! (For better or worse...)
             builder.RegisterType<Core.ValuesDiffer>().As<IValuesDiffer>().SingleInstance();
 
             // Scope Wrapper
-            builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
+            builder.RegisterType<ServiceScope>().As<IServiceScope>();
+            builder.RegisterType<PortalScope>().As<IPortalScope>().InstancePerLifetimeScope().ExternallyOwned();
+
 
             // Meta Data about the properties and methods of Classes
             // This will not change during runtime
@@ -58,7 +57,7 @@ namespace OOBehave.Autofac
             builder.RegisterGeneric(typeof(RuleManager<>)).As(typeof(IRuleManager<>)).AsSelf();
             builder.RegisterType<RuleResultList>().As<IRuleResultList>();
             builder.RegisterType<RequiredRule>().As<IRequiredRule>();
-            builder.RegisterType<AttributeToRule>().As<IAttributeToRule>().SingleInstance(); // SingleInstance is save as long as it only resolves Func<>s
+            builder.RegisterType<AttributeToRule>().As<IAttributeToRule>(); // SingleInstance is save as long as it only resolves Func<>s
 
             builder.RegisterGeneric(typeof(RegisteredProperty<>)).As(typeof(IRegisteredProperty<>));
             builder.Register<CreateRegisteredProperty>(cc =>

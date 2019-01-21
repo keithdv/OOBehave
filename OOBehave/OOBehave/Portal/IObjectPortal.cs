@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using OOBehave.Portal.Core;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace OOBehave.Portal
 {
@@ -8,6 +11,13 @@ namespace OOBehave.Portal
 
     public interface IReceivePortal<T> where T : IPortalTarget
     {
+        /// <summary>
+        /// Use if you want to override the scope used to make dependencies
+        /// Advanced: Use at your own risk
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        IPortalScope PortalOperationScope();
+
         Task<T> Create();
         Task<T> Create<C0>(C0 criteria0);
         Task<T> Create<C0, C1>(C0 criteria0, C1 criteria1);
@@ -31,6 +41,13 @@ namespace OOBehave.Portal
 
     public interface IReceivePortalChild<T> where T : IPortalTarget
     {
+        /// <summary>
+        /// Use if you want to override the scope used to make dependencies
+        /// Advanced: Use at your own risk
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        IPortalScope PortalOperationScope();
+
         Task<T> CreateChild();
         Task<T> CreateChild<C0>(C0 criteria0);
         Task<T> CreateChild<C0, C1>(C0 criteria0, C1 criteria1);

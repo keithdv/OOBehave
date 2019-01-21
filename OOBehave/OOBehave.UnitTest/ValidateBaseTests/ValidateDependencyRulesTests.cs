@@ -140,7 +140,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         [TestMethod]
         public void ValidateDependencyRules_DisposableDependency_Count()
         {
-            var dependencies = scope.Resolve<DisposableDependencyList>();
+            var dependencies = scope.Resolve<ConstructorDisposableDependencyList>();
 
             Assert.AreEqual(2, dependencies.Count);
             Assert.AreEqual(2, dependencies.Select(x => x.UniqueId).Distinct().Count());
@@ -150,7 +150,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         [TestMethod]
         public void ValidateDependencyRules_DisposableDependency_Unique()
         {
-            var dependencies = scope.Resolve<DisposableDependencyList>();
+            var dependencies = scope.Resolve<ConstructorDisposableDependencyList>();
 
             Assert.AreEqual(2, dependencies.Select(x => x.UniqueId).Distinct().Count());
         }
@@ -158,7 +158,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         [TestMethod]
         public void ValidateDependencyRules_DisposableDependency_NotDisposed()
         {
-            var dependencies = scope.Resolve<DisposableDependencyList>();
+            var dependencies = scope.Resolve<ConstructorDisposableDependencyList>();
 
             Assert.IsFalse(dependencies.Where(x => x.IsDisposed).Any());
         }
@@ -166,7 +166,7 @@ namespace OOBehave.UnitTest.ValidateBaseTests
         [TestMethod]
         public void ValidateDependencyRules_DisposableDependency_Dispose()
         {
-            var dependencies = scope.Resolve<DisposableDependencyList>();
+            var dependencies = scope.Resolve<ConstructorDisposableDependencyList>();
 
             scope.Dispose();
 

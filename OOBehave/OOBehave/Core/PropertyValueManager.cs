@@ -76,7 +76,7 @@ namespace OOBehave.Core
     public class PropertyValueManager<T> : PropertyValueManagerBase<T, IPropertyValue>
         where T : IBase
     {
-        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, CreatePropertyValue createPropertyValue) : base(registeredPropertyManager, factory)
+        public PropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, CreatePropertyValue createPropertyValue) : base(registeredPropertyManager)
         {
             CreatePropertyValue1 = createPropertyValue;
         }
@@ -96,16 +96,14 @@ namespace OOBehave.Core
     {
         protected T Target { get; set; }
 
-        protected IFactory Factory { get; }
         protected readonly IRegisteredPropertyManager<T> registeredPropertyManager;
 
         [PortalDataMember]
         protected IDictionary<uint, P> fieldData = new ConcurrentDictionary<uint, P>();
 
-        public PropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory)
+        public PropertyValueManagerBase(IRegisteredPropertyManager<T> registeredPropertyManager)
         {
             this.registeredPropertyManager = registeredPropertyManager;
-            Factory = factory;
         }
 
         protected abstract P CreatePropertyValue(IRegisteredProperty registeredProperty, object value);

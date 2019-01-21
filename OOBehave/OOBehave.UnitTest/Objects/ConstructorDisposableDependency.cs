@@ -5,18 +5,22 @@ using System.Text;
 namespace OOBehave.UnitTest.Objects
 {
 
-    public class DisposableDependencyList : List<DisposableDependency> { }
+    public class ConstructorDisposableDependencyList : List<ConstructorDisposableDependency> { }
 
-    public interface IDisposableDependency : IDisposable
+    public interface IConstructorDisposableDependency : IDisposable
     {
         Guid UniqueId { get; }
         bool IsDisposed { get; set; }
     }
 
-    public class DisposableDependency : IDisposableDependency
+    public class ConstructorDisposableDependency : IConstructorDisposableDependency
     {
-        public DisposableDependency(DisposableDependencyList list)
+        public ConstructorDisposableDependency(IServiceScope scope, ConstructorDisposableDependencyList list)
         {
+            if (scope.Tag.ToString() != "Target")
+            {
+                throw new Exception(scope.Tag.ToString());
+            }
             list.Add(this);
         }
 

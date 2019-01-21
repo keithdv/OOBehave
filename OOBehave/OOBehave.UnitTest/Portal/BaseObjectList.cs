@@ -19,8 +19,8 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         public Guid GuidCriteria { get; set; } = Guid.Empty;
         public int IntCriteria { get; set; } = -1;
-
         public bool CreateCalled { get; set; } = false;
+        public object[] MultipleCriteria { get; set; }
 
         [Create]
         private async Task Create()
@@ -37,7 +37,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Create]
-        private async Task Create(Guid criteria, IDisposableDependency dependency)
+        private async Task Create(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -61,7 +61,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [CreateChild]
-        private async Task CreateChild(Guid criteria, IDisposableDependency dependency)
+        private async Task CreateChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -85,7 +85,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Fetch]
-        private async Task Fetch(Guid criteria, IDisposableDependency dependency)
+        private async Task Fetch(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -110,7 +110,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [FetchChild]
-        private async Task FetchChild(Guid criteria, IDisposableDependency dependency)
+        private async Task FetchChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;

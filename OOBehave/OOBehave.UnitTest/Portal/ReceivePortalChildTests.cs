@@ -19,6 +19,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         public void TestInitialize()
         {
             portal = scope.Resolve<IReceivePortalChild<IBaseObject>>();
+            portal.PortalOperationScope();
         }
 
         [TestCleanup]

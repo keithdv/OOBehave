@@ -5,6 +5,7 @@ using OOBehave.Portal;
 using OOBehave.UnitTest.Objects;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OOBehave.UnitTest.ObjectPortal
@@ -31,6 +32,7 @@ namespace OOBehave.UnitTest.ObjectPortal
             scope.Dispose();
         }
 
+
         [TestMethod]
         public async Task ReceivePortalList_Create()
         {
@@ -46,6 +48,21 @@ namespace OOBehave.UnitTest.ObjectPortal
             list = await portal.Create(crit);
             Assert.AreEqual(crit, list.GuidCriteria);
             Assert.AreEqual(crit, list.Single().GuidCriteria);
+        }
+
+
+        [TestMethod]
+        public async Task ReceivePortalList_AsyncronousScope()
+        {
+            using (var s = AutofacContainer.GetLifetimeScope(true))
+            {
+                portal = s.Resolve<IReceivePortal<IBaseObjectList>>();
+                var crit = Guid.NewGuid();
+                list = await portal.Create(crit);
+                var ddl = (PortalOperationDisposableDependencyList)list.First().MultipleCriteria[0];
+                // PortalOperationDisposableDependencyList is InstancePerLifetimeScope so itshould have kept track of both DisposableDependency objects
+                Assert.AreEqual(2, ddl.Count);
+            }
         }
 
         [TestMethod]

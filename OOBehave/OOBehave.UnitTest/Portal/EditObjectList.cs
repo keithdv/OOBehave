@@ -36,7 +36,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Create]
-        private void Create(Guid criteria, IDisposableDependency dependency)
+        private void Create(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -60,7 +60,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [CreateChild]
-        private void CreateChild(Guid criteria, IDisposableDependency dependency)
+        private void CreateChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -85,7 +85,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Fetch]
-        private void Fetch(Guid criteria, IDisposableDependency dependency)
+        private void Fetch(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -109,7 +109,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [FetchChild]
-        private void FetchChild(Guid criteria, IDisposableDependency dependency)
+        private void FetchChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -135,7 +135,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Insert]
-        private void Insert(Guid criteria, IDisposableDependency dependency)
+        private void Insert(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             InsertCalled = true;
@@ -160,7 +160,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [InsertChild]
-        private void InsertChild(Guid criteria, IDisposableDependency dependency)
+        private void InsertChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -188,7 +188,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [Update]
-        private void Update(Guid criteria, IDisposableDependency dependency)
+        private void Update(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -213,7 +213,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
 
         [UpdateChild]
-        private void UpdateChild(Guid criteria, IDisposableDependency dependency)
+        private void UpdateChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -236,7 +236,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Delete]
-        private void Delete(Guid criteria, IDisposableDependency dependency)
+        private void Delete(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -259,7 +259,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [DeleteChild]
-        private void DeleteChild(Guid criteria, IDisposableDependency dependency)
+        private void DeleteChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;

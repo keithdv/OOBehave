@@ -39,10 +39,10 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Create]
-        private void CreateMultiple(int i, double d, IDisposableDependency dep)
+        private void CreateMultiple(int i, double d, IPortalOperationDisposableDependency dep)
         {
             Assert.IsNotNull(dep);
-            MultipleCriteria = new object[] { i, d };
+            MultipleCriteria = new object[] { i, d, dep };
         }
 
         [Create]
@@ -51,7 +51,7 @@ namespace OOBehave.UnitTest.ObjectPortal
             Assert.Fail("Should not have reached");
         }
         [Create]
-        private void CreateErrorDuplicate(uint i, IDisposableDependency dep)
+        private void CreateErrorDuplicate(uint i, IPortalOperationDisposableDependency dep)
         {
             Assert.Fail("Should not have reached");
         }
@@ -64,7 +64,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Create]
-        private void CreateNullCriteria(List<int> a, List<int> b, IDisposableDependency dep)
+        private void CreateNullCriteria(List<int> a, List<int> b, IPortalOperationDisposableDependency dep)
         {
             Assert.IsNotNull(dep);
             CreateCalled = true;
@@ -72,7 +72,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Create]
-        private void Create(Guid criteria, IDisposableDependency dependency)
+        private void Create(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -93,9 +93,10 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [CreateChild]
-        private void CreateChild(Guid criteria, IDisposableDependency dependency)
+        private void CreateChild(Guid criteria, IPortalOperationDisposableDependency dependency, PortalOperationDisposableDependencyList list)
         {
             Assert.IsNotNull(dependency);
+            MultipleCriteria = new object[] { list }; // Be able to check Asyncrounous Scope
             GuidCriteria = criteria;
         }
 
@@ -114,7 +115,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [Fetch]
-        private void Fetch(Guid criteria, IDisposableDependency dependency)
+        private void Fetch(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;
@@ -135,7 +136,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [FetchChild]
-        private void FetchChild(Guid criteria, IDisposableDependency dependency)
+        private void FetchChild(Guid criteria, IPortalOperationDisposableDependency dependency)
         {
             Assert.IsNotNull(dependency);
             GuidCriteria = criteria;

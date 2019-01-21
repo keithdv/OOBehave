@@ -1,6 +1,7 @@
 using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OOBehave.Portal;
+using OOBehave.Portal.Core;
 using OOBehave.UnitTest.Objects;
 using System;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         public void TestInitialize()
         {
             portal = scope.Resolve<IReceivePortalChild<IBaseObjectList>>();
+            portal.PortalOperationScope();
         }
 
         [TestCleanup]

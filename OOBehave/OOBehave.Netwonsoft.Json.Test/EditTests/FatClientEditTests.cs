@@ -240,6 +240,26 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             Assert.IsTrue(newTarget.IsModified);
             Assert.IsTrue(newTarget.IsSelfModified);
         }
+
+        [TestMethod]
+        public void FatClientEdit_PropertyIsModified()
+        {
+            target.MarkOld();
+            target.MarkUnmodified();
+            Assert.IsFalse(target.PropertyIsModified[nameof(IEditObject.Name)]);
+
+            target.Name = $"{target.Name}0";
+
+            Assert.IsTrue(target.PropertyIsModified[nameof(IEditObject.Name)]);
+
+            var json = Serialize(target);
+
+            var newTarget = Deserialize(json);
+
+            Assert.IsTrue(target.PropertyIsModified[nameof(IEditObject.Name)]);
+
+
+        }
     }
 }
 

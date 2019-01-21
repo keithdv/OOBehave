@@ -74,7 +74,7 @@ namespace OOBehave.Core
     public class EditPropertyValueManager<T> : ValidatePropertyValueManagerBase<T, IEditPropertyValue>, IEditPropertyValueManager<T>
         where T : IBase
     {
-        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IFactory factory, IValuesDiffer valuesDiffer, CreateEditPropertyValue createEditPropertyValue) : base(registeredPropertyManager, factory, valuesDiffer)
+        public EditPropertyValueManager(IRegisteredPropertyManager<T> registeredPropertyManager, IValuesDiffer valuesDiffer, CreateEditPropertyValue createEditPropertyValue) : base(registeredPropertyManager, valuesDiffer)
         {
             CreateEditPropertyValue = createEditPropertyValue;
         }

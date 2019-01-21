@@ -11,7 +11,7 @@ namespace OOBehave.UnitTest.PersonObjects
         where T : IPersonBase
     {
 
-        public FullNameDependencyRule(IDisposableDependency dd) : base()
+        public FullNameDependencyRule(IConstructorDisposableDependency dd) : base()
         {
             TriggerProperties.Add(nameof(IPersonBase.Title));
             TriggerProperties.Add(nameof(IPersonBase.ShortName));
@@ -19,7 +19,7 @@ namespace OOBehave.UnitTest.PersonObjects
             this.DisposableDependency = dd;
         }
 
-        private IDisposableDependency DisposableDependency { get; }
+        private IConstructorDisposableDependency DisposableDependency { get; }
 
         public override IRuleResult Execute(T target)
         {
