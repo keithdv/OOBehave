@@ -38,7 +38,7 @@ namespace OOBehave.Autofac
             builder.RegisterType<Core.ValuesDiffer>().As<IValuesDiffer>().SingleInstance();
 
             // Scope Wrapper
-            builder.RegisterType<ServiceScope>().As<IServiceScope>();
+            builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
             builder.RegisterType<PortalScope>().As<IPortalScope>().InstancePerLifetimeScope().ExternallyOwned();
 
 

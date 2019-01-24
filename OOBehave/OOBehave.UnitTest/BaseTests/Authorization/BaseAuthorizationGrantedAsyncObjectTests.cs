@@ -119,15 +119,13 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         {
             scope = AutofacContainer.GetLifetimeScope(true);
             portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedAsyncObject>>();
-            var ps = portal.PortalOperationScope();
-            dependencyScope = ps.DependencyScope;
         }
 
         [TestMethod]
         public async Task BaseAuthorizationGrantedAsync_Create()
         {
             var obj = await portal.Create();
-            var authRule = dependencyScope.Resolve<IAuthorizationGrantedAsyncRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedAsyncRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
         }
 

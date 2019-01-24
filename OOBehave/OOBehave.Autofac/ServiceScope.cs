@@ -3,20 +3,25 @@ using Autofac.Core;
 using OOBehave.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace OOBehave.Autofac
 {
+    [DebuggerDisplay("UniqueId = {UniqueId}")]
     public class ServiceScope : IServiceScope
     {
-        private ILifetimeScope scope { get; }
+        private static uint uniqueIdCount = 0;
 
+        private ILifetimeScope scope { get; }
+        public uint UniqueId { get; }
         public bool IsDisposed { get; private set; } = false;
 
         public ServiceScope(ILifetimeScope scope)
         {
             this.scope = scope;
+            UniqueId = uniqueIdCount++;
         }
 
         public IServiceScope BeginNewScope(object tag = null)

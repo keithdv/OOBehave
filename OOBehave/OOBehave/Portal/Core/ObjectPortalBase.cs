@@ -10,13 +10,16 @@ namespace OOBehave.Portal.Core
 {
     public interface IPortalScope : IDisposable
     {
-        IServiceScope DependencyScope { get; }
+        IServiceScope DependencyScope { get; set; }
         IServiceScope TargetScope { get; set; }
-        bool IsInUsing { get; set; }
+        void BeginDependencyScope();
+        uint UniqueId { get; }
     }
 
     public class PortalScope : IPortalScope
     {
+        private static uint uniqueIdCount = 0;
+
         public PortalScope(IServiceScope scope)
         {
             if (scope.Tag.ToString() != "Target")
@@ -25,6 +28,7 @@ namespace OOBehave.Portal.Core
             }
 
             TargetScope = scope;
+            UniqueId = uniqueIdCount++;
 
         }
 
@@ -37,13 +41,14 @@ namespace OOBehave.Portal.Core
         {
             get
             {
-                if(dependencyScope == null && IsInUsing)
+                if (dependencyScope == null)
                 {
-                    dependencyScope = TargetScope.BeginNewScope("DependencyScope");
-                    var ps = dependencyScope.Resolve<IPortalScope>();
-                    ps.TargetScope = TargetScope;
+                    throw new Exception("BegineDependencyScope should be called before DependencyScope is used");
                 }
                 return dependencyScope;
+            }set
+            {
+                dependencyScope = value;
             }
         }
 
@@ -52,20 +57,27 @@ namespace OOBehave.Portal.Core
         /// disposed at the end of the Portal Operation
         /// </summary>
         public IServiceScope TargetScope { get; set; }
+        public uint UniqueId { get; }
 
-        public bool IsInUsing { get; set; } = false;
+        public void BeginDependencyScope()
+        {
+            if(dependencyScope != null)
+            {
+                throw new Exception("PortalScope should be disposed before being used again.");
+            }
 
+            dependencyScope = TargetScope.BeginNewScope("DependencyScope");
+            var ps = dependencyScope.Resolve<IPortalScope>();
+            ps.TargetScope = TargetScope;
+            ps.DependencyScope = dependencyScope; // Feels weird
+        }
         public void Dispose()
         {
-            
+
             // TODO : Make PortalScope not externally owned for safety or don't allow it to be used outside of OOBehave
-            if(!IsInUsing) { throw new Exception("PortalScope should not be disposed before being used in a using(PortalScope). For example in AutoFac use ExternallyOwned"); }
-            if (dependencyScope != null)
-            {
-                dependencyScope.Dispose();
-                dependencyScope = null;
-                IsInUsing = false;
-            }
+            if (dependencyScope == null) { throw new Exception("PortalScope should not be disposed before being used in a using(PortalScope). For example in AutoFac use ExternallyOwned"); }
+            dependencyScope.Dispose();
+            dependencyScope = null;
         }
 
     }
@@ -98,7 +110,6 @@ namespace OOBehave.Portal.Core
         {
             get
             {
-                var scope = PortalScope.DependencyScope ?? throw new Exception($"PortalOperationScope must be called within a using(PortalOperationScope).");
                 return (IPortalOperationManager)PortalScope.DependencyScope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(ConcreteType));
             }
         }
@@ -117,11 +128,9 @@ namespace OOBehave.Portal.Core
             // Difficult Situation - Using Constructor Injected IObjectPortal's in the Portal Method
             // Need to be aware of both
 
-            if (!PortalScope.IsInUsing)
-            {
-                PortalScope.IsInUsing = true;
-                return PortalScope;
-            }
+
+            PortalScope.BeginDependencyScope();
+            return PortalScope;
 
             //if (alwaysNewScope)
             //{
@@ -137,7 +146,6 @@ namespace OOBehave.Portal.Core
 
             //    return newPortalScope;
             //}
-            return null;
         }
     }
 

@@ -22,6 +22,7 @@ namespace OOBehave
         bool IsDisposed { get; }
 
         object Tag { get; }
+        uint UniqueId { get; }
     }
 
 }
