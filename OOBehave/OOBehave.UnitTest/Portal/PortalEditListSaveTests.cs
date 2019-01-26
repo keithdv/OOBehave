@@ -13,7 +13,7 @@ namespace OOBehave.UnitTest.Portal
     public class PortalEditListSaveTests
     {
 
-        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
+        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest);
         private ISendReceivePortal<IEditObjectList> portal;
         private IEditObjectList list;
         private IEditObject child;

@@ -17,7 +17,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         IValidateObject target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        FatClientContractResolver resolver;
+        private INewtonsoftJsonSerializer serializer;
 
         [TestInitialize]
         public void TestInitailize()
@@ -26,8 +26,19 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             target = scope.Resolve<IValidateObject>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<FatClientContractResolver>();
+            serializer = scope.Resolve<INewtonsoftJsonSerializer>();
         }
+
+        private string Serialize(object target)
+        {
+            return serializer.Serialize(target);
+        }
+
+        private IValidateObject Deserialize(string json)
+        {
+            return serializer.Deserialize<IValidateObject>(json);
+        }
+
 
         [TestMethod]
         public void FatClientValidate_Serialize()
@@ -37,31 +48,6 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
 
             Assert.IsTrue(result.Contains(Id.ToString()));
             Assert.IsTrue(result.Contains(Name));
-        }
-
-        private string Serialize(object target)
-        {
-            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-
-            });
-        }
-
-        private IValidateObject Deserialize(string json)
-        {
-            return JsonConvert.DeserializeObject<IValidateObject>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-
-            });
         }
 
         [TestMethod]

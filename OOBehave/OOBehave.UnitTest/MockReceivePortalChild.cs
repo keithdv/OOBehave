@@ -88,9 +88,9 @@ namespace OOBehave.UnitTest
             return MockPortal.Object.FetchChild(new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
 
-        public IPortalScope PortalOperationScope()
+        public IServiceScope UsingOperationScope()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

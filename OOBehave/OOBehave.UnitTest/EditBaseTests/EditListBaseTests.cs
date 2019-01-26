@@ -23,7 +23,7 @@ namespace OOBehave.UnitTest.EditBaseTests
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope();
+            scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.NoPortal);
             var parentDto = scope.Resolve<IReadOnlyList<PersonDto>>().Where(p => !p.FatherId.HasValue && !p.MotherId.HasValue).First();
 
             list = scope.Resolve<IEditPersonList>();

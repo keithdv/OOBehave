@@ -121,7 +121,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope(true);
+            scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest);
             portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedObject>>();
         }
 

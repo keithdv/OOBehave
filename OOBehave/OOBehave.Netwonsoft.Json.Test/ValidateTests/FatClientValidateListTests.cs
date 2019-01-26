@@ -18,7 +18,7 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
         IValidateObject child;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        FatClientContractResolver resolver;
+        private INewtonsoftJsonSerializer serializer;
 
         [TestInitialize]
         public void TestInitailize()
@@ -27,13 +27,24 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             target = scope.Resolve<IValidateObjectList>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<FatClientContractResolver>();
 
             child = scope.Resolve<IValidateObject>();
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
             target.Add(child);
+            serializer = scope.Resolve<INewtonsoftJsonSerializer>();
         }
+
+        private string Serialize(object target)
+        {
+            return serializer.Serialize(target);
+        }
+
+        private IValidateObjectList Deserialize(string json)
+        {
+            return serializer.Deserialize<IValidateObjectList>(json);
+        }
+
 
         [TestMethod]
         public void FatClientListValidate_Serialize()
@@ -55,28 +66,6 @@ namespace OOBehave.Netwonsoft.Json.Test.ValidateTests
             Assert.IsTrue(result.Contains("Error")); // Weak check
         }
 
-        private string Serialize(object target)
-        {
-            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
-        }
-
-        private IValidateObjectList Deserialize(string json)
-        {
-            return JsonConvert.DeserializeObject<IValidateObjectList>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
-        }
 
         [TestMethod]
         public void FatClientListValidate_Deserialize()

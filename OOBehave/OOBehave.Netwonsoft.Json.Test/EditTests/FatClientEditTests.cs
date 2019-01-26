@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using OOBehave.Newtonsoft.Json;
 using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         IEditObject target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        FatClientContractResolver resolver;
+        private INewtonsoftJsonSerializer serializer;
 
         [TestInitialize]
         public void TestInitailize()
@@ -26,29 +27,19 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             target = scope.Resolve<IEditObject>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<FatClientContractResolver>();
+            serializer = scope.Resolve<INewtonsoftJsonSerializer>();
         }
 
         private string Serialize(object target)
         {
-            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented
-            });
+            return serializer.Serialize(target);
         }
 
         private IEditObject Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<IEditObject>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All
-            });
+            return serializer.Deserialize<IEditObject>(json);
         }
+
 
         [TestMethod]
         public void FatClientEdit_Serialize()

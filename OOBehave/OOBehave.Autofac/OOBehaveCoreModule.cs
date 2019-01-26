@@ -17,7 +17,19 @@ namespace OOBehave.Autofac
 {
     public enum Portal
     {
-        NoPortal, Client, Local
+        NoPortal, Client,
+
+        /// <summary>
+        /// Request / Response - Scope per request expected.
+        /// No management of Scope - use single scope thru entire Portal operation
+        /// </summary>
+        Server,
+
+        /// <summary>
+        /// Scope per unit test expected
+        /// No management of Scope - use single scope thru entire Portal operation
+        /// </summary>
+        UnitTest, Client2Tier
     }
 
     public class OOBehaveCoreModule : Module
@@ -39,7 +51,6 @@ namespace OOBehave.Autofac
 
             // Scope Wrapper
             builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
-            builder.RegisterType<PortalScope>().As<IPortalScope>().InstancePerLifetimeScope().ExternallyOwned();
 
 
             // Meta Data about the properties and methods of Classes
@@ -65,7 +76,7 @@ namespace OOBehave.Autofac
                 var scope = cc.Resolve<Func<ILifetimeScope>>();
                 return (propertyInfo) =>
                 {
-                    return (IRegisteredProperty) scope().Resolve(typeof(IRegisteredProperty<>).MakeGenericType(propertyInfo.PropertyType), new TypedParameter(typeof(System.Reflection.PropertyInfo), propertyInfo));
+                    return (IRegisteredProperty)scope().Resolve(typeof(IRegisteredProperty<>).MakeGenericType(propertyInfo.PropertyType), new TypedParameter(typeof(System.Reflection.PropertyInfo), propertyInfo));
                 };
             });
 
@@ -105,21 +116,39 @@ namespace OOBehave.Autofac
             builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>)).AsSelf();
             builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>)).AsSelf();
 
-            if (Portal == Portal.Local)
+            if (Portal == Portal.Server || Portal == Portal.UnitTest)
             {
                 // Takes IServiceScope so these need to match it's lifetime
-                builder.RegisterGeneric(typeof(LocalReceivePortal<>))
+                builder.RegisterGeneric(typeof(ServerReceivePortal<>))
                     .As(typeof(IReceivePortal<>))
                     .As(typeof(IReceivePortalChild<>))
                     .InstancePerLifetimeScope();
 
-                builder.RegisterGeneric(typeof(LocalSendReceivePortal<>))
+                builder.RegisterGeneric(typeof(ServerSendReceivePortal<>))
                     .As(typeof(ISendReceivePortal<>))
                     .As(typeof(ISendReceivePortalChild<>))
                     .InstancePerLifetimeScope();
 
-                builder.RegisterGeneric(typeof(LocalMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
+                builder.RegisterGeneric(typeof(ServerMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
             }
+            else if (Portal == Portal.Client2Tier)
+            {
+
+                // Takes IServiceScope so these need to match it's lifetime
+                builder.RegisterGeneric(typeof(Client2TierReceivePortal<>))
+                    .As(typeof(IReceivePortal<>))
+                    .As(typeof(IReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
+
+                builder.RegisterGeneric(typeof(Client2TierSendReceivePortal<>))
+                    .As(typeof(ISendReceivePortal<>))
+                    .As(typeof(ISendReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
+
+                // For now
+                builder.RegisterGeneric(typeof(Client2TierMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
+            }
+
 
             // Simple wrapper - Always InstancePerDependency
             builder.RegisterGeneric(typeof(BaseServices<>)).As(typeof(IBaseServices<>));

@@ -18,7 +18,7 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
         IEditObjectList target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        FatClientContractResolver resolver;
+        private INewtonsoftJsonSerializer serializer;
 
         [TestInitialize]
         public void TestInitailize()
@@ -27,31 +27,18 @@ namespace OOBehave.Netwonsoft.Json.Test.EditTests
             target = scope.Resolve<IEditObjectList>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<FatClientContractResolver>();
+            serializer = scope.Resolve<INewtonsoftJsonSerializer>();
+
         }
 
         private string Serialize(object target)
         {
-            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
+            return serializer.Serialize(target);
         }
 
         private IEditObjectList Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<IEditObjectList>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
+            return serializer.Deserialize<IEditObjectList>(json);
         }
 
         [TestMethod]

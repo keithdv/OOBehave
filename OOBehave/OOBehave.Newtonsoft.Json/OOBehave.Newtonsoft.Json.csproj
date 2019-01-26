@@ -1,7 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>0.1.2-Beta</Version>
+    <Authors>Keith Voels</Authors>
+    <Description>Serilization library for distributed computing with OOBehave</Description>
+    <Copyright>2019</Copyright>
+    <PackageLicenseUrl>https://github.com/keithdv/OOBehave/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>http://oobehave.net</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/keithdv/OOBehave/blob/master/OOBehave/Logo.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/keithdv/OOBehave</RepositoryUrl>
+    <PackageTags>OOBehave CSLA Newtonsoft</PackageTags>
+    <AssemblyVersion>0.1.2.0</AssemblyVersion>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +24,9 @@
   <ItemGroup>
     <ProjectReference Include="..\OOBehave\OOBehave.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy .\bin\debug\*.nupkg ..\OutPackages\ /y /d" />
+  </Target>
 
 </Project>

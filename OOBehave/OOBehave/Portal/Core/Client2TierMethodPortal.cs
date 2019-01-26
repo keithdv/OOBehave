@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Portal.Core
 {
-    public class LocalMethodPortal<D> : IRemoteMethodPortal<D> where D : Delegate
+    public class Client2TierMethodPortal<D> : IRemoteMethodPortal<D> where D : Delegate
     {
 
-        public LocalMethodPortal(IServiceScope scope)
+        public Client2TierMethodPortal(IServiceScope scope)
         {
             Scope = scope;
         }
@@ -17,9 +17,8 @@ namespace OOBehave.Portal.Core
 
         public async Task<T> Execute<T>(params object[] p)
         {
-
             // Execute methods get their own scope
-            using (var scope = Scope.BeginNewScope("DependencyScope"))
+            using (var scope = Scope.BeginNewScope())
             {
                 var method = (D)scope.Resolve(typeof(D));
                 var result = method.Method.Invoke(method.Target, p);

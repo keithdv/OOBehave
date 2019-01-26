@@ -17,8 +17,8 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
         IBaseObjectList target;
         Guid Id = Guid.NewGuid();
         string Name = Guid.NewGuid().ToString();
-        FatClientContractResolver resolver;
         IBaseObject child;
+        private INewtonsoftJsonSerializer serializer;
 
         [TestInitialize]
         public void TestInitailize()
@@ -27,35 +27,23 @@ namespace OOBehave.Netwonsoft.Json.Test.BaseTests
             target = scope.Resolve<IBaseObjectList>();
             target.ID = Id;
             target.Name = Name;
-            resolver = scope.Resolve<FatClientContractResolver>();
 
             child = scope.Resolve<IBaseObject>();
             child.ID = Guid.NewGuid();
             child.Name = Guid.NewGuid().ToString();
             target.Add(child);
+            serializer = scope.Resolve<INewtonsoftJsonSerializer>();
+
         }
 
         private string Serialize(object target)
         {
-            return JsonConvert.SerializeObject(target, new JsonSerializerSettings()
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
+            return serializer.Serialize(target);
         }
 
         private IBaseObjectList Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<IBaseObjectList>(json, new JsonSerializerSettings
-            {
-                ContractResolver = resolver,
-                TypeNameHandling = TypeNameHandling.All,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                Converters = new List<JsonConverter>() { scope.Resolve<ListBaseCollectionConverter>() }
-            });
+            return serializer.Deserialize<IBaseObjectList>(json);
         }
 
         [TestMethod]

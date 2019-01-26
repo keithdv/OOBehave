@@ -8,145 +8,23 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Portal.Core
 {
-    public interface IPortalScope : IDisposable
-    {
-        IServiceScope DependencyScope { get; set; }
-        IServiceScope TargetScope { get; set; }
-        void BeginDependencyScope();
-        uint UniqueId { get; }
-    }
-
-    public class PortalScope : IPortalScope
-    {
-        private static uint uniqueIdCount = 0;
-
-        public PortalScope(IServiceScope scope)
-        {
-            if (scope.Tag.ToString() != "Target")
-            {
-                //throw new Exception(scope.Tag.ToString());
-            }
-
-            TargetScope = scope;
-            UniqueId = uniqueIdCount++;
-
-        }
-
-        private IServiceScope dependencyScope;
-        /// <summary>
-        /// Used for Method Injected Dependencies
-        /// Gets Disposed at end of Portal Operation
-        /// </summary>
-        public IServiceScope DependencyScope
-        {
-            get
-            {
-                if (dependencyScope == null)
-                {
-                    throw new Exception("BegineDependencyScope should be called before DependencyScope is used");
-                }
-                return dependencyScope;
-            }set
-            {
-                dependencyScope = value;
-            }
-        }
-
-        /// <summary>
-        /// Used to resolve Target so that the Constructor Injection dependencies are not 
-        /// disposed at the end of the Portal Operation
-        /// </summary>
-        public IServiceScope TargetScope { get; set; }
-        public uint UniqueId { get; }
-
-        public void BeginDependencyScope()
-        {
-            if(dependencyScope != null)
-            {
-                throw new Exception("PortalScope should be disposed before being used again.");
-            }
-
-            dependencyScope = TargetScope.BeginNewScope("DependencyScope");
-            var ps = dependencyScope.Resolve<IPortalScope>();
-            ps.TargetScope = TargetScope;
-            ps.DependencyScope = dependencyScope; // Feels weird
-        }
-        public void Dispose()
-        {
-
-            // TODO : Make PortalScope not externally owned for safety or don't allow it to be used outside of OOBehave
-            if (dependencyScope == null) { throw new Exception("PortalScope should not be disposed before being used in a using(PortalScope). For example in AutoFac use ExternallyOwned"); }
-            dependencyScope.Dispose();
-            dependencyScope = null;
-        }
-
-    }
 
     public class ObjectPortalBase
     {
-        public ObjectPortalBase(IPortalScope scope, Type type)
-        {
-            PortalScope = scope;
+        protected static AsyncLocal<IServiceScope> dependencyScope { get; } = new AsyncLocal<IServiceScope>();
 
-            if (type.IsInterface)
-            {
-                // To find the static method this needs to be the concrete type
-                ConcreteType = scope.TargetScope.ConcreteType(type) ?? throw new Exception($"Type {type.FullName} is not registered");
-            }
-            else
-            {
-                ConcreteType = type;
-            }
+        protected IServiceScope DependencyScope
+        {
+            get { return dependencyScope.Value ?? throw new Exception("Must be called within a using(UsingDependencyScope) first."); }
         }
 
-        /// <summary>
-        /// Resolve the Target Objects - Never Dispose
-        /// </summary>
-        protected IPortalScope PortalScope { get; private set; }
-        public Func<IPortalScope> CreatePortalScope { get; }
-        public Type ConcreteType { get; }
+        protected static AsyncLocal<IServiceScope> targetScope { get; } = new AsyncLocal<IServiceScope>();
 
-        protected IPortalOperationManager OperationManager
+        protected IServiceScope TargetScope
         {
-            get
-            {
-                return (IPortalOperationManager)PortalScope.DependencyScope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(ConcreteType));
-            }
+            get { return targetScope.Value ?? throw new Exception("Must call within a using(UsingDependencyScope) first."); }
         }
 
-        /// <summary>
-        /// Dispose Portal Operation Scope at the right Moment
-        /// Null except for the parent operation
-        /// </summary>
-        public IPortalScope PortalOperationScope()
-        {
-            // Difficult Situation
-            // Do no want the constructor injected services to be disposed at the end of the portal methods
-            // But we do want the method injected services to the portal methods to be disposed
-            // So pass along the target scope that will to resolve new instances of Base<> objects
-
-            // Difficult Situation - Using Constructor Injected IObjectPortal's in the Portal Method
-            // Need to be aware of both
-
-
-            PortalScope.BeginDependencyScope();
-            return PortalScope;
-
-            //if (alwaysNewScope)
-            //{
-
-            //    var scope = PortalScope.TargetScope.BeginNewScope("DependencyScope");
-            //    var newPortalScope = scope.Resolve<IPortalScope>();
-
-            //    // Scope used to create targets and do constructur injection cannot be disposed
-            //    // Must be passed along
-            //    newPortalScope.TargetScope = PortalScope.TargetScope;
-
-            //    PortalScope.DependencyScope = scope;
-
-            //    return newPortalScope;
-            //}
-        }
     }
 
     /// <summary>
@@ -157,12 +35,57 @@ namespace OOBehave.Portal.Core
         where T : IPortalTarget
     {
 
-
-        public ObjectPortalBase(IPortalScope portalScope) : base(portalScope, typeof(T))
+        public ObjectPortalBase(IServiceScope scope)
         {
 
+            var type = typeof(T);
+
+            if (type.IsInterface)
+            {
+                // To find the static method this needs to be the concrete type
+                ConcreteType = scope.ConcreteType(type) ?? throw new Exception($"Type {type.FullName} is not registered");
+            }
+            else
+            {
+                ConcreteType = type;
+            }
         }
 
+        public Type ConcreteType { get; }
+
+        public virtual IServiceScope UsingOperationScope()
+        {
+            return null;
+        }
+
+        protected virtual IPortalOperationManager OperationManager(IServiceScope scope)
+        {
+            return (IPortalOperationManager)scope.Resolve(typeof(IPortalOperationManager<>).MakeGenericType(ConcreteType));
+        }
+
+        protected virtual async Task CallOperationMethod(IServiceScope scope, T target, PortalOperation operation, bool throwException = true)
+        {
+            var success = await OperationManager(scope).TryCallOperation(target, operation).ConfigureAwait(false);
+
+            if (!success && throwException)
+            {
+                throw new OperationMethodCallFailedException($"{operation.ToString()} method with no criteria not found on {target.GetType().FullName}.");
+            }
+        }
+
+
+        protected virtual async Task CallOperationMethod(IServiceScope scope, T target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
+        {
+            if (target == null) { throw new ArgumentNullException(nameof(target)); }
+            if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }
+
+            var success = await OperationManager(scope).TryCallOperation(target, operation, criteria, criteriaTypes).ConfigureAwait(false);
+
+            if (!success)
+            {
+                throw new OperationMethodCallFailedException($"{operation.ToString()} method on {target.GetType().FullName} with criteria [{string.Join(", ", criteriaTypes.Select(x => x.FullName))}] not found.");
+            }
+        }
     }
 
 }

@@ -34,13 +34,15 @@ namespace OOBehave.Netwonsoft.Json.Test
                 var builder = new ContainerBuilder();
 
                 // Run first - some of these definition need to be modified
-                builder.RegisterModule(new OOBehaveCoreModule(Autofac.Portal.Local));
+                builder.RegisterModule(new OOBehaveCoreModule(Autofac.Portal.Server));
 
                 builder.AutoRegisterAssemblyTypes(Assembly.GetExecutingAssembly());
 
                 // Newtonsoft.Json
                 builder.RegisterType<FatClientContractResolver>();
                 builder.RegisterType<ListBaseCollectionConverter>();
+
+                builder.RegisterType<NewtonsoftJsonSerializer>().As<INewtonsoftJsonSerializer>();
 
                 builder.RegisterType<DisposableDependencyList>();
                 builder.RegisterType<DisposableDependency>().As<IDisposableDependency>().InstancePerLifetimeScope();

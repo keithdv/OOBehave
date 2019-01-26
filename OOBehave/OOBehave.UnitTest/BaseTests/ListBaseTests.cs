@@ -18,7 +18,7 @@ namespace OOBehave.UnitTest.BaseTests
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope();
+            scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.NoPortal);
             list = scope.Resolve<IBaseObjectList>();
         }
 

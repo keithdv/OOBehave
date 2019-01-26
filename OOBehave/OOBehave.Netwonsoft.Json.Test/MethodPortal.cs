@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using OOBehave.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -76,36 +77,18 @@ namespace OOBehave.Netwonsoft.Json.Test
         {
 
             var client = scope.Resolve<IRemoteMethod<MethodObject.CommandMethod, int, int>>();
-
+            var serializer = scope.Resolve<INewtonsoftJsonSerializer>();
             client.Param = 10;
 
-            var sendJson = JsonConvert.SerializeObject(client, new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All,
-                Formatting = Formatting.Indented,
-                ContractResolver = scope.Resolve<FatClientContractResolver>()
-            });
+            var sendJson = serializer.Serialize(client);
 
-            var server = JsonConvert.DeserializeObject<IRemoteMethod>(sendJson, new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = scope.Resolve<FatClientContractResolver>()
-            });
+            var server = serializer.Deserialize<IRemoteMethod>(sendJson);
 
             server.Execute();
 
-            var returnJson = JsonConvert.SerializeObject(server, new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All,
-                Formatting = Formatting.Indented,
-                ContractResolver = scope.Resolve<FatClientContractResolver>()
-            });
+            var returnJson = serializer.Serialize(server);
 
-            var clientResult = JsonConvert.DeserializeObject<IRemoteMethod<MethodObject.CommandMethod, int, int>>(returnJson, new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = scope.Resolve<FatClientContractResolver>()
-            });
+            var clientResult = serializer.Deserialize<IRemoteMethod<MethodObject.CommandMethod, int, int>>(returnJson);
 
         }
 

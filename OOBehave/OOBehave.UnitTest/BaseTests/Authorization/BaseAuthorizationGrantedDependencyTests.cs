@@ -118,22 +118,19 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
 
         ILifetimeScope scope;
         IReceivePortal<IBaseAuthorizationGrantedDependencyObject> portal;
-        private IServiceScope dependencyScope;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope(true);
+            scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest);
             portal = scope.Resolve<IReceivePortal<IBaseAuthorizationGrantedDependencyObject>>();
-            var ps = portal.PortalOperationScope();
-            dependencyScope = ps.DependencyScope;
         }
 
         [TestMethod]
         public async Task BaseAuthorization_Create()
         {
             var obj = await portal.Create();
-            var authRule = dependencyScope.Resolve<IAuthorizationGrantedDependencyRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedDependencyRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
         }
 
@@ -142,7 +139,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Create(criteria);
-            var authRule = dependencyScope.Resolve<IAuthorizationGrantedDependencyRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedDependencyRule>();
             Assert.IsTrue(authRule.ExecuteCreateCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }
@@ -151,7 +148,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         public async Task BaseAuthorization_Fetch()
         {
             var obj = await portal.Fetch();
-            var authRule = dependencyScope.Resolve<IAuthorizationGrantedDependencyRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedDependencyRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
         }
 
@@ -160,7 +157,7 @@ namespace OOBehave.UnitTest.BaseTests.Authorization
         {
             var criteria = DateTime.Now.Millisecond;
             var obj = await portal.Fetch(criteria);
-            var authRule = dependencyScope.Resolve<IAuthorizationGrantedDependencyRule>();
+            var authRule = scope.Resolve<IAuthorizationGrantedDependencyRule>();
             Assert.IsTrue(authRule.ExecuteFetchCalled);
             Assert.AreEqual(criteria, authRule.Criteria);
         }

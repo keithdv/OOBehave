@@ -113,7 +113,7 @@ namespace OOBehave
             // CreateChild cannot define a scope 
             // Don't want any fallback to a new scope because the requirement is uses the parent scope
             // But here there is none - so define it
-            using (ItemPortal.PortalOperationScope())
+            using (ItemPortal.UsingOperationScope())
             {
                 var item = await ItemPortal.CreateChild().ConfigureAwait(false);
                 base.Add(item);

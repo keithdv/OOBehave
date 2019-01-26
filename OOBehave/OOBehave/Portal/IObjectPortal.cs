@@ -16,7 +16,7 @@ namespace OOBehave.Portal
         /// Advanced: Use at your own risk
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        IPortalScope PortalOperationScope();
+        IServiceScope UsingOperationScope();
 
         Task<T> Create();
         Task<T> Create<C0>(C0 criteria0);
@@ -46,7 +46,7 @@ namespace OOBehave.Portal
         /// Advanced: Use at your own risk
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        IPortalScope PortalOperationScope();
+        IServiceScope UsingOperationScope();
 
         Task<T> CreateChild();
         Task<T> CreateChild<C0>(C0 criteria0);

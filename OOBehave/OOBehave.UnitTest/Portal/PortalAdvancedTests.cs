@@ -15,7 +15,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     {
         IServiceScope MethodPortalScope { get; }
         Task<IAdvancedObject> FetchChild();
-        IPortalScope ConstPortalScope { get; }
+        IServiceScope ConstPortalScope { get; }
         IAdvancedObject Child { get; }
         IPortalOperationDisposableDependency PortalOperationDisposableDependency { get; }
         IConstructorDisposableDependency ConstructorDisposableDependency { get; }
@@ -23,7 +23,7 @@ namespace OOBehave.UnitTest.ObjectPortal
 
     public class AdvancedObject : ValidateBase<AdvancedObject>, IAdvancedObject
     {
-        public AdvancedObject(IValidateBaseServices<AdvancedObject> services, IReceivePortalChild<IAdvancedObject> constPortal, IPortalScope constPs, IConstructorDisposableDependency constructorDisposableDependency) : base(services)
+        public AdvancedObject(IValidateBaseServices<AdvancedObject> services, IReceivePortalChild<IAdvancedObject> constPortal, IServiceScope constPs, IConstructorDisposableDependency constructorDisposableDependency) : base(services)
         {
             ConstPortal = constPortal;
             ConstPortalScope = constPs;
@@ -31,7 +31,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         public IReceivePortalChild<IAdvancedObject> ConstPortal { get; }
-        public IPortalScope ConstPortalScope { get; }
+        public IServiceScope ConstPortalScope { get; }
         public IConstructorDisposableDependency ConstructorDisposableDependency { get; }
         public IServiceScope MethodPortalScope { get; private set; }
 
@@ -39,11 +39,11 @@ namespace OOBehave.UnitTest.ObjectPortal
 
         public IPortalOperationDisposableDependency PortalOperationDisposableDependency { get; set; }
         [Fetch]
-        public async Task Fetch(IPortalScope methodPs, IPortalOperationDisposableDependency portalOperationDisposableDependency)
+        public async Task Fetch(IServiceScope methodPs, IPortalOperationDisposableDependency portalOperationDisposableDependency)
         {
-            MethodPortalScope = methodPs.DependencyScope;
+            MethodPortalScope = methodPs;
             // Need MethodPortal and ConstPortal to have the same DependencyScope
-            Assert.AreEqual(methodPs.DependencyScope.UniqueId, ConstPortalScope.DependencyScope.UniqueId);
+            Assert.AreNotEqual(methodPs.UniqueId, ConstPortalScope.UniqueId);
             PortalOperationDisposableDependency = portalOperationDisposableDependency;
 
             // This is how Lists work
@@ -51,10 +51,10 @@ namespace OOBehave.UnitTest.ObjectPortal
         }
 
         [FetchChild]
-        public async Task FetchChild(IPortalScope methodPs, IPortalOperationDisposableDependency portalOperationDisposableDependency)
+        public async Task FetchChild(IServiceScope methodPs, IPortalOperationDisposableDependency portalOperationDisposableDependency)
         {
-            MethodPortalScope = methodPs.DependencyScope;
-            Assert.AreEqual(methodPs.DependencyScope.UniqueId, ConstPortalScope.DependencyScope.UniqueId);
+            MethodPortalScope = methodPs;
+            Assert.AreNotEqual(methodPs.UniqueId, ConstPortalScope.UniqueId);
             PortalOperationDisposableDependency = portalOperationDisposableDependency;
 
             await Task.Delay(10);
@@ -66,7 +66,7 @@ namespace OOBehave.UnitTest.ObjectPortal
             // This is required because "no sope create one" creates hidden issues
             // More scope than you mean to create get created by simple mistakes
             // ViewModels and services should always use the non-child operation anyways
-            using (ConstPortal.PortalOperationScope())
+            using (ConstPortal.UsingOperationScope())
             {
                 return await ConstPortal.FetchChild();
             }
@@ -79,16 +79,16 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task PortalAdvanced_Child()
         {
-            var scope = AutofacContainer.GetLifetimeScope(true).Resolve<IServiceScope>();
+            var scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.Client2Tier).Resolve<IServiceScope>();
             var portal = scope.Resolve<IReceivePortal<IAdvancedObject>>();
             var obj = await portal.Fetch();
 
             // TargetScope should be the scope that was used at the top operation
-            Assert.AreEqual(scope.UniqueId, obj.ConstPortalScope.TargetScope.UniqueId);
-            Assert.AreEqual(scope.UniqueId, obj.Child.ConstPortalScope.TargetScope.UniqueId);
+            Assert.AreEqual(scope.UniqueId, obj.ConstPortalScope.UniqueId);
+            Assert.AreEqual(scope.UniqueId, obj.Child.ConstPortalScope.UniqueId);
 
-            Assert.IsFalse(obj.ConstPortalScope.TargetScope.IsDisposed);
-            Assert.IsFalse(obj.ConstPortalScope.TargetScope.IsDisposed);
+            Assert.IsFalse(obj.ConstPortalScope.IsDisposed);
+            Assert.IsFalse(obj.ConstPortalScope.IsDisposed);
 
             Assert.IsFalse(obj.ConstructorDisposableDependency.IsDisposed);
             Assert.IsFalse(obj.Child.ConstructorDisposableDependency.IsDisposed);
@@ -104,7 +104,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task PortalAdvanced_2Tier_Parrallel()
         {
-            var scope = AutofacContainer.GetLifetimeScope(true);
+            var scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.Client2Tier);
 
             var portal = scope.Resolve<IReceivePortal<IAdvancedObject>>();
 
@@ -126,7 +126,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task PortalAdvanced_FetchChild()
         {
-            var scope = AutofacContainer.GetLifetimeScope(true);
+            var scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.Client2Tier);
             var portal = scope.Resolve<IReceivePortal<IAdvancedObject>>();
             var obj = await portal.Fetch();
 

@@ -14,7 +14,7 @@ namespace OOBehave.UnitTest.ObjectPortal
     [TestClass]
     public class ReceivePortalListTests
     {
-        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(true);
+        private ILifetimeScope scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest);
         private IReceivePortal<IBaseObjectList> portal;
         private IBaseObjectList list;
 
@@ -54,7 +54,7 @@ namespace OOBehave.UnitTest.ObjectPortal
         [TestMethod]
         public async Task ReceivePortalList_AsyncronousScope()
         {
-            using (var s = AutofacContainer.GetLifetimeScope(true))
+            using (var s = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest))
             {
                 portal = s.Resolve<IReceivePortal<IBaseObjectList>>();
                 var crit = Guid.NewGuid();

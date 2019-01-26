@@ -17,15 +17,13 @@ namespace OOBehave.UnitTest.Objects
     {
         public PortalOperationDisposableDependency(IServiceScope scope, PortalOperationDisposableDependencyList list)
         {
-            if (scope.Tag.ToString() != "DependencyScope")
-            {
-                throw new Exception("Yes!");
-            }
             list.Add(this);
+            ScopeId = scope.UniqueId;
         }
 
         public Guid UniqueId { get; } = Guid.NewGuid();
         public bool IsDisposed { get; set; } = false;
+        public uint ScopeId { get; }
 
         public void Dispose()
         {

@@ -47,18 +47,18 @@ namespace OOBehave.UnitTest.Portal
     }
 
     [TestClass]
-    public class LocalMethodPortalTests
+    public class ServerMethodPortalTests
     {
         private ILifetimeScope scope;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            scope = AutofacContainer.GetLifetimeScope(true);
+            scope = AutofacContainer.GetLifetimeScope(Autofac.Portal.UnitTest);
         }
 
         [TestMethod]
-        public async Task LocalMethodPortal_ExecuteServer()
+        public async Task ServerMethodPortal_ExecuteServer()
         {
             // Hide the fact that there is a remote call from the client
             var methodObject = scope.Resolve<IMethodObject>();
@@ -69,9 +69,9 @@ namespace OOBehave.UnitTest.Portal
         }
 
         [TestMethod]
-        public async Task LocalMethodPortal_Execute()
+        public async Task ServerMethodPortal_Execute()
         {
-            var portal = scope.Resolve<LocalMethodPortal<MethodObject.Execute>>();
+            var portal = scope.Resolve<ServerMethodPortal<MethodObject.Execute>>();
 
             var result = await portal.Execute<int>(10);
 
