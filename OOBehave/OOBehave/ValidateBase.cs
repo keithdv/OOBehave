@@ -26,8 +26,9 @@ namespace OOBehave
         Task CheckAllRules(CancellationToken token = new CancellationToken());
         Task CheckAllSelfRules(CancellationToken token = new CancellationToken());
         IRuleResultReadOnlyList RuleResultList { get; }
-
-        IEnumerable<string> BrokenRuleMessages { get; }
+        
+        [EditorBrowsable(EditorBrowsableState.Advanced)] // Don't do this every time we hover over
+        IReadOnlyList<string> BrokenRuleMessages { get; }
 
         IValidatePropertyMeta this[string propertyName] { get; }
 
@@ -135,7 +136,7 @@ namespace OOBehave
 
         public IRuleResultReadOnlyList RuleResultList => RuleManager.Results;
 
-        public IEnumerable<string> BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value);
+        public IReadOnlyList<string> BrokenRuleMessages => RuleManager.Results.Where(x => x.IsError).SelectMany(x => x.PropertyErrorMessages).Select(x => x.Value).ToList().AsReadOnly();
 
         string IDataErrorInfo.Error
         {

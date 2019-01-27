@@ -1,12 +1,15 @@
 ﻿using OOBehave.Portal;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace OOBehave
 {
     public interface IEditBase : IValidateBase, IEditMetaProperties, IPortalEditTarget
     {
-        IEnumerable<string> ModifiedProperties { get; }
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        IReadOnlyList<string> ModifiedProperties { get; }
+
         bool IsChild { get; }
 
         /// <summary>

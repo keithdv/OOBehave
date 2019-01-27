@@ -74,7 +74,7 @@ namespace OOBehave.Portal.Core
         }
 
 
-        protected virtual async Task CallOperationMethod(IServiceScope scope, T target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
+        public virtual async Task CallOperationMethod(IServiceScope scope, T target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
         {
             if (target == null) { throw new ArgumentNullException(nameof(target)); }
             if (criteria == null) { throw new ArgumentNullException(nameof(criteria)); }

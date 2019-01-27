@@ -42,7 +42,7 @@ namespace OOBehave.Netwonsoft.Json.Test
                 builder.RegisterType<FatClientContractResolver>();
                 builder.RegisterType<ListBaseCollectionConverter>();
 
-                builder.RegisterType<NewtonsoftJsonSerializer>().As<INewtonsoftJsonSerializer>();
+                builder.RegisterType<NewtonsoftJsonSerializer>().As<INewtonsoftJsonSerializer>().As<ISerializer>();
 
                 builder.RegisterType<DisposableDependencyList>();
                 builder.RegisterType<DisposableDependency>().As<IDisposableDependency>().InstancePerLifetimeScope();

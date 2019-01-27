@@ -116,6 +116,8 @@ namespace OOBehave.Autofac
             builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>)).AsSelf();
             builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>)).AsSelf();
 
+            builder.RegisterType<Zip>().As<IZip>().SingleInstance();    
+
             if (Portal == Portal.Server || Portal == Portal.UnitTest)
             {
                 // Takes IServiceScope so these need to match it's lifetime
@@ -147,6 +149,19 @@ namespace OOBehave.Autofac
 
                 // For now
                 builder.RegisterGeneric(typeof(Client2TierMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
+            }
+            else if (Portal == Portal.Client)
+            {
+                builder.RegisterGeneric(typeof(ClientReceivePortal<>))
+                    .As(typeof(IReceivePortal<>))
+                    .As(typeof(IReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
+
+                builder.RegisterGeneric(typeof(ClientSendReceivePortal<>))
+                    .As(typeof(ISendReceivePortal<>))
+                    .As(typeof(ISendReceivePortalChild<>))
+                    .InstancePerLifetimeScope();
+
             }
 
 

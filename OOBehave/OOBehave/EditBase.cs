@@ -28,7 +28,7 @@ namespace OOBehave
         public bool IsNew { get; protected set; }
         [PortalDataMember]
         public bool IsDeleted { get; protected set; }
-        public IEnumerable<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
+        public IReadOnlyList<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
         [PortalDataMember]
         public bool IsChild { get; protected set; }
         protected ISendReceivePortal<T> SendReceivePortal { get; }

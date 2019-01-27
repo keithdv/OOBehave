@@ -13,7 +13,7 @@ namespace OOBehave.Core
         bool IsModified { get; }
         bool IsSelfModified { get; }
 
-        IEnumerable<string> ModifiedProperties { get; }
+        IReadOnlyList<string> ModifiedProperties { get; }
         void MarkSelfUnmodified();
     }
 
@@ -87,7 +87,7 @@ namespace OOBehave.Core
         public bool IsModified => fieldData.Values.Any(p => p.IsModified);
         public bool IsSelfModified => fieldData.Values.Any(p => p.IsSelfModified);
 
-        public IEnumerable<string> ModifiedProperties => fieldData.Values.Where(f => f.IsModified).Select(f => f.Name);
+        public IReadOnlyList<string> ModifiedProperties => fieldData.Values.Where(f => f.IsModified).Select(f => f.Name).ToList().AsReadOnly();
 
         public CreateEditPropertyValue CreateEditPropertyValue { get; }
 

@@ -43,7 +43,7 @@ namespace OOBehave
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
         public bool IsNew { get; protected set; }
         public bool IsDeleted { get; protected set; }
-        public IEnumerable<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
+        public IReadOnlyList<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;
         public bool IsChild { get; protected set; }
         protected List<I> DeletedList { get; } = new List<I>();
 

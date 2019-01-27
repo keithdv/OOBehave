@@ -1,24 +1,39 @@
-﻿using OOBehave.AuthorizationRules;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OOBehave.Portal.Core
 {
-
-
-    public class ServerReceivePortal<T> : ObjectPortalBase<T>, IReceivePortal<T>, IReceivePortalChild<T>
-        where T : IPortalTarget
+    public class ClientReceivePortal<T> : IReceivePortal<T>, IReceivePortalChild<T>
+        where T : class, IPortalTarget
     {
-        public IServiceScope Scope { get; }
 
-        public ServerReceivePortal(IServiceScope scope) : base(scope)
+        public ClientReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress)
         {
-            Scope = scope;
+            Serializer = serializer;
+            Compress = compress;
+
+            var type = typeof(T);
+
+            if (type.IsInterface)
+            {
+                // To find the static method this needs to be the concrete type
+                ConcreteType = scope.ConcreteType(type) ?? throw new Exception($"Type {type.FullName} is not registered");
+            }
+            else
+            {
+                ConcreteType = type;
+            }
         }
+
+        public Type ConcreteType { get; }
+
+        public IServiceScope UsingOperationScope() { return null; }
+
+        public ISerializer Serializer { get; }
+        public IZip Compress { get; }
 
         public async Task<T> Create()
         {
@@ -165,33 +180,89 @@ namespace OOBehave.Portal.Core
             return CallOperationMethod(PortalOperation.FetchChild, new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 }, new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) });
         }
 
-        protected async Task<T> CallOperationMethod(PortalOperation operation, bool throwException = true)
+        protected static HttpClient httpClient = new HttpClient();
+
+        protected virtual HttpClient HttpClient => httpClient;
+
+
+        protected Task<T> CallOperationMethod(PortalOperation operation, bool throwException = true)
         {
-            var target = Scope.Resolve<T>();
-            await CallOperationMethod(Scope, target, operation, throwException).ConfigureAwait(false);
-            return target;
+            return CallOperationMethod(operation, null, null, null, throwException);
         }
-
-
-        protected async Task<T> CallOperationMethod(PortalOperation operation, object[] criteria, Type[] criteriaTypes)
+        protected Task<T> CallOperationMethod(PortalOperation operation, object[] criteria, Type[] criteriaType, bool throwException = true)
         {
-            var target = Scope.Resolve<T>();
-            await CallOperationMethod(Scope, target, operation, criteria, criteriaTypes).ConfigureAwait(false);
-            return target;
+            return CallOperationMethod(operation, null, criteria, criteriaType, throwException);
         }
+        protected async Task<T> CallOperationMethod(PortalOperation operation, T target, object[] criteria, Type[] criteriaType, bool throwException = true)
+        {
 
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:52985/api/portal"))
+            {
 
+                var portalRequest = new PortalRequest() { Operation = operation, ObjectType = ConcreteType };
+
+                if (target != null)
+                {
+                    portalRequest.ObjectData = Compress.Compress(Serializer.Serialize(target));
+                }
+
+                if (criteria != null)
+                {
+
+                    Dictionary<Type, byte[]> criteriaData = new Dictionary<Type, byte[]>();
+
+                    for (var i = 0; i < criteria.Length; i++)
+                    {
+                        var data = Compress.Compress(Serializer.Serialize(criteria[i]));
+                        criteriaData.Add(criteriaType[i], data);
+                    }
+
+                    portalRequest.CriteriaData = criteriaData;
+
+                }
+
+                httpRequest.Content = new StringContent(Serializer.Serialize(portalRequest), System.Text.Encoding.UTF8, "application/json");
+
+                var httpResponse = await HttpClient.SendAsync(httpRequest);
+
+                httpResponse.EnsureSuccessStatusCode();
+
+                var response = Serializer.Deserialize<PortalResponse>(await httpResponse.Content.ReadAsStringAsync());
+
+                T obj = null;
+
+                if (response.ObjectData != null)
+                {
+                    if (target != null)
+                    {
+                        Serializer.Populate(Compress.Decompress(response.ObjectData), target);
+                    }
+                    else
+                    {
+                        obj = Serializer.Deserialize<T>(Compress.Decompress(response.ObjectData));
+                    }
+                }
+
+                return obj;
+            }
+        }
     }
 
-
-    public class ServerSendReceivePortal<T> : ServerReceivePortal<T>, ISendReceivePortal<T>, ISendReceivePortalChild<T>
-        where T : IPortalEditTarget, IEditMetaProperties
+    public class ClientSendReceivePortal<T> : ClientReceivePortal<T>, ISendReceivePortal<T>, ISendReceivePortalChild<T>
+        where T : class, IPortalEditTarget, IEditMetaProperties
     {
-
-        public ServerSendReceivePortal(IServiceScope scope)
-            : base(scope)
+        public ClientSendReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress) : base(scope, serializer, compress)
         {
+        }
 
+        public async Task CallOperationMethod(T target, PortalOperation operation)
+        {
+            var newT = await base.CallOperationMethod(operation, target, null, null, true).ConfigureAwait(false);
+        }
+
+        public async Task CallOperationMethod(T target, PortalOperation operation, object[] criteria, Type[] criteriaType)
+        {
+            var newT = await base.CallOperationMethod(operation, target, criteria, criteriaType, true).ConfigureAwait(false);
         }
 
         public async Task Update(T target)
@@ -200,17 +271,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update).ConfigureAwait(false);
             }
         }
         public async Task Update<C0>(T target, C0 criteria0)
@@ -222,17 +293,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1>(T target, C0 criteria0, C1 criteria1)
@@ -244,17 +315,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
@@ -266,17 +337,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
@@ -288,17 +359,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
@@ -310,17 +381,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
@@ -332,17 +403,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
@@ -354,42 +425,39 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
                 await Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
             }
             else
             {
-                await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public async Task Update<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
         {
+            var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 };
+            var typeArray = new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) };
 
+            if (target.IsDeleted)
             {
-                var objectArray = new object[] { criteria0, criteria1, criteria2, criteria3, criteria4, criteria5, criteria6, criteria7 };
-                var typeArray = new Type[] { typeof(C0), typeof(C1), typeof(C2), typeof(C3), typeof(C4), typeof(C5), typeof(C6), typeof(C7) };
-
-                if (target.IsDeleted)
+                if (!target.IsNew)
                 {
-                    if (!target.IsNew)
-                    {
-                        await CallOperationMethod(Scope, target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
-                    }
-                    await Task.CompletedTask;
+                    await CallOperationMethod(target, PortalOperation.Delete, objectArray, typeArray).ConfigureAwait(false);
                 }
-                else if (target.IsNew)
-                {
-                    await CallOperationMethod(Scope, target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
-                }
-                else
-                {
-                    await CallOperationMethod(Scope, target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
-                }
+                await Task.CompletedTask;
+            }
+            else if (target.IsNew)
+            {
+                await CallOperationMethod(target, PortalOperation.Insert, objectArray, typeArray).ConfigureAwait(false);
+            }
+            else
+            {
+                await CallOperationMethod(target, PortalOperation.Update, objectArray, typeArray).ConfigureAwait(false);
             }
         }
         public Task UpdateChild(T target)
@@ -398,17 +466,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild);
+                return CallOperationMethod(target, PortalOperation.InsertChild);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild);
+                return CallOperationMethod(target, PortalOperation.UpdateChild);
             }
         }
         public Task UpdateChild<C0>(T target, C0 criteria0)
@@ -420,17 +488,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1>(T target, C0 criteria0, C1 criteria1)
@@ -442,17 +510,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2>(T target, C0 criteria0, C1 criteria1, C2 criteria2)
@@ -464,17 +532,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2, C3>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3)
@@ -486,17 +554,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2, C3, C4>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
@@ -508,17 +576,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2, C3, C4, C5>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5)
@@ -530,17 +598,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2, C3, C4, C5, C6>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6)
@@ -552,17 +620,17 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
         public Task UpdateChild<C0, C1, C2, C3, C4, C5, C6, C7>(T target, C0 criteria0, C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4, C5 criteria5, C6 criteria6, C7 criteria7)
@@ -574,38 +642,20 @@ namespace OOBehave.Portal.Core
             {
                 if (!target.IsNew)
                 {
-                    return CallOperationMethod(Scope, target, PortalOperation.DeleteChild, objectArray, typeArray);
+                    return CallOperationMethod(target, PortalOperation.DeleteChild, objectArray, typeArray);
                 }
                 return Task.CompletedTask;
             }
             else if (target.IsNew)
             {
-                return CallOperationMethod(Scope, target, PortalOperation.InsertChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.InsertChild, objectArray, typeArray);
             }
             else
             {
-                return CallOperationMethod(Scope, target, PortalOperation.UpdateChild, objectArray, typeArray);
+                return CallOperationMethod(target, PortalOperation.UpdateChild, objectArray, typeArray);
             }
         }
 
-        protected Task CallOperationMethod(T target, PortalOperation operation, object[] criteria, Type[] criteriaTypes)
-        {
-            return base.CallOperationMethod(Scope, target, operation, criteria, criteriaTypes);
-        }
 
     }
-
-
-
-    [Serializable]
-    public class OperationMethodCallFailedException : Exception
-    {
-        public OperationMethodCallFailedException() { }
-        public OperationMethodCallFailedException(string message) : base(message) { }
-        public OperationMethodCallFailedException(string message, Exception inner) : base(message, inner) { }
-        protected OperationMethodCallFailedException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-    }
-
 }

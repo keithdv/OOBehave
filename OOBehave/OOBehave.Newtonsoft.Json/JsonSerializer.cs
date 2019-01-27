@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using OOBehave.Netwonsoft.Json;
+using OOBehave.Portal;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace OOBehave.Newtonsoft.Json
 {
-    public class NewtonsoftJsonSerializer : INewtonsoftJsonSerializer
+    public class NewtonsoftJsonSerializer : INewtonsoftJsonSerializer, ISerializer
     {
         public FatClientContractResolver Resolver { get; }
         public ListBaseCollectionConverter ListBaseCollectionConverter { get; }
@@ -40,5 +41,26 @@ namespace OOBehave.Newtonsoft.Json
             });
         }
 
+        public object Deserialize(Type type, string json)
+        {
+            return JsonConvert.DeserializeObject(json, type, new JsonSerializerSettings
+            {
+                ContractResolver = Resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { ListBaseCollectionConverter }
+            });
+        }
+
+        public void Populate(string json, object obj)
+        {
+            JsonConvert.PopulateObject(json, obj, new JsonSerializerSettings
+            {
+                ContractResolver = Resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { ListBaseCollectionConverter }
+            });
+        }
     }
 }

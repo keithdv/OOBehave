@@ -86,7 +86,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             // Two possibilities exist due to one with a dependency and one without
             Assert.ThrowsException<AggregateException>(() => domainObject = portal.Create(1u).Result);
-
         }
 
         [TestMethod]
@@ -94,19 +93,6 @@ namespace OOBehave.UnitTest.ObjectPortal
         {
             domainObject = await portal.Create(1, 10d);
             CollectionAssert.AreEquivalent(new object[] { 1, 10d }, domainObject.MultipleCriteria.Take(2).ToList());
-
-
-        }
-
-        [TestMethod]
-        public async Task ReceivePortal_DependencyDisposed()
-        {
-            // This was hard to get right and should use some more testing
-            domainObject = await portal.Create(1, 10d);
-            var disposableDependency = domainObject.MultipleCriteria.Last() as IPortalOperationDisposableDependency;
-            Assert.IsNotNull(disposableDependency);
-            // Portal Operation Method Injected dependencies should be disposed at the end of the operation
-            Assert.IsTrue(disposableDependency.IsDisposed);
         }
 
         [TestMethod]

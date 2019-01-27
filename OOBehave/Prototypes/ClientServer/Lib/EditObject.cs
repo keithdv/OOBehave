@@ -1,7 +1,8 @@
 ﻿using OOBehave;
+using OOBehave.Portal;
 using System;
 
-namespace _3Tier.Lib
+namespace Lib
 {
     public class EditObject : EditBase<EditObject>, IEditObject
     {
@@ -13,5 +14,21 @@ namespace _3Tier.Lib
         public string Name { get => Getter<string>(); set => Setter(value); }
         public int? Value { get => Getter<int?>(); set => Setter(value); }
 
+        public IEditObject Child { get => Getter<IEditObject>(); set => Setter(value); }
+
+
+        [Create]
+        [CreateChild]
+        public void Create(string name, int value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        [Insert]
+        public void Insert()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }
