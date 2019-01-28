@@ -41,6 +41,16 @@ namespace OOBehave
         public bool IsModified => PropertyValueManager.IsModified || IsNew || this.Any(c => c.IsModified) || IsDeleted || DeletedList.Any();
         public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
+        public async Task<bool> IsSavableAsync()
+        {
+            if (IsBusy)
+            {
+                await this.WaitForRules().ConfigureAwait(false);
+            }
+
+            return IsSavable;
+        }
+
         public bool IsNew { get; protected set; }
         public bool IsDeleted { get; protected set; }
         public IReadOnlyList<string> ModifiedProperties => PropertyValueManager.ModifiedProperties;

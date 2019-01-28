@@ -31,7 +31,10 @@ namespace OOBehave
     public interface IListBase<I> : IBase, IOOBehaveObject, IPortalTarget, INotifyCollectionChanged, INotifyPropertyChanged, IEnumerable<I>, ICollection<I>, IList<I>
     {
         Task<I> CreateAdd();
-        Task<I> CreateAdd(params object[] criteria);
+        Task<I> CreateAdd<C1>(C1 criteria);
+        Task<I> CreateAdd<C1, C2>(C1 criteria1, C2 criteria2);
+        Task<I> CreateAdd<C1, C2, C3>(C1 criteria1, C2 criteria2, C3 criteria3);
+        Task<I> CreateAdd<C1, C2, C3, C4>(C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4);
     }
 
     public abstract class ListBase<T, I> : ObservableCollection<I>, IOOBehaveObject, IListBase<I>, IListBase, IReadOnlyListBase<I>, IPortalTarget, IPropertyAccess, ISetParent
@@ -121,9 +124,30 @@ namespace OOBehave
             }
         }
 
-        public async Task<I> CreateAdd(params object[] criteria)
+        public async Task<I> CreateAdd<C1>(C1 criteria)
         {
             var item = await ItemPortal.CreateChild(criteria).ConfigureAwait(false);
+            base.Add(item);
+            return item;
+        }
+
+        public async Task<I> CreateAdd<C1, C2>(C1 criteria1, C2 criteria2)
+        {
+            var item = await ItemPortal.CreateChild(criteria1, criteria2).ConfigureAwait(false);
+            base.Add(item);
+            return item;
+        }
+
+        public async Task<I> CreateAdd<C1, C2, C3>(C1 criteria1, C2 criteria2, C3 criteria3)
+        {
+            var item = await ItemPortal.CreateChild(criteria1, criteria2, criteria3).ConfigureAwait(false);
+            base.Add(item);
+            return item;
+        }
+
+        public async Task<I> CreateAdd<C1, C2, C3, C4>(C1 criteria1, C2 criteria2, C3 criteria3, C4 criteria4)
+        {
+            var item = await ItemPortal.CreateChild(criteria1, criteria2, criteria3).ConfigureAwait(false);
             base.Add(item);
             return item;
         }

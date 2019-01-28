@@ -24,6 +24,17 @@ namespace OOBehave
         public bool IsModified => PropertyValueManager.IsModified || IsDeleted || IsNew;
         public bool IsSelfModified => PropertyValueManager.IsSelfModified || IsDeleted;
         public bool IsSavable => IsModified && IsValid && !IsBusy && !IsChild;
+
+        public async Task<bool> IsSavableAsync()
+        {
+            if (IsBusy)
+            {
+                await this.WaitForRules().ConfigureAwait(false);
+            }
+
+            return IsSavable;
+        }
+
         [PortalDataMember]
         public bool IsNew { get; protected set; }
         [PortalDataMember]

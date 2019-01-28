@@ -51,7 +51,7 @@ namespace OOBehave.Autofac
 
             // Scope Wrapper
             builder.RegisterType<ServiceScope>().As<IServiceScope>().InstancePerLifetimeScope();
-
+            builder.RegisterType<OOBehaveConfiguration>().As<IOOBehaveConfiguration>().SingleInstance();
 
             // Meta Data about the properties and methods of Classes
             // This will not change during runtime
@@ -71,6 +71,7 @@ namespace OOBehave.Autofac
             builder.RegisterType<AttributeToRule>().As<IAttributeToRule>(); // SingleInstance is save as long as it only resolves Func<>s
 
             builder.RegisterGeneric(typeof(RegisteredProperty<>)).As(typeof(IRegisteredProperty<>));
+
             builder.Register<CreateRegisteredProperty>(cc =>
             {
                 var scope = cc.Resolve<Func<ILifetimeScope>>();
@@ -81,6 +82,7 @@ namespace OOBehave.Autofac
             });
 
             builder.RegisterGeneric(typeof(PropertyValue<>)).As(typeof(IPropertyValue<>));
+
             builder.Register<CreatePropertyValue>(cc =>
             {
                 var scope = cc.Resolve<Func<ILifetimeScope>>();
@@ -110,13 +112,19 @@ namespace OOBehave.Autofac
                 };
             });
 
+            builder.Register<GetPortalOperationManager>(cc =>
+            {
+                var scope = cc.Resolve<Func<ILifetimeScope>>();
+                return (Type t) => (IPortalOperationManager)scope().Resolve(typeof(IPortalOperationManager<>).MakeGenericType(t));
+            });
+
             // Stored values for each Domain Object instance
             // MUST BE per instance
             builder.RegisterGeneric(typeof(PropertyValueManager<>)).As(typeof(IPropertyValueManager<>)).AsSelf();
             builder.RegisterGeneric(typeof(ValidatePropertyValueManager<>)).As(typeof(IValidatePropertyValueManager<>)).AsSelf();
             builder.RegisterGeneric(typeof(EditPropertyValueManager<>)).As(typeof(IEditPropertyValueManager<>)).AsSelf();
 
-            builder.RegisterType<Zip>().As<IZip>().SingleInstance();    
+            builder.RegisterType<Zip>().As<IZip>().SingleInstance();
 
             if (Portal == Portal.Server || Portal == Portal.UnitTest)
             {
@@ -132,6 +140,9 @@ namespace OOBehave.Autofac
                     .InstancePerLifetimeScope();
 
                 builder.RegisterGeneric(typeof(ServerMethodPortal<>)).As(typeof(IRemoteMethodPortal<>)).AsSelf();
+
+                builder.RegisterType<Server>().As<IServer>();
+
             }
             else if (Portal == Portal.Client2Tier)
             {

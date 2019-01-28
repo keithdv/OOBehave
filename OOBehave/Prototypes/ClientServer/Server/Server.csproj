@@ -10,9 +10,9 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
-    <PackageReference Include="OOBehave" Version="0.1.59-Beta" />
-    <PackageReference Include="OOBehave.Autofac" Version="0.1.14-Beta" />
-    <PackageReference Include="OOBehave.Newtonsoft.Json" Version="0.1.5-Beta" />
+    <PackageReference Include="OOBehave" Version="0.1.70-Beta" />
+    <PackageReference Include="OOBehave.Autofac" Version="0.1.15-Beta" />
+    <PackageReference Include="OOBehave.Newtonsoft.Json" Version="0.1.8-Beta" />
   </ItemGroup>
 
   <ItemGroup>

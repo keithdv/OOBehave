@@ -9,6 +9,7 @@ namespace OOBehave.Portal
         string Serialize(object obj);
         T Deserialize<T>(string obj);
         object Deserialize(Type type, string obj);
+        object Deserialize(string json);
         void Populate(string json, object target);
     }
 }

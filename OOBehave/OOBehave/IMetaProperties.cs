@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OOBehave
 {
@@ -20,7 +21,7 @@ namespace OOBehave
         bool IsSelfModified { get; }
         bool IsNew { get; }
         bool IsSavable { get; }
-
+        Task<bool> IsSavableAsync();
         bool IsDeleted { get; }
     }
 }

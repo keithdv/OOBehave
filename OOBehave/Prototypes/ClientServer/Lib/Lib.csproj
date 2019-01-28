@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OOBehave" Version="0.1.59-Beta" />
+    <PackageReference Include="OOBehave" Version="0.1.70-Beta" />
   </ItemGroup>
 
 </Project>

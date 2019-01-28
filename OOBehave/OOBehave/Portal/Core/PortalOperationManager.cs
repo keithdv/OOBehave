@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace OOBehave.Portal.Core
 {
+
+    public delegate IPortalOperationManager GetPortalOperationManager(Type t);
+
     public class PortalOperationManager<T> : IPortalOperationManager<T>
         where T : IPortalTarget
     {

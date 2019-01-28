@@ -8,6 +8,9 @@ namespace OOBehave.Portal
     {
         public Type ObjectType { get; set; }
         public byte[] ObjectData { get; set; }
+        public Type ExceptionType { get; set; }
         public byte[] Exception { get; set; }
+        public string ExceptionMessage { get; set; }
+
     }
 }

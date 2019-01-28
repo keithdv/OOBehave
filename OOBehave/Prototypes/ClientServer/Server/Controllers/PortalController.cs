@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OOBehave;
 using OOBehave.Portal;
+using OOBehave.Portal.Core;
 
 namespace Server.Controllers
 {
@@ -16,12 +17,13 @@ namespace Server.Controllers
     public class PortalController : ControllerBase
     {
 
-        public PortalController(IServiceScope scope)
+        public PortalController(IServer server)
         {
-            Scope = scope;
+            Server = server;
         }
 
         public IServiceScope Scope { get; }
+        public IServer Server { get; }
 
         // GET api/values
         [HttpGet]
@@ -34,9 +36,7 @@ namespace Server.Controllers
         public async Task<PortalResponse> Post(PortalRequest request)
         {
 
-            var server = (IServer) Scope.Resolve(typeof(Server<>).MakeGenericType(request.ObjectType));
-
-            var response = await server.Handle(request).ConfigureAwait(false);
+            var response = await Server.Handle(request).ConfigureAwait(false);
 
             return response;
         }

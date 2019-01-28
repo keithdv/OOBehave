@@ -30,6 +30,17 @@ namespace OOBehave.Newtonsoft.Json
             });
         }
 
+        public object Deserialize(string json)
+        {
+            return JsonConvert.DeserializeObject(json, new JsonSerializerSettings
+            {
+                ContractResolver = Resolver,
+                TypeNameHandling = TypeNameHandling.All,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                Converters = new List<JsonConverter>() { ListBaseCollectionConverter }
+            });
+        }
+
         public T Deserialize<T>(string json)
         {
             return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings

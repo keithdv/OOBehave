@@ -115,6 +115,7 @@ namespace OOBehave.Rules
 
         public FluentRule<T> AddRule(Func<T, IRuleResult> func, params string[] triggerProperty)
         {
+            if (triggerProperty == null || triggerProperty.Length == 0) { throw new ArgumentNullException($"One of more trigger properties required."); }
             FluentRule<T> rule = new FluentRule<T>(func, triggerProperty); // TODO - DI
             Rules.Add(rule.UniqueIndex, rule);
             return rule;

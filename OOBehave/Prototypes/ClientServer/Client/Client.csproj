@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OOBehave" Version="0.1.59-Beta" />
-    <PackageReference Include="OOBehave.Autofac" Version="0.1.14-Beta" />
-    <PackageReference Include="OOBehave.Newtonsoft.Json" Version="0.1.5-Beta" />
+    <PackageReference Include="OOBehave" Version="0.1.70-Beta" />
+    <PackageReference Include="OOBehave.Autofac" Version="0.1.15-Beta" />
+    <PackageReference Include="OOBehave.Newtonsoft.Json" Version="0.1.8-Beta" />
   </ItemGroup>
 
   <ItemGroup>

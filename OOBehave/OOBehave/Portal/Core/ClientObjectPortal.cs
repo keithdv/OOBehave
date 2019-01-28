@@ -10,11 +10,11 @@ namespace OOBehave.Portal.Core
         where T : class, IPortalTarget
     {
 
-        public ClientReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress)
+        public ClientReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress, IOOBehaveConfiguration configuration)
         {
             Serializer = serializer;
             Compress = compress;
-
+            Configuration = configuration;
             var type = typeof(T);
 
             if (type.IsInterface)
@@ -34,6 +34,7 @@ namespace OOBehave.Portal.Core
 
         public ISerializer Serializer { get; }
         public IZip Compress { get; }
+        public IOOBehaveConfiguration Configuration { get; }
 
         public async Task<T> Create()
         {
@@ -196,7 +197,7 @@ namespace OOBehave.Portal.Core
         protected async Task<T> CallOperationMethod(PortalOperation operation, T target, object[] criteria, Type[] criteriaType, bool throwException = true)
         {
 
-            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:52985/api/portal"))
+            using (var httpRequest = new HttpRequestMessage(HttpMethod.Post, Configuration.PortalURL))
             {
 
                 var portalRequest = new PortalRequest() { Operation = operation, ObjectType = ConcreteType };
@@ -229,6 +230,28 @@ namespace OOBehave.Portal.Core
 
                 var response = Serializer.Deserialize<PortalResponse>(await httpResponse.Content.ReadAsStringAsync());
 
+                if (response.Exception != null)
+                {
+                    Exception dex = null;
+                    try
+                    {
+                        dex = (Exception)Serializer.Deserialize(response.ExceptionType, Compress.Decompress(response.Exception));
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!string.IsNullOrWhiteSpace(response.ExceptionMessage))
+                        {
+                            throw new Exception(response.ExceptionMessage);
+                        }
+                        else
+                        {
+                            throw new Exception("Fatal Error: There was an error on the server that cannot be transferred to the client.");
+                        }
+                    }
+
+                    throw dex;
+                }
+
                 T obj = null;
 
                 if (response.ObjectData != null)
@@ -239,7 +262,8 @@ namespace OOBehave.Portal.Core
                     }
                     else
                     {
-                        obj = Serializer.Deserialize<T>(Compress.Decompress(response.ObjectData));
+                        var json = Compress.Decompress(response.ObjectData);
+                        obj = (T) Serializer.Deserialize(ConcreteType, json);
                     }
                 }
 
@@ -251,7 +275,7 @@ namespace OOBehave.Portal.Core
     public class ClientSendReceivePortal<T> : ClientReceivePortal<T>, ISendReceivePortal<T>, ISendReceivePortalChild<T>
         where T : class, IPortalEditTarget, IEditMetaProperties
     {
-        public ClientSendReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress) : base(scope, serializer, compress)
+        public ClientSendReceivePortal(IServiceScope scope, ISerializer serializer, IZip compress, IOOBehaveConfiguration configuration) : base(scope, serializer, compress, configuration)
         {
         }
 

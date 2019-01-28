@@ -43,10 +43,8 @@ namespace Server
             builder.RegisterType<OOBehave.Newtonsoft.Json.ListBaseCollectionConverter>();
             builder.RegisterType<OOBehave.Netwonsoft.Json.FatClientContractResolver>();
             builder.RegisterType<Zip>().As<IZip>().SingleInstance();
-
-            builder.RegisterGeneric(typeof(Server<>));
-
             builder.RegisterType<EditObject>().As<IEditObject>().AsSelf();
+            builder.RegisterType<EditObjectList>().As<IEditObjectList>().AsSelf();
             builder.RegisterModule(new OOBehave.Autofac.OOBehaveCoreModule(OOBehave.Autofac.Portal.Server));
         }
 
